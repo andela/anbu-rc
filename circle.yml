@@ -11,7 +11,7 @@ dependencies:
     - "~/.meteor"
     - "~/docker"
   override:
-    - cd ~/reaction
+    - cd $HOME/reaction
     - .reaction/docker/scripts/plugin-loader.sh
 
 test:
