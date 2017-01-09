@@ -19,6 +19,9 @@ npm-debug.log
 pids
 results
 allure-results
+selenium-server-standalone-3.0.1.jar
+geckodriver
+chromedriver
 
 client/plugins.js
 server/plugins.js
