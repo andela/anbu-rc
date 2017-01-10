@@ -16,31 +16,31 @@ function getProductFindTerm(searchTerm, searchTags, userId) {
           {
             description: {
               $regex: searchTerm,
-              $options: 'i'
+              $options: "i"
             }
           },
           {
             title: {
               $regex: searchTerm,
-              $options: 'i'
+              $options: "i"
             }
           },
           {
             vendor: {
               $regex: searchTerm,
-              $options: 'i'
+              $options: "i"
             }
           },
           {
             handle: {
               $regex: searchTerm,
-              $options: 'i'
+              $options: "i"
             }
           },
           {
             metafields: {
               $regex: searchTerm,
-              $options: 'i'
+              $options: "i"
             }
           }
         ]
