@@ -59,7 +59,7 @@ Template.searchModal.onCreated(function () {
         const productResultsCount = productResults.length;
         this.state.set("productSearchResults", productResults);
         this.state.set("productSearchCount", productResultsCount);
-
+        console.log('heloo');
         const hashtags = [];
         for (const product of productResults) {
           if (product.hashtags) {
