@@ -95,3 +95,6 @@ practicalmeteor:sinon
 
 
 # Custom Packages
+lmieulet:meteor-coverage
+practicalmeteor:mocha@2.4.5_6
+practicalmeteor:mocha-console-runner
