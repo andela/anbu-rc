@@ -8,24 +8,8 @@
 
       {{> searchInput }}
 
-      {{> searchTypeToggle }}
-      <!--
-      <div class="row" style="width: 100%">
-
-        <div class="col-sm-4">
-          {{> productSearchSort sortOptions=sortOptions }}
-        </div
-        >
-        <div class="col-sm-4">
-          {{> vendorFilter productSearchVendors=productSearchVendors}}
-        </div>
-
-        <div class="col-sm-4">
-
-        </div>
-        
-      </div>-->
       <div class="rui search-modal-options-container">
+        {{#if productSearchResults}}
         <div class="col-sm-4">
           <div class="rui">
             <div class="col-sm-6">
@@ -39,8 +23,11 @@
         <div class="col-sm-8">
           {{> productSearchTags tagSearchResults=tagSearchResults }}
         </div>
+        {{/if}}
       </div>
       
+      {{> searchTypeToggle }}
+
     </div>
 
     {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
