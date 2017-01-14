@@ -12,10 +12,20 @@
 
       {{> productSearchTags tagSearchResults=tagSearchResults }}
 
+      <div class="rui row" style="width: 100%">
+        <div class="col-sm-4">
+          {{> productSearchSort sortOptions=sortOptions }}
+        </div>
+
+        <div class="col-sm-4">
+          {{> vendorFilter productSearchVendors=productSearchVendors}}
+        </div>
+      </div>
+
     </div>
 
     {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
-
+    
   </div>
 
 </template>

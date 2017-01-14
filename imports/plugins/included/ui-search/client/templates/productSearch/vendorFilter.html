@@ -1,0 +1,11 @@
+<template name="vendorFilter">
+  <label> Filter By Brand: </label>
+  <span>
+    <select data-event-action="filterByVendor">
+      <option>All Brands</option>
+      {{#each vendor in productSearchVendors}}
+        <option value={{vendor}}>{{vendor}}</option>
+      {{/each}}
+    </select>
+  </span>
+</template>

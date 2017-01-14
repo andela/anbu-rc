@@ -1,0 +1,12 @@
+<template name="productSearchSort">
+  <div>
+    <label for="sortSelector">Sort By: </label>
+    <span>
+      <select class="rui" data-event-action="sortSearchResult">
+        {{#each option in sortOptions}}
+          <option value={{option}}>{{option}}</option>
+        {{/each}}
+      </select>
+    </span>
+  </div>
+</template>

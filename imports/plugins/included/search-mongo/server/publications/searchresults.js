@@ -57,7 +57,6 @@ function getProductFindTerm(searchTerm, searchTags, userId) {
 }
 
 export const getResults = {};
-
 getResults.products = function (searchTerm, facets, maxResults, userId) {
   const searchTags = facets || [];
   const findTerm = getProductFindTerm(searchTerm, searchTags, userId);
@@ -69,7 +68,8 @@ getResults.products = function (searchTerm, facets, maxResults, userId) {
         hashtags: 1,
         description: 1,
         handle: 1,
-        price: 1
+        price: 1,
+        vendor: 1
       },
       sort: {score: {$meta: "textScore"}},
       limit: maxResults
@@ -152,7 +152,6 @@ getResults.accounts = function (searchTerm, facets, maxResults, userId) {
 };
 
 Meteor.publish("SearchResults", function (collection, searchTerm, facets, maxResults = 99) {
-  check(collection, String);
   check(collection, Match.Where((coll) => {
     return _.includes(supportedCollections, coll);
   }));

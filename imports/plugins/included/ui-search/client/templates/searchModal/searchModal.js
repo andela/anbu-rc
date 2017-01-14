@@ -16,6 +16,52 @@ function tagToggle(arr, val) {
   return arr;
 }
 
+/**
+ * Custom helper function for sorting the return array based on maximum price comparison
+ * @param {Number} order - greater than 1 to sort in ascending order, otherwise in descending order
+ * @param {Array} productSearchResults - Array containg all the documents returned from a Products collections
+ * @return {Array} - the passed in products array with all elements sorted based on their maximum price
+ */
+function sortByPrice(order, productsSearchResults) {
+  return productsSearchResults.sort((a, b) => {
+    if (order === 1) {
+      const diff = parseFloat(a.price.max - b.price.max);
+      if (diff > 1) {
+        return 1;
+      }
+      if (diff < 0) {
+        return -1;
+      }
+      return 0;
+    } else {
+      const diff = parseFloat(b.price.max - a.price.max);
+      if (diff > 1) {
+        return -1;
+      }
+      if (diff < 0) {
+        return 1;
+      }
+      return 0;
+    }
+  });
+}
+
+/**
+ * search modal extra function to help filter the search result based on returned venddors
+ * @param{String} vendor - vendor we want to filter our search results by.
+ * @param{Array} productSearchResults - Array containing current product search results.
+ * @return{Array} Array containing products by the specified vendor
+ */
+filterSearchByVendor = (vendor, productSearchResults) => {
+  const filteredSearchResult = [];
+  productSearchResults.forEach((product) => {
+    if (product.vendor === vendor) {
+      filteredSearchResult.push(product);
+    }
+  });
+  return filteredSearchResult;
+};
+
 /*
  * searchModal onCreated
  */
@@ -27,7 +73,8 @@ Template.searchModal.onCreated(function () {
     canLoadMoreProducts: false,
     searchQuery: "",
     productSearchResults: [],
-    tagSearchResults: []
+    tagSearchResults: [],
+    productSearchVendors: [] // holds all brands found
   });
 
 
@@ -61,6 +108,7 @@ Template.searchModal.onCreated(function () {
         this.state.set("productSearchCount", productResultsCount);
 
         const hashtags = [];
+        const vendors = [];
         for (const product of productResults) {
           if (product.hashtags) {
             for (const hashtag of product.hashtags) {
@@ -69,7 +117,16 @@ Template.searchModal.onCreated(function () {
               }
             }
           }
+          // populate vendors array
+          const vendor = product.vendor;
+          if (vendor) {
+            if (vendors.indexOf(vendor) === -1) {
+              vendors.push(vendor);
+            }
+          }
         }
+        this.state.set("productSearchVendors", vendors);
+
         const tagResults = Tags.find({
           _id: { $in: hashtags }
         }).fetch();
@@ -147,6 +204,11 @@ Template.searchModal.helpers({
   },
   showSearchResults() {
     return false;
+  },
+  sortOptions: ["Higest Price", "Lowest Price", "Best Seller"],
+  productSearchVendors() {
+    const instance = Template.instance();
+    return instance.state.get("productSearchVendors");
   }
 });
 
@@ -200,6 +262,30 @@ Template.searchModal.events({
     $("#search-input").focus();
 
     templateInstance.state.set("searchCollection", searchCollection);
+  },
+  "change [data-event-action=sortSearchResult]": function (event, templateInstance) {
+    event.preventDefault();
+    const selection = event.target.value;
+    // sort in descending price
+    if (selection === this.sortOptions[0]) {
+      //templateInstance.state.set("productSearchResults", sortByPrice(-1, templateInstance.state.get("productSearchResults")));
+    }
+    if (selection === this.sortOptions[1]) {
+      //templateInstance.state.set("productSearchResults", sortByPrice(1, templateInstance.state.get("productSearchResults")));
+    }
+  },
+  "change [data-event-action=filterByVendor]": function (event, templateInstance) {
+    event.preventDefault();
+    const vendor = event.target.value;
+    if (vendor === "All Brands") {
+      const searchQuery = templateInstance.find("#search-input").value;
+      // reset the query
+      templateInstance.state.set("searchQuery", "");
+      templateInstance.state.set("searchQuery", searchQuery);
+    } else {
+      templateInstance.state.set("productSearchResults", filterSearchByVendor(vendor, templateInstance.state.get("productSearchResults")));
+      templateInstance.state.set("productSearchVendors", [vendor]);
+    }
   }
 });
 
