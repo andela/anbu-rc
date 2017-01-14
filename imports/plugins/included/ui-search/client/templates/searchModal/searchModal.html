@@ -9,19 +9,38 @@
       {{> searchInput }}
 
       {{> searchTypeToggle }}
+      <!--
+      <div class="row" style="width: 100%">
 
-      {{> productSearchTags tagSearchResults=tagSearchResults }}
-
-      <div class="rui row" style="width: 100%">
         <div class="col-sm-4">
           {{> productSearchSort sortOptions=sortOptions }}
-        </div>
-
+        </div
+        >
         <div class="col-sm-4">
           {{> vendorFilter productSearchVendors=productSearchVendors}}
         </div>
-      </div>
 
+        <div class="col-sm-4">
+
+        </div>
+        
+      </div>-->
+      <div class="rui search-modal-options-container">
+        <div class="col-sm-4">
+          <div class="rui">
+            <div class="col-sm-6">
+              {{> productSearchSort sortOptions=sortOptions }}
+            </div>
+            <div class="col-sm-6">
+              {{> vendorFilter productSearchVendors=productSearchVendors}}
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8">
+          {{> productSearchTags tagSearchResults=tagSearchResults }}
+        </div>
+      </div>
+      
     </div>
 
     {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
