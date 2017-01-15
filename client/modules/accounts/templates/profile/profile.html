@@ -36,6 +36,24 @@
       </div>
     </div>
 
+    <!-- Upgrading button -->
+    <div class="flex-item">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title" >Upgrade Account</h3>
+        </div>
+        <!-- show vendor form -->
+        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#showVendorForm">Become a seller</button>
+        <div id="showVendorForm" class="collapse">
+          {{> vendorForm}}
+          <br>
+          <button class="btn btn-primary" type="submit">Register shop</button>
+          <br>
+        </div>
+        <!-- end of vendor form -->
+      </div>
+    </div>
+    <!-- End of Upgrading button -->
 
     <div class="flex-item">
       {{> addressBookPanel}}

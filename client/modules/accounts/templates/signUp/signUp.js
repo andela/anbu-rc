@@ -10,6 +10,7 @@ Template.loginFormSignUpView.onCreated(() => {
   template.uniqueId = Random.id();
   template.formMessages = new ReactiveVar({});
   template.type = "signUp";
+  Session.set('vendorForm',false);
 });
 
 /**
@@ -77,5 +78,10 @@ Template.loginFormSignUpView.events({
         // Close dropdown or navigate to page
       }
     });
+  },
+  'change :radio': function(event, template) {
+    let element = template.find('input:radio[name=optradio]:checked');
+    let value = $(element).val();
+    value === 'isVendor' ? Session.set('vendorForm',true) : Session.set('vendorForm',false);
   }
 });
