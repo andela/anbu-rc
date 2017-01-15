@@ -23,27 +23,7 @@ function tagToggle(arr, val) {
  * @return {Array} - the passed in products array with all elements sorted based on their maximum price
  */
 function sortByPrice(order, productsSearchResults) {
-  return productsSearchResults.sort((a, b) => {
-    if (order === 1) {
-      const diff = parseFloat(a.price.max - b.price.max);
-      if (diff > 1) {
-        return 1;
-      }
-      if (diff < 0) {
-        return -1;
-      }
-      return 0;
-    } else {
-      const diff = parseFloat(b.price.max - a.price.max);
-      if (diff > 1) {
-        return -1;
-      }
-      if (diff < 0) {
-        return 1;
-      }
-      return 0;
-    }
-  });
+  return _.orderBy(productsSearchResults, ["price.max"], [order]);
 }
 
 /**
@@ -74,6 +54,7 @@ Template.searchModal.onCreated(function () {
     searchQuery: "",
     productSearchResults: [],
     tagSearchResults: [],
+    sortOption: "desc", // default sort option (descending price)
     productSearchVendors: [] // holds all brands found
   });
 
@@ -95,6 +76,7 @@ Template.searchModal.onCreated(function () {
     const searchCollection = this.state.get("searchCollection") || "products";
     const searchQuery = this.state.get("searchQuery");
     const facets = this.state.get("facets") || [];
+    const sortOption = this.state.get("sortOption");
     const sub = this.subscribe("SearchResults", searchCollection, searchQuery, facets);
 
     if (sub.ready()) {
@@ -104,7 +86,7 @@ Template.searchModal.onCreated(function () {
       if (searchCollection === "products") {
         const productResults = ProductSearch.find().fetch();
         const productResultsCount = productResults.length;
-        this.state.set("productSearchResults", productResults);
+        this.state.set("productSearchResults", sortByPrice(sortOption, productResults));
         this.state.set("productSearchCount", productResultsCount);
 
         const hashtags = [];
@@ -266,12 +248,15 @@ Template.searchModal.events({
   "change [data-event-action=sortSearchResult]": function (event, templateInstance) {
     event.preventDefault();
     const selection = event.target.value;
-    // sort in descending price
+    // sort in Ascending price
     if (selection === this.sortOptions[0]) {
-      //templateInstance.state.set("productSearchResults", sortByPrice(-1, templateInstance.state.get("productSearchResults")));
+      templateInstance.state.set("sortOption", "desc");
+      templateInstance.state.set("productSearchResults", sortByPrice("desc", templateInstance.state.get("productSearchResults")));
     }
+    // sort in Descending price
     if (selection === this.sortOptions[1]) {
-      //templateInstance.state.set("productSearchResults", sortByPrice(1, templateInstance.state.get("productSearchResults")));
+      templateInstance.state.set("sortOption", "asc");
+      templateInstance.state.set("productSearchResults", sortByPrice("asc", templateInstance.state.get("productSearchResults")));
     }
   },
   "change [data-event-action=filterByVendor]": function (event, templateInstance) {
