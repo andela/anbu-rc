@@ -33,6 +33,9 @@ function sortByPrice(order, productsSearchResults) {
  * @return{Array} Array containing products by the specified vendor
  */
 filterSearchByVendor = (vendor, productSearchResults) => {
+  if (vendor === "All Brands") {
+    return productSearchResults;
+  }
   const filteredSearchResult = [];
   productSearchResults.forEach((product) => {
     if (product.vendor === vendor) {
@@ -54,6 +57,7 @@ Template.searchModal.onCreated(function () {
     searchQuery: "",
     productSearchResults: [],
     tagSearchResults: [],
+    filterBrand: "All Brands",
     sortOption: "desc", // default sort option (descending price)
     productSearchVendors: [] // holds all brands found
   });
@@ -78,6 +82,7 @@ Template.searchModal.onCreated(function () {
     const facets = this.state.get("facets") || [];
     const sortOption = this.state.get("sortOption");
     const sub = this.subscribe("SearchResults", searchCollection, searchQuery, facets);
+    const filterBrand = this.state.get("filterBrand");
 
     if (sub.ready()) {
       /*
@@ -86,7 +91,7 @@ Template.searchModal.onCreated(function () {
       if (searchCollection === "products") {
         const productResults = ProductSearch.find().fetch();
         const productResultsCount = productResults.length;
-        this.state.set("productSearchResults", sortByPrice(sortOption, productResults));
+        this.state.set("productSearchResults", filterSearchByVendor(filterBrand, sortByPrice(sortOption, productResults)));
         this.state.set("productSearchCount", productResultsCount);
 
         const hashtags = [];
@@ -251,26 +256,16 @@ Template.searchModal.events({
     // sort in Ascending price
     if (selection === this.sortOptions[0]) {
       templateInstance.state.set("sortOption", "desc");
-      templateInstance.state.set("productSearchResults", sortByPrice("desc", templateInstance.state.get("productSearchResults")));
     }
     // sort in Descending price
     if (selection === this.sortOptions[1]) {
       templateInstance.state.set("sortOption", "asc");
-      templateInstance.state.set("productSearchResults", sortByPrice("asc", templateInstance.state.get("productSearchResults")));
     }
   },
   "change [data-event-action=filterByVendor]": function (event, templateInstance) {
     event.preventDefault();
-    const vendor = event.target.value;
-    if (vendor === "All Brands") {
-      const searchQuery = templateInstance.find("#search-input").value;
-      // reset the query
-      templateInstance.state.set("searchQuery", "");
-      templateInstance.state.set("searchQuery", searchQuery);
-    } else {
-      templateInstance.state.set("productSearchResults", filterSearchByVendor(vendor, templateInstance.state.get("productSearchResults")));
-      templateInstance.state.set("productSearchVendors", [vendor]);
-    }
+    const brand = event.target.value;
+    templateInstance.state.set("filterBrand", brand);
   }
 });
 
