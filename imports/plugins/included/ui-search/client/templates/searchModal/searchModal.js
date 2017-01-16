@@ -208,6 +208,7 @@ Template.searchModal.events({
   "keyup input": (event, templateInstance) => {
     event.preventDefault();
     const searchQuery = templateInstance.find("#search-input").value;
+    templateInstance.state.set("filterBrand", "All Brands");
     templateInstance.state.set("searchQuery", searchQuery);
     $(".search-modal-header:not(.active-search)").addClass(".active-search");
     if (!$(".search-modal-header").hasClass("active-search")) {
