@@ -80,7 +80,7 @@ Template.loginFormSignUpView.events({
     });
   },
   'change :radio': function(event, template) {
-    let element = template.find('input:radio[name=optradio]:checked');
+    let element = template.find('input:radio[name=role]:checked');
     let value = $(element).val();
     value === 'isVendor' ? Session.set('vendorForm',true) : Session.set('vendorForm',false);
   }
