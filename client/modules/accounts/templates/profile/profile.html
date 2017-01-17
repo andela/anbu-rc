@@ -40,15 +40,15 @@
     <div class="flex-item">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title" >Upgrade Account</h3>
+          <h3 class="panel-title" >Become A Seller</h3>
+          <i class="fa fa-chevron-down" aria-hidden="true" data-toggle="collapse" data-target="#showVendorForm" style="float:right"></i>
         </div>
         <!-- show vendor form -->
-        <button class="btn btn-primary btn-block" data-toggle="collapse" data-target="#showVendorForm">Become a seller</button>
-        <div id="showVendorForm" class="collapse">
-          {{> vendorForm}}
-          <br>
-          <button class="btn btn-primary" type="submit">Register shop</button>
-          <br>
+        <div class="panel-content">
+          <div id="showVendorForm" class="collapse">
+            {{> vendorForm}}
+            <button class="btn btn-primary" type="submit">Register shop</button>
+          </div>
         </div>
         <!-- end of vendor form -->
       </div>
