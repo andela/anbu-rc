@@ -10,7 +10,7 @@ Template.loginFormSignUpView.onCreated(() => {
   template.uniqueId = Random.id();
   template.formMessages = new ReactiveVar({});
   template.type = "signUp";
-  Session.set('vendorForm',false);
+  Session.set("vendorForm", false);
 });
 
 /**
@@ -54,6 +54,24 @@ Template.loginFormSignUpView.events({
       errors.password = validatedPassword;
     }
 
+    if (LoginFormSharedHelpers.showVendorForm()) {
+      const shopName = template.$(".shop-name").val().trim();
+      const shopPhone = template.$(".shop-phone").val().trim();
+      const shopAddress = template.$(".shop-address").val().trim();
+
+      if (!/\w+/g.test(shopName) && shopName.length <= 20) {
+        errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
+      }
+
+      if (!/\d+(-)?/g.test(shopPhone) && shopPhone.length <= 14) {
+        errors.shopPhone = { i18nKeyReason: "invalid shop phone number", reason: "invalid shop phone number"};
+      }
+
+      if (!/\w{250}/g.test(shopAddress) && shopAddress.length <= 250) {
+        errors.shopAddress = { i18nKeyReason: "invalid shop address", reason: "invalid shop address"};
+      }
+    }
+
     if ($.isEmptyObject(errors) === false) {
       templateInstance.formMessages.set({
         errors: errors
@@ -79,9 +97,9 @@ Template.loginFormSignUpView.events({
       }
     });
   },
-  'change :radio': function(event, template) {
-    let element = template.find('input:radio[name=role]:checked');
-    let value = $(element).val();
-    value === 'isVendor' ? Session.set('vendorForm',true) : Session.set('vendorForm',false);
+  "change :radio": function (event, template) {
+    const element = template.find("input:radio[name=role]:checked");
+    const value = $(element).val();
+    value === "isVendor" ? Session.set("vendorForm", true) : Session.set("vendorForm", false);
   }
 });
