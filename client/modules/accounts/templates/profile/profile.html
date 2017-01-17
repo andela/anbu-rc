@@ -40,14 +40,28 @@
     <div class="flex-item">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title" >Become A Seller</h3>
+          <h3 class="panel-title" >{{shopFormHeader}}</h3>
           <i class="fa fa-chevron-down" aria-hidden="true" data-toggle="collapse" data-target="#showVendorForm" style="float:right"></i>
         </div>
         <!-- show vendor form -->
         <div class="panel-content">
           <div id="showVendorForm" class="collapse">
-            {{> vendorForm}}
-            <button class="btn btn-primary" type="submit">Register shop</button>
+            <!-- {{> vendorForm}} -->
+              <form>
+                <div class="row form-group col-md-12">
+                  <label class="control-label">Shop Name</label>
+                  <input class="form-control shop-name" type="text" value="{{shopProfile.shopName}}" {{shopNameDisable}}>
+                </div>
+                <div class="row form-group col-md-12">
+                  <label class="control-label">Phone</label>
+                  <input class="form-control shop-phone" type="text" value="{{shopProfile.shopPhone}}">
+                </div>
+                <div class="row form-group col-md-12">
+                  <label class="control-label">Shop Address</label>
+                  <input class="form-control shop-address" type="text" value="{{shopProfile.shopName}}">
+                </div>
+              </form>
+            <button class="btn btn-primary register-shop-button" type="submit">{{shopFormButtonText}}</button>
           </div>
         </div>
         <!-- end of vendor form -->

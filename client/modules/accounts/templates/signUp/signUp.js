@@ -1,4 +1,3 @@
-import { Meteor } from "meteor/meteor";
 import { LoginFormSharedHelpers } from "/client/modules/accounts/helpers";
 import { Template } from "meteor/templating";
 
@@ -32,13 +31,15 @@ Template.loginFormSignUpView.events({
   "submit form": function (event, template) {
     event.preventDefault();
 
-    //const usernameInput = template.$(".login-input--username");
+    const usernameInput = template.$(".login-input--username");
     const emailInput = template.$(".login-input-email");
     const passwordInput = template.$(".login-input-password");
 
+    const username = usernameInput.val().trim();
     const email = emailInput.val().trim();
     const password = passwordInput.val().trim();
 
+    const validatedUsername = LoginFormValidation.username(username);
     const validatedEmail = LoginFormValidation.email(email);
     const validatedPassword = LoginFormValidation.password(password);
 
@@ -47,8 +48,13 @@ Template.loginFormSignUpView.events({
     let shopName;
     let shopPhone;
     let shopAddress;
+    let shopProfile = null;
 
     templateInstance.formMessages.set({});
+
+    if (validatedUsername !== true) {
+      errors.username = validatedUsername;
+    }
 
     if (validatedEmail !== true) {
       errors.email = validatedEmail;
@@ -74,6 +80,11 @@ Template.loginFormSignUpView.events({
       if (!/\w+/g.test(shopAddress) && shopAddress.length <= 250) {
         errors.shopAddress = { i18nKeyReason: "invalid shop address", reason: "invalid shop address"};
       }
+      shopProfile = {
+        shopName: shopName,
+        shopPhone: shopPhone,
+        shopAddress: shopAddress
+      }
     }
 
     if ($.isEmptyObject(errors) === false) {
@@ -85,14 +96,10 @@ Template.loginFormSignUpView.events({
     }
 
     const newUserData = {
-      // username: username,
+      username,
       email,
       password,
-      profile: {
-        shopName: shopName,
-        shopPhone: shopPhone, 
-        shopAddress: shopAddress
-      }
+      profile: shopProfile
     };
 
     Accounts.createUser(newUserData, function (error) {

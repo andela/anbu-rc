@@ -2,6 +2,8 @@ import * as Collections from "/lib/collections";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 
+var shopNameInput = null;
+
 /**
  * onCreated: Account Profile View
  */
@@ -64,5 +66,47 @@ Template.accountProfile.helpers({
       return "addressBookGrid";
     }
     return "addressBookAdd";
+  },
+  // to check if user is a vendor
+  isVendor: function() {
+    return Meteor.user().profile.vendor[0] || false;
+  },
+  shopProfile: function() {
+    return Meteor.user().profile.vendor[1] || {};
+  },
+  shopFormHeader: function() {
+    let vendor = Meteor.user().profile.vendor[0] || false;
+    return vendor ? 'Update Vendor Info' : 'Become A Seller';
+  },
+  shopFormButtonText: function() {
+    let vendor = Meteor.user().profile.vendor[0] || false;
+    return vendor ? 'Update Shop Info' : 'Create Shop';
+  },
+  shopNameDisable: function() {
+    return Meteor.user().profile.vendor[0] ? 'disabled' : '';
+  }
+});
+// event to upgrade to seller account on profile
+Template.accountProfile.events({
+  'click .register-shop-button': function(event) {
+    const error = { message: 'add error strings'};
+    const vendorRoles =
+    ["dashboard", "createProduct", "orders", "dashboard/orders", "guest", "account/profile", "product", "tag", "index", "cart/checkout", "cart/completed"];
+    console.log('Upgrade to a seller account');
+    let vendorDetail = {};
+    event.preventDefault();
+
+    let shopName = Template.instance().find('.shop-name').value;
+    let shopPhone = Template.instance().find('.shop-phone').value;
+    let shopAddress = Template.instance().find('.shop-address').value;
+    let dbShopName = Meteor.user().profile.vendor.shopName;
+    vendorDetail = {shopName, shopPhone, shopAddress};
+    console.log(vendorDetail);
+    if (shopName === dbShopName || dbShopName === undefined) {
+      Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] }, roles: vendorRoles } });
+    }
+    else {
+      console.log(error);
+    }
   }
 });
