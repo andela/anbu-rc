@@ -1,3 +1,4 @@
+import { Meteor } from "meteor/meteor";
 import { LoginFormSharedHelpers } from "/client/modules/accounts/helpers";
 import { Template } from "meteor/templating";
 
@@ -31,7 +32,7 @@ Template.loginFormSignUpView.events({
   "submit form": function (event, template) {
     event.preventDefault();
 
-    // var usernameInput = template.$(".login-input--username");
+    //const usernameInput = template.$(".login-input--username");
     const emailInput = template.$(".login-input-email");
     const passwordInput = template.$(".login-input-password");
 
@@ -43,6 +44,9 @@ Template.loginFormSignUpView.events({
 
     const templateInstance = Template.instance();
     const errors = {};
+    let shopName;
+    let shopPhone;
+    let shopAddress;
 
     templateInstance.formMessages.set({});
 
@@ -55,9 +59,9 @@ Template.loginFormSignUpView.events({
     }
 
     if (LoginFormSharedHelpers.showVendorForm()) {
-      const shopName = template.$(".shop-name").val().trim();
-      const shopPhone = template.$(".shop-phone").val().trim();
-      const shopAddress = template.$(".shop-address").val().trim();
+      shopName = template.$(".shop-name").val().trim();
+      shopPhone = template.$(".shop-phone").val().trim();
+      shopAddress = template.$(".shop-address").val().trim();
 
       if (!/\w+/g.test(shopName) && shopName.length <= 20) {
         errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
@@ -67,7 +71,7 @@ Template.loginFormSignUpView.events({
         errors.shopPhone = { i18nKeyReason: "invalid shop phone number", reason: "invalid shop phone number"};
       }
 
-      if (!/\w{250}/g.test(shopAddress) && shopAddress.length <= 250) {
+      if (!/\w+/g.test(shopAddress) && shopAddress.length <= 250) {
         errors.shopAddress = { i18nKeyReason: "invalid shop address", reason: "invalid shop address"};
       }
     }
@@ -82,8 +86,13 @@ Template.loginFormSignUpView.events({
 
     const newUserData = {
       // username: username,
-      email: email,
-      password: password
+      email,
+      password,
+      profile: {
+        shopName: shopName,
+        shopPhone: shopPhone, 
+        shopAddress: shopAddress
+      }
     };
 
     Accounts.createUser(newUserData, function (error) {

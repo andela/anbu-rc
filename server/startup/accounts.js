@@ -146,7 +146,7 @@ export default function () {
 
       // assign default user roles
       user.roles = roles;
-
+      options.profile ? (user.vendor = options.profile) : (user.vendor = false);
       // run onCreateUser hooks
       // (the user object must be returned by all callbacks)
       const userDoc = Hooks.Events.run("onCreateUser", user, options);
