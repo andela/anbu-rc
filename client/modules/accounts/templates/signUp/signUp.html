@@ -1,4 +1,11 @@
 <template name="loginFormSignUpView">
+  <!-- add temporary styling for  radio buttons-->
+  <style>
+    #form-role span{
+      font-weight: bold;
+      margin-right: 10px
+    }
+  </style>
 
   <div class="loginForm-title">
     <h2 data-i18n="accountsUI.createAccount">Create an Account</h2>
@@ -15,6 +22,14 @@
   <form class="login-form" novalidate>
 
     {{> loginFormMessages messages=messages}}
+
+    <!-- Add user type radio button -->
+    <div id="form-role" class="form-group radio">
+      <span> I am a </span>
+      <label><input  class="user-role" value="noVendor" type="radio" name="role" checked>Customer</label>
+      <label><input class="user-role" value="isVendor" type="radio" name="role">Vendor</label>
+    </div>
+    <!-- end of radio button -->
 
     <div class="form-group form-group-email {{hasError messages.errors.email}}">
       <label for="email-{{uniqueId}}" class="control-label" data-i18n="accountsUI.emailAddress">Email</label>
@@ -37,16 +52,6 @@
         </span>
       {{/if}}
     </div>
-
-    <!-- Add radio button -->
-    <div class="radio">
-      <label><input value="noVendor" class="customerRadio" type="radio" name="optradio" checked="checked">Customer</label>
-    </div>
-
-    <div class="radio">
-      <label><input value="isVendor" class="sellerRadio" type="radio" name="optradio">Become a vendor {{value}}</label>
-    </div>
-    <!-- end of radio button -->
 
     <!-- show vendor form -->
       {{#if showVendorForm}}
