@@ -12,10 +12,9 @@ Template.productDetailSimple.helpers({
 });
 Template.disqus.helpers({
   getDisqus() {
-    const d = document;
-    const s = d.createElement("script");
-    s.src = "//anbu-rc.disqus.com/embed.js";
-    s.setAttribute("data-timestamp", +new Date());
-    (d.head || d.body).appendChild(s);
+    const script = document.createElement("script");
+    script.src = "//anbu-rc.disqus.com/embed.js";
+    script.setAttribute("data-timestamp", +new Date());
+    (document.head || document.body).appendChild(script);
   }
 });
