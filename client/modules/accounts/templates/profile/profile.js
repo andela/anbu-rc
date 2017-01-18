@@ -1,3 +1,4 @@
+import { Reaction, i18next } from "/client/api";
 import * as Collections from "/lib/collections";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
@@ -69,18 +70,22 @@ Template.accountProfile.helpers({
   },
   // to check if user is a vendor
   isVendor: function() {
-    return Meteor.user().profile.vendor[0] || false;
+    if (Meteor.user().profile.vendor[0]) {
+       return true;
+    }
+    return false;
   },
   shopProfile: function() {
-    return Meteor.user().profile.vendor[1] || {};
+    if (Meteor.user().profile.vendor[1]) {
+      return Meteor.user().profile.vendor[1];
+    }
+    return { shopName: "", shopPhone: "", shopAddress: ""};
   },
   shopFormHeader: function() {
-    let vendor = Meteor.user().profile.vendor[0] || false;
-    return vendor ? 'Update Vendor Info' : 'Become A Seller';
+    return Meteor.user().profile.vendor[0] ? 'Update Vendor Info' : 'Become A Seller';
   },
   shopFormButtonText: function() {
-    let vendor = Meteor.user().profile.vendor[0] || false;
-    return vendor ? 'Update Shop Info' : 'Create Shop';
+    return Meteor.user().profile.vendor[0] ? 'Update Shop Info' : 'Create Shop';
   },
   shopNameDisable: function() {
     return Meteor.user().profile.vendor[0] ? 'disabled' : '';
@@ -103,7 +108,7 @@ Template.accountProfile.events({
     vendorDetail = {shopName, shopPhone, shopAddress};
     console.log(vendorDetail);
     if (shopName === dbShopName || dbShopName === undefined) {
-      Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] }, roles: vendorRoles } });
+      Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] } } });
     }
     else {
       console.log(error);
