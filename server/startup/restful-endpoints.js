@@ -1,7 +1,6 @@
 import { Accounts, Cart, Orders, Products, Shops } from "/lib/collections";
 
 export default () => {
-
   // Global API configuration
   const Api = new Restivus({
     useDefaultAuth: true,
@@ -26,13 +25,13 @@ export default () => {
               return {
                 status: "success",
                 data: record
-              }
+              };
             }
             return {
-              statusCode: 404, 
+              statusCode: 404,
               message: "Item not found",
               body: this.bodyParams
-            }
+            };
           }
         }
       }
