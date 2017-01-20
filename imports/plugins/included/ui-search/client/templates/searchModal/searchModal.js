@@ -18,12 +18,44 @@ function tagToggle(arr, val) {
 
 /**
  * Custom helper function for sorting the return array based on maximum price comparison
- * @param {Number} order - greater than 1 to sort in ascending order, otherwise in descending order
+ * @param {String} order - "asc" to sort in ascending order or "desc" to sort in descending order
  * @param {Array} productSearchResults - Array containg all the documents returned from a Products collections
  * @return {Array} - the passed in products array with all elements sorted based on their maximum price
  */
 function sortByPrice(order, productsSearchResults) {
   return _.orderBy(productsSearchResults, ["price.max"], [order]);
+}
+
+/**
+ * Custom helper function to sort product search results by date created (Newest Item)
+ * @param {String} order - "asc" to sort in ascending order or "desc" to sort in descending order
+ * @param {Array} productSearchResults - Array containing all the documents returned from the ProductSearch collection.
+ * @return {Array} - The passed in array sorted by dateCreated.
+ */
+function sortByDateCreated(order, productsSearchResults) {
+  return _.orderBy(productsSearchResults,
+    function (value) {
+      return Date.parse(value.createdAt);
+    },
+    order);
+}
+
+/**
+ * Helper function for sorting the ProductSearch results based on different criterias
+ * @param {String} sortOption - Option to sort the search results (newest, desPrice, ascPrice)
+ * @param {Array} productSearchResults - Array containing the products search results to be sorted
+ * @return {Array} the productsResults sorted based on the sort option
+ */
+function sortProductSearchResults(sortOption, productSearchResults) {
+  if (sortOption === "ascPrice") {
+    return sortByPrice("asc", productSearchResults);
+  }
+  if (sortOption === "descPrice") {
+    return sortByPrice("desc", productSearchResults);
+  }
+  if (sortOption === "newest") {
+    return sortByDateCreated("desc", productSearchResults);
+  }
 }
 
 /**
@@ -58,7 +90,7 @@ Template.searchModal.onCreated(function () {
     productSearchResults: [],
     tagSearchResults: [],
     filterBrand: "All Brands",
-    sortOption: "desc", // default sort option (descending price)
+    sortOption: "descPrice", // default sort option (descending price)
     productSearchVendors: [] // holds all brands found
   });
 
@@ -91,7 +123,7 @@ Template.searchModal.onCreated(function () {
       if (searchCollection === "products") {
         const productResults = ProductSearch.find().fetch();
         const productResultsCount = productResults.length;
-        this.state.set("productSearchResults", filterSearchByVendor(filterBrand, sortByPrice(sortOption, productResults)));
+        this.state.set("productSearchResults", filterSearchByVendor(filterBrand, sortProductSearchResults(sortOption, productResults)));
         this.state.set("productSearchCount", productResultsCount);
 
         const hashtags = [];
@@ -192,7 +224,7 @@ Template.searchModal.helpers({
   showSearchResults() {
     return false;
   },
-  sortOptions: ["Higest Price", "Lowest Price", "Best Seller"],
+  sortOptions: ["Higest Price", "Lowest Price", "Newest Item"],
   productSearchVendors() {
     const instance = Template.instance();
     return instance.state.get("productSearchVendors");
@@ -256,11 +288,15 @@ Template.searchModal.events({
     const selection = event.target.value;
     // sort in Ascending price
     if (selection === this.sortOptions[0]) {
-      templateInstance.state.set("sortOption", "desc");
+      templateInstance.state.set("sortOption", "descPrice");
     }
     // sort in Descending price
     if (selection === this.sortOptions[1]) {
-      templateInstance.state.set("sortOption", "asc");
+      templateInstance.state.set("sortOption", "ascPrice");
+    }
+    // sort by Newest item (date created)
+    if (selection === this.sortOptions[2]) {
+      templateInstance.state.set("sortOption", "newest");
     }
   },
   "change [data-event-action=filterByVendor]": function (event, templateInstance) {
