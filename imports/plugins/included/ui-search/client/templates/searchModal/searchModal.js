@@ -40,6 +40,10 @@ function sortByDateCreated(order, productsSearchResults) {
     order);
 }
 
+function sortByQuantitySold(order, productSearchResults) {
+  return _.orderBy(productSearchResults, ["quantitySold"], [order]);
+}
+
 /**
  * Helper function for sorting the ProductSearch results based on different criterias
  * @param {String} sortOption - Option to sort the search results (newest, desPrice, ascPrice)
@@ -55,6 +59,9 @@ function sortProductSearchResults(sortOption, productSearchResults) {
   }
   if (sortOption === "newest") {
     return sortByDateCreated("desc", productSearchResults);
+  }
+  if (sortOption === "quantitySold") {
+    return sortByQuantitySold("desc", productSearchResults);
   }
 }
 
@@ -224,7 +231,7 @@ Template.searchModal.helpers({
   showSearchResults() {
     return false;
   },
-  sortOptions: ["Higest Price", "Lowest Price", "Newest Item"],
+  sortOptions: ["Higest Price", "Lowest Price", "Newest Item", "Best Seller"],
   productSearchVendors() {
     const instance = Template.instance();
     return instance.state.get("productSearchVendors");
@@ -297,6 +304,10 @@ Template.searchModal.events({
     // sort by Newest item (date created)
     if (selection === this.sortOptions[2]) {
       templateInstance.state.set("sortOption", "newest");
+    }
+    // sort by Best seller
+    if (selection === this.sortOptions[3]) {
+      templateInstance.state.set("sortOption", "quantitySold");
     }
   },
   "change [data-event-action=filterByVendor]": function (event, templateInstance) {
