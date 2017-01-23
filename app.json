@@ -12,6 +12,18 @@
     },
     "ROOT_URL": {
       "required": true
+    },
+    "REACTION_AUTH": {
+      "required": true
+    },
+    "REACTION_EMAIL": {
+      "required": true
+    },
+    "REACTION_USER": {
+      "required": true
+    },
+    "MAIL_URL": {
+      "required": true
     }
   },
   "formation": {
