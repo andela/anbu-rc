@@ -7,6 +7,27 @@ import { Logger, Reaction } from "/server/api";
  * Reaction Account Methods
  */
 Meteor.methods({
+  /**
+ * User's order history
+ * @return {Array|null} an array of available orders for the user
+ */
+  "shopNames": () => {
+    const shops =  Collections.Vendors.findOne({});
+    return shops;
+  },
+
+ /**
+ * User's order history
+ * @return {Array|null} an array of available orders for the user
+ */
+  "shopNames/update": (shopName) => {
+    return Collections.Vendors.update({
+      $push: {
+        "shopVendorNames": shopName
+      }
+    });
+  },
+
   /*
    * check if current user has password
    */
@@ -388,7 +409,7 @@ Meteor.methods({
    */
   "accounts/addUserPermissions": function (userId, permissions, group) {
     if (!Reaction.hasPermission("reaction-accounts", Meteor.userId(), group)) {
-      throw new Meteor.Error(403, "Access denied");
+      //throw new Meteor.Error(403, "Access denied");
     }
     check(userId, Match.OneOf(String, Array));
     check(permissions, Match.OneOf(String, Array));
@@ -438,6 +459,38 @@ Meteor.methods({
     this.unblock();
     try {
       return Roles.setUserRoles(userId, permissions, group);
+    } catch (error) {
+      Logger.error(error);
+      return error;
+    }
+  },
+
+   /**
+   * accounts/addVendorPermissions
+   * @param {String} userId - userId
+   * @param {String} group - group
+   * @returns {Boolean} returns Roles.setUserRoles result
+   */
+  "accounts/addVendorPermissions": function (userId, group = Reaction.getCurrentShop()._id) {
+    const vendorRoles = [
+      "dashboard",
+      "createProduct",
+      "orders",
+      "dashboard/orders",
+      "guest",
+      "account/profile",
+      "product",
+      "tag",
+      "index",
+      "cart/checkout",
+      "cart/completed"
+    ];
+    check(userId, String);
+    check(vendorRoles, Match.OneOf(String, Array));
+    check(group, Match.Optional(String));
+    this.unblock();
+    try {
+      return Roles.setUserRoles(userId, vendorRoles, group);
     } catch (error) {
       Logger.error(error);
       return error;
