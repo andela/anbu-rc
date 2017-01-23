@@ -1,4 +1,3 @@
-import { Reaction, i18next } from "/client/api";
 import * as Collections from "/lib/collections";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
@@ -93,25 +92,29 @@ Template.accountProfile.helpers({
 });
 // event to upgrade to seller account on profile
 Template.accountProfile.events({
-  'click .register-shop-button': function(event) {
-    const error = { message: 'add error strings'};
-    const vendorRoles =
-    ["dashboard", "createProduct", "orders", "dashboard/orders", "guest", "account/profile", "product", "tag", "index", "cart/checkout", "cart/completed"];
-    console.log('Upgrade to a seller account');
-    let vendorDetail = {};
+  "click .register-shop-button": function(event) {
     event.preventDefault();
+    Meteor.call("shopNames", (err, result) => {
+      console.log(err, result);
+      return err ? err : result;
+    });
 
-    let shopName = Template.instance().find('.shop-name').value;
-    let shopPhone = Template.instance().find('.shop-phone').value;
-    let shopAddress = Template.instance().find('.shop-address').value;
-    let dbShopName = Meteor.user().profile.vendor.shopName;
-    vendorDetail = {shopName, shopPhone, shopAddress};
-    console.log(vendorDetail);
+    Meteor.call("shopNames/update", 'anbu-squad', (err, result) => {
+      console.log(err, result);
+      return err ? err : result;
+    });
+
+    const error = { message: "add error strings"};
+    const shopName = Template.instance().find(".shop-name").value;
+    const shopPhone = Template.instance().find(".shop-phone").value;
+    const shopAddress = Template.instance().find(".shop-address").value;
+    const dbShopName = Meteor.user().profile.vendor.shopName;
+    const vendorDetail = {shopName, shopPhone, shopAddress};
     if (shopName === dbShopName || dbShopName === undefined) {
       Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] } } });
-    }
-    else {
-      console.log(error);
-    }
+      Meteor.call("accounts/addVendorPermissions", Meteor.userId(), (err, result) => {
+        return err ? err : result;
+      });
+    } else { throw new TypeError({error}); }
   }
 });
