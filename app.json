@@ -24,6 +24,9 @@
     },
     "MAIL_URL": {
       "required": true
+    },
+    "BUILDPACK_CLEAR_CACHE": {
+      "required": true
     }
   },
   "formation": {
