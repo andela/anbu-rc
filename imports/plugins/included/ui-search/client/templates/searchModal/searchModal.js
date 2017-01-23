@@ -22,24 +22,30 @@ function tagToggle(arr, val) {
  * @param {Array} productSearchResults - Array containg all the documents returned from a Products collections
  * @return {Array} - the passed in products array with all elements sorted based on their maximum price
  */
-function sortByPrice(order, productsSearchResults) {
-  return _.orderBy(productsSearchResults, ["price.max"], [order]);
+function sortByPrice(order, productSearchResults) {
+  return _.orderBy(productSearchResults, ["price.max"], [order]);
 }
 
 /**
  * Custom helper function to sort product search results by date created (Newest Item)
  * @param {String} order - "asc" to sort in ascending order or "desc" to sort in descending order
- * @param {Array} productSearchResults - Array containing all the documents returned from the ProductSearch collection.
+ * @param {Array} productSearchResults - Array containing all the records returned from the ProductSearch collection.
  * @return {Array} - The passed in array sorted by dateCreated.
  */
-function sortByDateCreated(order, productsSearchResults) {
-  return _.orderBy(productsSearchResults,
-    function (value) {
+function sortByDateCreated(order, productSearchResults) {
+  return _.orderBy(productSearchResults,
+    value => {
       return Date.parse(value.createdAt);
     },
     order);
 }
 
+/**
+ * Custom helper method to sort product search results by quantity sold.
+ * @param {String} order - specify the sort order (asc to sort in ascending and desc to sort in descending order)
+ * @param {Array} productSearchResults - Array containing all the records returned from the ProductSearch collection
+ * @return {Array} - The  produdsSearchResults array sorted accordingly.
+ */
 function sortByQuantitySold(order, productSearchResults) {
   return _.orderBy(productSearchResults, ["quantitySold"], [order]);
 }
@@ -51,17 +57,22 @@ function sortByQuantitySold(order, productSearchResults) {
  * @return {Array} the productsResults sorted based on the sort option
  */
 function sortProductSearchResults(sortOption, productSearchResults) {
-  if (sortOption === "ascPrice") {
-    return sortByPrice("asc", productSearchResults);
-  }
-  if (sortOption === "descPrice") {
-    return sortByPrice("desc", productSearchResults);
-  }
-  if (sortOption === "newest") {
-    return sortByDateCreated("desc", productSearchResults);
-  }
-  if (sortOption === "quantitySold") {
-    return sortByQuantitySold("desc", productSearchResults);
+  switch (sortOption) {
+    case "ascPrice": {
+      return sortByPrice("asc", productSearchResults);
+    }
+    case "descPrice": {
+      return sortByPrice("desc", productSearchResults);
+    }
+    case "newest": {
+      return sortByDateCreated("desc", productSearchResults);
+    }
+    case "quantitySold": {
+      return sortByQuantitySold("desc", productSearchResults);
+    }
+    default: {
+      return productSearchResults;
+    }
   }
 }
 
@@ -71,7 +82,7 @@ function sortProductSearchResults(sortOption, productSearchResults) {
  * @param{Array} productSearchResults - Array containing current product search results.
  * @return{Array} Array containing products by the specified vendor
  */
-filterSearchByVendor = (vendor, productSearchResults) => {
+function filterSearchByVendor(vendor, productSearchResults) {
   if (vendor === "All Brands") {
     return productSearchResults;
   }
@@ -82,7 +93,7 @@ filterSearchByVendor = (vendor, productSearchResults) => {
     }
   });
   return filteredSearchResult;
-};
+}
 
 /*
  * searchModal onCreated
