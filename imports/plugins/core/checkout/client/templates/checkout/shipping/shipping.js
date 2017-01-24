@@ -12,6 +12,7 @@ function cartShippingMethods(currentCart) {
   if (cart) {
     if (cart.shipping) {
       if (cart.shipping[0].shipmentQuotes) {
+        console.log('This is the cart shipping');
         return cart.shipping[0].shipmentQuotes;
       }
     }
@@ -43,6 +44,7 @@ Template.coreCheckoutShipping.helpers({
   // in the users cart collection (historical, and prevents repeated rate lookup)
   shipmentQuotes: function () {
     const cart = Cart.findOne();
+    console.log(cart);
     return cartShippingMethods(cart);
   },
 
