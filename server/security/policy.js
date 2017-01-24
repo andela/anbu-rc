@@ -41,6 +41,10 @@ BrowserPolicy.content.allowOriginForAll("http://disqus.com");
 BrowserPolicy.content.allowOriginForAll("https://a.disquscdn.com");
 BrowserPolicy.content.allowEval("*.disqus.com");
 
+BrowserPolicy.content.allowOriginForAll("*.twitter.com");
+BrowserPolicy.content.allowOriginForAll("cdn.syndication.twimg.com");
+BrowserPolicy.content.allowOriginForAll("*.twimg.com");
+
 BrowserPolicy.content.allowImageOrigin("fbcdn-profile-a.akamaihd.net");
 BrowserPolicy.content.allowImageOrigin("secure.gravatar.com");
 BrowserPolicy.content.allowImageOrigin("i0.wp.com");
