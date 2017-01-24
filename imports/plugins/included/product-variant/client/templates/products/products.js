@@ -5,6 +5,7 @@ import { Products, Tags, Packages } from "/lib/collections";
 import { Session } from "meteor/session";
 import { Template } from "meteor/templating";
 import { ITEMS_INCREMENT } from "/client/config/defaults";
+import { ReactiveDict } from "meteor/reactive-dict";
 
 /**
  * loadMoreProducts
