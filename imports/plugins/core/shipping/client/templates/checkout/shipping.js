@@ -5,7 +5,6 @@ import _ from "lodash";
 import { Cart, Shipping } from "/lib/collections";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
-import { Logger } from "/client/api";
 // These helpers can be used in general shipping packages
 // cartShippingMethods to get current shipment methods
 // until we handle multiple methods, we just use the first
@@ -55,6 +54,7 @@ Template.flatRateCheckoutShipping.helpers({
         "methods.enabled": true
       }).count();
     }
+    return null;
   },
   // helper to display currently selected shipmentMethod
   isSelected: function () {
