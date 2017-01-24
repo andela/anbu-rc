@@ -22,7 +22,13 @@
     "REACTION_USER": {
       "required": true
     },
-    "MAIL_URL": {
+    "SENDGRID_PASSWORD": {
+      "required": true
+    },
+    "SENDGRID_USERNAME": {
+      "required": true
+    },
+    "BUILDPACK_CLEAR_CACHE": {
       "required": true
     }
   },
