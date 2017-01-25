@@ -77,7 +77,7 @@ export default {
    */
   hasPermission(checkPermissions, checkUserId, checkGroup) {
     let group = this.getShopId();
-    let permissions = ["owner"];
+    let permissions = ["owner", "createProduct"];
     let id = "";
     const userId = checkUserId || this.userId || Meteor.userId();
     //
