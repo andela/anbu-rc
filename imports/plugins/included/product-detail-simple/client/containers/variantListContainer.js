@@ -186,13 +186,13 @@ function composer(props, onData) {
     }).fetch();
   }
 
-  let editable;
-
-  if (Reaction.Router.getQueryParam("as") === "customer") {
-    editable = false;
-  } else {
-    editable = Reaction.hasPermission(["createProduct"]);
-  }
+  // let editable;
+  let editable = props.editRight;
+  // if (Reaction.Router.getQueryParam("as") === "customer") {
+  //   editable = false;
+  // } else {
+  //   editable = Reaction.hasPermission(["createProduct"]);
+  // }
 
   onData(null, {
     variants: getTopVariants(),

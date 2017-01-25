@@ -15,7 +15,8 @@ class ProductSocialContainer extends Component {
         field={["facebookMsg", "twitterMsg", "googleplusMsg", "pinterestMsg"]}
         i18nKeyLabel="productDetailEdit.editSocial"
         label="Edit Social Messaging"
-        permissions={["createProduct"]}
+        // permissions={["createProduct"]}
+        permissions={this.props.editRight}
       >
         <SocialButtons {...this.props.socialSettings} />
       </EditContainer>
@@ -88,12 +89,14 @@ function composer(props, onData) {
 
   onData(null, {
     data: product,
-    socialSettings
+    socialSettings,
+    editRight: props.editRight
   });
 }
 
 ProductSocialContainer.propTypes = {
   data: PropTypes.object,
+  editRight: PropTypes.bool,
   socialSettings: PropTypes.object
 };
 

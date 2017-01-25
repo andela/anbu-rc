@@ -124,6 +124,15 @@ Template.productGridItems.helpers({
   positions() {
     const tag = ReactionProduct.getTag();
     return this.positions && this.positions[tag] || {};
+  },
+  // check if user was the creator of the product
+  isProductCreator: () => {
+    const product = Template.instance().data;
+    if (product.viewerShopId) {
+      return product.shopId === product.viewerShopId;
+    } else if (Reaction.hasPermission("admin")) {
+      return Reaction.getShopId() === product.shopId;
+    }
   }
 });
 

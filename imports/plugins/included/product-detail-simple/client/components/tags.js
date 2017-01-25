@@ -23,7 +23,8 @@ class ProductTags extends Component {
             field="hashtags"
             i18nKeyLabel="productDetailEdit.productSettings"
             label="Product Settings"
-            permissions={["createProduct"]}
+            // permissions={["createProduct"]}
+            permissions={this.props.editable}
           />
         </span>
       );

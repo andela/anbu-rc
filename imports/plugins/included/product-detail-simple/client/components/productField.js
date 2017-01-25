@@ -57,7 +57,8 @@ class ProductField extends Component {
             field={this.fieldName}
             i18nKeyLabel={`productDetailEdit.${this.field}`}
             label="Edit Field"
-            permissions={["createProduct"]}
+            // permissions={["createProduct"]}
+            permissions={this.props.editable}
             {...this.props.editContainerProps}
           />
         </span>

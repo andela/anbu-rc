@@ -56,7 +56,8 @@ class VariantList extends Component {
             label="Edit Variant"
             onEditButtonClick={this.handleVariantEditClick}
             onVisibilityButtonClick={this.handleVariantVisibilityClick}
-            permissions={["createProduct"]}
+            // permissions={["createProduct"]}
+            permissions={this.props.editable}
             showsVisibilityButton={true}
           >
             <Variant
@@ -103,7 +104,8 @@ class VariantList extends Component {
             label="Edit Variant"
             onEditButtonClick={this.handleChildVariantEditClick}
             onVisibilityButtonClick={this.handleVariantVisibilityClick}
-            permissions={["createProduct"]}
+            // permissions={["createProduct"]}
+            permissions={this.props.editable}
             showsVisibilityButton={true}
           >
             <ChildVariant
