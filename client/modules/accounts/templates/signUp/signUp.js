@@ -1,13 +1,16 @@
 import { LoginFormSharedHelpers } from "/client/modules/accounts/helpers";
 import { Template } from "meteor/templating";
-import { Meteor } from 'meteor/meteor';
+import { Meteor } from "meteor/meteor";
 
+let allShops = [];
 /**
  * onCreated: Login form sign up view
  */
 Template.loginFormSignUpView.onCreated(() => {
   const template = Template.instance();
-
+  Meteor.call("shopNames/all", (err, result) => {
+    return err ? err : (allShops = result.vendorShopNames);
+  });
   template.uniqueId = Random.id();
   template.formMessages = new ReactiveVar({});
   template.type = "signUp";
@@ -74,6 +77,13 @@ Template.loginFormSignUpView.events({
         errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
       }
 
+      if (allShops.includes(shopName)) {
+        errors.shopName = {
+          i18nKeyReason: "shop name already exists. please choose another.",
+          reason: "shop name already exists. please choose another."
+        };
+      }
+
       if (!/\d+(-)?/g.test(shopPhone) && shopPhone.length <= 14) {
         errors.shopPhone = { i18nKeyReason: "invalid shop phone number", reason: "invalid shop phone number"};
       }
@@ -85,7 +95,7 @@ Template.loginFormSignUpView.events({
         shopName: shopName,
         shopPhone: shopPhone,
         shopAddress: shopAddress
-      }
+      };
     }
 
     if ($.isEmptyObject(errors) === false) {
