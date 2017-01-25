@@ -15,7 +15,6 @@ class ProductSocialContainer extends Component {
         field={["facebookMsg", "twitterMsg", "googleplusMsg", "pinterestMsg"]}
         i18nKeyLabel="productDetailEdit.editSocial"
         label="Edit Social Messaging"
-        // permissions={["createProduct"]}
         permissions={this.props.editRight}
       >
         <SocialButtons {...this.props.socialSettings} />

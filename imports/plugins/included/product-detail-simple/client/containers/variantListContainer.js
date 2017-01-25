@@ -188,12 +188,6 @@ function composer(props, onData) {
 
   // let editable;
   let editable = props.editRight;
-  // if (Reaction.Router.getQueryParam("as") === "customer") {
-  //   editable = false;
-  // } else {
-  //   editable = Reaction.hasPermission(["createProduct"]);
-  // }
-
   onData(null, {
     variants: getTopVariants(),
     variantIsSelected,

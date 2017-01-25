@@ -24,7 +24,6 @@ class ProductMetadata extends Component {
             field="metafields"
             i18nKeyLabel="productDetailEdit.productSettings"
             label="Product Settings"
-            // permissions={["createProduct"]}
             permissions={this.props.editable}
             {...this.props.editContainerProps}
           />

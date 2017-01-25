@@ -154,8 +154,6 @@ class ProductDetailContainer extends Component {
             onAddToCart={this.handleAddToCart}
             onCartQuantityChange={this.handleCartQuantityChange}
             onViewContextChange={this.handleViewContextChange}
-            // socialComponent={<SocialContainer />}
-            // topVariantComponent={<VariantListContainer />}
             socialComponent={<SocialContainer editRight={this.props.hasAdminPermission} />}
             topVariantComponent={<VariantListContainer editRight={this.props.hasAdminPermission} />}
             onDeleteProduct={this.handleDeleteProduct}
@@ -240,22 +238,6 @@ function composer(props, onData) {
 
       let editable = false;
       let hasAdminPermission = false;
-
-      // if (viewProductAs === "customer") {
-      //   editable = false;
-      // } else {
-      //   editable = Reaction.hasPermission(["createProduct"]);
-      // }
-
-      // onData(null, {
-      //   product: productRevision || product,
-      //   priceRange,
-      //   tags,
-      //   media: mediaArray,
-      //   editable,
-      //   viewAs: viewProductAs,
-      //   hasAdminPermission
-      // });
       setData = function () {
         onData(null, {
           product: productRevision || product,
