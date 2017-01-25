@@ -9,23 +9,35 @@ import { Logger, Reaction } from "/server/api";
 Meteor.methods({
   /**
  * User's order history
- * @return {Array|null} an array of available orders for the user
+ * @return {Array} an array of available orders for the user
  */
-  "shopNames": () => {
+  "shopNames/all": () => {
     const shops =  Collections.Vendors.findOne({});
+    if (!shops) {
+      Collections.Vendors.insert({
+        theId: 1234,
+        vendorShopNames: ["Reaction"]
+      });
+    }
     return shops;
   },
 
  /**
- * User's order history
- * @return {Array|null} an array of available orders for the user
+ * Shopnames registered
+ * @param {String} shopName - vendor's shop name
+ * @return {Array} an array of all shops
  */
   "shopNames/update": (shopName) => {
-    return Collections.Vendors.update({
-      $push: {
-        "shopVendorNames": shopName
-      }
-    });
+    check(shopName, String);
+    const shops = Collections.Vendors.findOne({}).vendorShopNames;
+    if (!shops.includes(shopName)) {
+      return Collections.Vendors.update({ theId: 1234 }, {
+        $push: {
+          vendorShopNames: shopName
+        }
+      });
+    }
+    return [];
   },
 
   /*
@@ -409,7 +421,7 @@ Meteor.methods({
    */
   "accounts/addUserPermissions": function (userId, permissions, group) {
     if (!Reaction.hasPermission("reaction-accounts", Meteor.userId(), group)) {
-      //throw new Meteor.Error(403, "Access denied");
+      throw new Meteor.Error(403, "Access denied");
     }
     check(userId, Match.OneOf(String, Array));
     check(permissions, Match.OneOf(String, Array));

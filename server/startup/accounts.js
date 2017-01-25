@@ -146,7 +146,7 @@ export default function () {
       }
 
       // add vendor's roles
-      if(options.profile){
+      if (options.profile) {
         user.profile = { vendor: [ true, options.profile] };
         roles[shopId] = vendorRoles;
       } else {

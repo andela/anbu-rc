@@ -669,7 +669,14 @@ Meteor.methods({
     }
 
     return Products.insert({
-      type: "simple" // needed for multi-schema
+      type: "simple", // needed for multi-schema
+      vendor: Meteor.user().profile.vendor[1].shopName,
+      vendorDetail: {
+        userId: Meteor.userId(),
+        shopName: Meteor.user().profile.vendor[1].shopName,
+        shopPhone: Meteor.user().profile.vendor[1].shopPhone,
+        shopAddress: Meteor.user().profile.vendor[1].shopAddress
+      }
     }, {
       validate: false
     }, (error, result) => {
