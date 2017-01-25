@@ -40,3 +40,5 @@ imports/plugins/custom/*
 
 .reaction/config.json
 .env
+geckodriver
+selenium-server-standalone-3.0.1.jar
