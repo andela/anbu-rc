@@ -16,6 +16,85 @@ function tagToggle(arr, val) {
   return arr;
 }
 
+/**
+ * Custom helper function for sorting the return array based on maximum price comparison
+ * @param {String} order - "asc" to sort in ascending order or "desc" to sort in descending order
+ * @param {Array} productSearchResults - Array containg all the documents returned from a Products collections
+ * @return {Array} - the passed in products array with all elements sorted based on their maximum price
+ */
+function sortByPrice(order, productSearchResults) {
+  return _.orderBy(productSearchResults, ["price.max"], [order]);
+}
+
+/**
+ * Custom helper function to sort product search results by date created (Newest Item)
+ * @param {String} order - "asc" to sort in ascending order or "desc" to sort in descending order
+ * @param {Array} productSearchResults - Array containing all the records returned from the ProductSearch collection.
+ * @return {Array} - The passed in array sorted by dateCreated.
+ */
+function sortByDateCreated(order, productSearchResults) {
+  return _.orderBy(productSearchResults,
+    value => {
+      return Date.parse(value.createdAt);
+    },
+    order);
+}
+
+/**
+ * Custom helper method to sort product search results by quantity sold.
+ * @param {String} order - specify the sort order (asc to sort in ascending and desc to sort in descending order)
+ * @param {Array} productSearchResults - Array containing all the records returned from the ProductSearch collection
+ * @return {Array} - The  produdsSearchResults array sorted accordingly.
+ */
+function sortByQuantitySold(order, productSearchResults) {
+  return _.orderBy(productSearchResults, ["quantitySold"], [order]);
+}
+
+/**
+ * Helper function for sorting the ProductSearch results based on different criterias
+ * @param {String} sortOption - Option to sort the search results (newest, desPrice, ascPrice)
+ * @param {Array} productSearchResults - Array containing the products search results to be sorted
+ * @return {Array} the productsResults sorted based on the sort option
+ */
+function sortProductSearchResults(sortOption, productSearchResults) {
+  switch (sortOption) {
+    case "ascPrice": {
+      return sortByPrice("asc", productSearchResults);
+    }
+    case "descPrice": {
+      return sortByPrice("desc", productSearchResults);
+    }
+    case "newest": {
+      return sortByDateCreated("desc", productSearchResults);
+    }
+    case "quantitySold": {
+      return sortByQuantitySold("desc", productSearchResults);
+    }
+    default: {
+      return productSearchResults;
+    }
+  }
+}
+
+/**
+ * search modal extra function to help filter the search result based on returned venddors
+ * @param{String} vendor - vendor we want to filter our search results by.
+ * @param{Array} productSearchResults - Array containing current product search results.
+ * @return{Array} Array containing products by the specified vendor
+ */
+function filterSearchByVendor(vendor, productSearchResults) {
+  if (vendor === "All Brands") {
+    return productSearchResults;
+  }
+  const filteredSearchResult = [];
+  productSearchResults.forEach((product) => {
+    if (product.vendor === vendor) {
+      filteredSearchResult.push(product);
+    }
+  });
+  return filteredSearchResult;
+}
+
 /*
  * searchModal onCreated
  */
@@ -27,7 +106,10 @@ Template.searchModal.onCreated(function () {
     canLoadMoreProducts: false,
     searchQuery: "",
     productSearchResults: [],
-    tagSearchResults: []
+    tagSearchResults: [],
+    filterBrand: "All Brands",
+    sortOption: "descPrice", // default sort option (descending price)
+    productSearchVendors: [] // holds all brands found
   });
 
 
@@ -48,7 +130,9 @@ Template.searchModal.onCreated(function () {
     const searchCollection = this.state.get("searchCollection") || "products";
     const searchQuery = this.state.get("searchQuery");
     const facets = this.state.get("facets") || [];
+    const sortOption = this.state.get("sortOption");
     const sub = this.subscribe("SearchResults", searchCollection, searchQuery, facets);
+    const filterBrand = this.state.get("filterBrand");
 
     if (sub.ready()) {
       /*
@@ -57,10 +141,11 @@ Template.searchModal.onCreated(function () {
       if (searchCollection === "products") {
         const productResults = ProductSearch.find().fetch();
         const productResultsCount = productResults.length;
-        this.state.set("productSearchResults", productResults);
+        this.state.set("productSearchResults", filterSearchByVendor(filterBrand, sortProductSearchResults(sortOption, productResults)));
         this.state.set("productSearchCount", productResultsCount);
 
         const hashtags = [];
+        const vendors = [];
         for (const product of productResults) {
           if (product.hashtags) {
             for (const hashtag of product.hashtags) {
@@ -69,7 +154,16 @@ Template.searchModal.onCreated(function () {
               }
             }
           }
+          // populate vendors array
+          const vendor = product.vendor;
+          if (vendor) {
+            if (vendors.indexOf(vendor) === -1) {
+              vendors.push(vendor);
+            }
+          }
         }
+        this.state.set("productSearchVendors", vendors);
+
         const tagResults = Tags.find({
           _id: { $in: hashtags }
         }).fetch();
@@ -147,6 +241,11 @@ Template.searchModal.helpers({
   },
   showSearchResults() {
     return false;
+  },
+  sortOptions: ["Higest Price", "Lowest Price", "Newest Item", "Best Seller"],
+  productSearchVendors() {
+    const instance = Template.instance();
+    return instance.state.get("productSearchVendors");
   }
 });
 
@@ -159,6 +258,7 @@ Template.searchModal.events({
   "keyup input": (event, templateInstance) => {
     event.preventDefault();
     const searchQuery = templateInstance.find("#search-input").value;
+    templateInstance.state.set("filterBrand", "All Brands");
     templateInstance.state.set("searchQuery", searchQuery);
     $(".search-modal-header:not(.active-search)").addClass(".active-search");
     if (!$(".search-modal-header").hasClass("active-search")) {
@@ -200,6 +300,31 @@ Template.searchModal.events({
     $("#search-input").focus();
 
     templateInstance.state.set("searchCollection", searchCollection);
+  },
+  "change [data-event-action=sortSearchResult]": function (event, templateInstance) {
+    event.preventDefault();
+    const selection = event.target.value;
+    // sort in Ascending price
+    if (selection === this.sortOptions[0]) {
+      templateInstance.state.set("sortOption", "descPrice");
+    }
+    // sort in Descending price
+    if (selection === this.sortOptions[1]) {
+      templateInstance.state.set("sortOption", "ascPrice");
+    }
+    // sort by Newest item (date created)
+    if (selection === this.sortOptions[2]) {
+      templateInstance.state.set("sortOption", "newest");
+    }
+    // sort by Best seller
+    if (selection === this.sortOptions[3]) {
+      templateInstance.state.set("sortOption", "quantitySold");
+    }
+  },
+  "change [data-event-action=filterByVendor]": function (event, templateInstance) {
+    event.preventDefault();
+    const brand = event.target.value;
+    templateInstance.state.set("filterBrand", brand);
   }
 });
 
