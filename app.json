@@ -12,6 +12,24 @@
     },
     "ROOT_URL": {
       "required": true
+    },
+    "REACTION_AUTH": {
+      "required": true
+    },
+    "REACTION_EMAIL": {
+      "required": true
+    },
+    "REACTION_USER": {
+      "required": true
+    },
+    "SENDGRID_PASSWORD": {
+      "required": true
+    },
+    "SENDGRID_USERNAME": {
+      "required": true
+    },
+    "BUILDPACK_CLEAR_CACHE": {
+      "required": true
     }
   },
   "formation": {
