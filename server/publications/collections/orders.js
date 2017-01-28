@@ -1,5 +1,6 @@
 import { Orders } from "/lib/collections";
 import { Reaction } from "/server/api";
+import { Meteor } from "meteor/meteor";
 
 /**
  * orders
@@ -13,10 +14,11 @@ Meteor.publish("Orders", function () {
   if (!shopId) {
     return this.ready();
   }
+  // query orders for both admin and vendor
   if (Roles.userIsInRole(this.userId, ["admin", "owner"], shopId)) {
-    return Orders.find({
-      shopId: shopId
-    });
+    return Orders.find({items: { $elemMatch: { shopId: shopId } }});
+  } else if (Meteor.call("vendorOrders", this.userId)) {
+    return Orders.find({items: { $elemMatch: { vendorId: this.userId } }});
   }
   return Orders.find({
     shopId: shopId,

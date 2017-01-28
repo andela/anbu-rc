@@ -82,7 +82,21 @@ export default function () {
     const shopId = shop._id;
     const defaultVisitorRole =  ["anonymous", "guest", "product", "tag", "index", "cart/checkout", "cart/completed"];
     const defaultRoles =  ["guest", "account/profile", "product", "tag", "index", "cart/checkout", "cart/completed"];
-    const vendorRoles = ["reaction-orders","reaction-dashboard","dashboard", "createProduct", "orders", "dashboard/orders", "guest", "account/profile", "product", "tag", "index", "cart/checkout", "cart/completed"];
+    const vendorRoles = [
+      "reaction-orders",
+      "reaction-dashboard",
+      "dashboard",
+      "createProduct",
+      "orders",
+      "dashboard/orders",
+      "guest",
+      "account/profile",
+      "product",
+      "tag",
+      "index",
+      "cart/checkout",
+      "cart/completed"
+    ];
     const roles = {};
     const additionals = {
       profile: Object.assign({}, options && options.profile)

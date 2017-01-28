@@ -33,7 +33,6 @@ class ProductDetailContainer extends Component {
     // console.log(currentProduct);
 
     if (currentVariant) {
-      console.log(currentVariant);
       if (currentVariant.ancestors.length === 1) {
         const options = ReactionProduct.getVariants(currentVariant._id);
 
@@ -156,8 +155,8 @@ class ProductDetailContainer extends Component {
             onAddToCart={this.handleAddToCart}
             onCartQuantityChange={this.handleCartQuantityChange}
             onViewContextChange={this.handleViewContextChange}
-            socialComponent={<SocialContainer editRight={this.props.hasAdminPermission} />}
-            topVariantComponent={<VariantListContainer editRight={this.props.hasAdminPermission} />}
+            socialComponent={<SocialContainer editRight={true} />}
+            topVariantComponent={<VariantListContainer editRight={true} />}
             onDeleteProduct={this.handleDeleteProduct}
             onProductFieldChange={this.handleProductFieldChange}
             {...this.props}
