@@ -5,6 +5,7 @@ import { Reaction } from "/client/api";
 import Logger from "/client/modules/logger";
 import { ReactionProduct } from "/lib/api";
 import Sortable from "sortablejs";
+import { Meteor } from "meteor/meteor";
 
 /**
  * productGrid helpers
@@ -17,9 +18,10 @@ Template.productGrid.onCreated(function () {
   this.state.setDefault({
     userShopId: null
   });
-
   if (Reaction.hasPermission("createProduct")) {
-    if(Meteor.user().profile.vendor[0]) {
+    if (Reaction.hasPermission("admin")) {
+      instance.state.set("userShopId", "J8Bhq3uTtdgwZx3rz");
+    } else {
       instance.state.set("userShopId", Meteor.userId());
     }
   }
@@ -30,6 +32,7 @@ Template.productGrid.onRendered(function () {
 
   if (Reaction.hasPermission("createProduct")) {
     const productSort = $(".product-grid-list")[0];
+
     this.sortable = Sortable.create(productSort, {
       group: "products",
       handle: ".product-grid-item",
@@ -102,7 +105,7 @@ Template.productGrid.helpers({
   },
   products() {
     Template.currentData().products.map((eachProd) => {
-      if (Reaction.hasPermission('createProduct')) {
+      if (Reaction.hasPermission("createProduct")) {
         eachProd.viewerShopId = Template.instance().state.get("userShopId");
         return eachProd;
       }

@@ -186,8 +186,8 @@ function composer(props, onData) {
     }).fetch();
   }
 
-  // let editable;
-  let editable = props.editRight;
+  const editable = props.editRight;
+
   onData(null, {
     variants: getTopVariants(),
     variantIsSelected,

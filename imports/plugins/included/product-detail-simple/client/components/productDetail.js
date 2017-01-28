@@ -137,7 +137,7 @@ class ProductDetail extends Component {
 
               <div className="vendor">
                 <ProductField
-                  editable={this.editable}
+                  editable={false}
                   fieldName="vendor"
                   fieldTitle="Vendor"
                   onProductFieldChange={this.props.onProductFieldChange}

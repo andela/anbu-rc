@@ -30,8 +30,10 @@ class ProductDetailContainer extends Component {
     let quantity;
     const currentVariant = ReactionProduct.selectedVariant();
     const currentProduct = ReactionProduct.selectedProduct();
+    // console.log(currentProduct);
 
     if (currentVariant) {
+      console.log(currentVariant);
       if (currentVariant.ancestors.length === 1) {
         const options = ReactionProduct.getVariants(currentVariant._id);
 
@@ -176,7 +178,7 @@ function composer(props, onData) {
   const productId = Reaction.Router.getParam("handle");
   const variantId = Reaction.Router.getParam("variantId");
   const revisionType = Reaction.Router.getQueryParam("revision");
-  let viewProductAs = Reaction.Router.getQueryParam("as");
+  const viewProductAs = Reaction.Router.getQueryParam("as");
 
   let productSub;
 
@@ -238,6 +240,7 @@ function composer(props, onData) {
 
       let editable = false;
       let hasAdminPermission = false;
+
       setData = function () {
         onData(null, {
           product: productRevision || product,
@@ -249,12 +252,16 @@ function composer(props, onData) {
           hasAdminPermission
         });
       };
+
       if (Reaction.hasPermission(["createProduct"])) {
-        console.log("create product", product.vendorDetail.userId);
-        if((Meteor.user().profile.vendor[0] && Meteor.userId() === product.vendorDetail.userId) ||
+        let vendor = null;
+        if (product.vendorDetail) {
+          vendor = product.vendorDetail.userId;
+        }
+        if ((Meteor.user().profile.vendor[0] && Meteor.userId() === vendor) ||
           (!Meteor.user().profile.vendor[0] && Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId)) {
-            editable = true;
-            hasAdminPermission = true;
+          editable = true;
+          hasAdminPermission = true;
         }
         setData();
       } else {
