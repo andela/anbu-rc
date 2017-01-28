@@ -155,8 +155,8 @@ class ProductDetailContainer extends Component {
             onAddToCart={this.handleAddToCart}
             onCartQuantityChange={this.handleCartQuantityChange}
             onViewContextChange={this.handleViewContextChange}
-            socialComponent={<SocialContainer editRight={true} />}
-            topVariantComponent={<VariantListContainer editRight={true} />}
+            socialComponent={<SocialContainer editRight={this.props.hasAdminPermission} />}
+            topVariantComponent={<VariantListContainer editRight={this.props.hasAdminPermission} />}
             onDeleteProduct={this.handleDeleteProduct}
             onProductFieldChange={this.handleProductFieldChange}
             {...this.props}
@@ -168,6 +168,7 @@ class ProductDetailContainer extends Component {
 }
 
 ProductDetailContainer.propTypes = {
+  hasAdminPermission: PropTypes.bool,
   media: PropTypes.arrayOf(PropTypes.object),
   product: PropTypes.object
 };
@@ -257,13 +258,19 @@ function composer(props, onData) {
         if (product.vendorDetail) {
           vendor = product.vendorDetail.userId;
         }
-        if ((Meteor.user().profile.vendor[0] && Meteor.userId() === vendor) ||
-          (!Meteor.user().profile.vendor[0] && Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId)) {
+        if (Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId) {
+          editable = true;
+          hasAdminPermission = true;
+        } else if ((Meteor.user().profile.vendor[0] && Meteor.userId() === vendor)) {
           editable = true;
           hasAdminPermission = true;
         }
         setData();
       } else {
+        setData();
+      }
+      if (viewProductAs === "customer") {
+        editable = false;
         setData();
       }
     }

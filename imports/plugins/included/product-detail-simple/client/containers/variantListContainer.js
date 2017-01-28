@@ -186,7 +186,11 @@ function composer(props, onData) {
     }).fetch();
   }
 
-  const editable = props.editRight;
+  let editable = props.editRight;
+
+  if (Reaction.Router.getQueryParam("as") === "customer") {
+    editable = false;
+  }
 
   onData(null, {
     variants: getTopVariants(),
