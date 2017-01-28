@@ -333,6 +333,10 @@
       "format": "%s%v",
       "symbol": "RM"
     },
+    "NGN": {
+      "format": "%s%v",
+      "symbol": "₦"
+    },
     "NZD": {
       "format": "%s%v",
       "symbol": "$"
