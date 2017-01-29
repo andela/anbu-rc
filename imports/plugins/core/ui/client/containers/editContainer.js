@@ -158,7 +158,6 @@ EditContainer.propTypes = {
 function composer(props, onData) {
   let hasPermission;
   const viewAs = Reaction.Router.getQueryParam("as");
-
   if (props.disabled === true || viewAs === "customer") {
     hasPermission = false;
   } else {

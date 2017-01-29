@@ -668,8 +668,34 @@ Meteor.methods({
       return Products.insert(product);
     }
 
+    if (Reaction.hasPermission("owner")) {
+      return Products.insert({
+        type: "simple",
+        vendor: "Reaction",
+        vendorDetail: false // needed for multi-schema
+      }, {
+        validate: false
+      }, (error, result) => {
+        // additionally, we want to create a variant to a new product
+        if (result) {
+          Products.insert({
+            ancestors: [result],
+            price: 0.00,
+            title: "",
+            type: "variant" // needed for multi-schema
+          });
+        }
+      });
+    }
     return Products.insert({
-      type: "simple" // needed for multi-schema
+      type: "simple", // needed for multi-schema
+      vendor: Meteor.user().profile.vendor[1].shopName,
+      vendorDetail: {
+        userId: Meteor.userId(),
+        shopName: Meteor.user().profile.vendor[1].shopName,
+        shopPhone: Meteor.user().profile.vendor[1].shopPhone,
+        shopAddress: Meteor.user().profile.vendor[1].shopAddress
+      }
     }, {
       validate: false
     }, (error, result) => {

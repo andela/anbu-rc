@@ -7,6 +7,39 @@ import { Logger, Reaction } from "/server/api";
  * Reaction Account Methods
  */
 Meteor.methods({
+  /**
+ * User's order history
+ * @return {Array} an array of available orders for the user
+ */
+  "shopNames/all": () => {
+    const shops =  Collections.Vendors.findOne({});
+    if (!shops) {
+      Collections.Vendors.insert({
+        theId: 1234,
+        vendorShopNames: ["Reaction"]
+      });
+    }
+    return shops;
+  },
+
+ /**
+ * Shopnames registered
+ * @param {String} shopName - vendor's shop name
+ * @return {Array} an array of all shops
+ */
+  "shopNames/update": (shopName) => {
+    check(shopName, String);
+    const shops = Collections.Vendors.findOne({}).vendorShopNames;
+    if (!shops.includes(shopName)) {
+      return Collections.Vendors.update({ theId: 1234 }, {
+        $push: {
+          vendorShopNames: shopName
+        }
+      });
+    }
+    return [];
+  },
+
   /*
    * check if current user has password
    */
@@ -438,6 +471,38 @@ Meteor.methods({
     this.unblock();
     try {
       return Roles.setUserRoles(userId, permissions, group);
+    } catch (error) {
+      Logger.error(error);
+      return error;
+    }
+  },
+
+   /**
+   * accounts/addVendorPermissions
+   * @param {String} userId - userId
+   * @param {String} group - group
+   * @returns {Boolean} returns Roles.setUserRoles result
+   */
+  "accounts/addVendorPermissions": function (userId, group = Reaction.getCurrentShop()._id) {
+    const vendorRoles = [
+      "dashboard",
+      "createProduct",
+      "orders",
+      "dashboard/orders",
+      "guest",
+      "account/profile",
+      "product",
+      "tag",
+      "index",
+      "cart/checkout",
+      "cart/completed"
+    ];
+    check(userId, String);
+    check(vendorRoles, Match.OneOf(String, Array));
+    check(group, Match.Optional(String));
+    this.unblock();
+    try {
+      return Roles.setUserRoles(userId, vendorRoles, group);
     } catch (error) {
       Logger.error(error);
       return error;
