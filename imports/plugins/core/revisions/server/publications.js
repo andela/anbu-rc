@@ -9,7 +9,7 @@ import { Reaction } from "/server/api";
  */
 Meteor.publish("ProductRevisions", function (productIds) {
   check(productIds, Array);
-
+  Logger.info("ProductRevisions method called");
   // Authorized content curators fo the shop get special publication of the product
   // all all relevant revisions all is one package
   if (Roles.userIsInRole(this.userId, ["owner", "admin", "createProduct"], shop._id)) {
