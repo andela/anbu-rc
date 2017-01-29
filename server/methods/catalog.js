@@ -672,7 +672,7 @@ Meteor.methods({
       return Products.insert({
         type: "simple",
         vendor: "Reaction",
-        vendorDetail: false // needed for multi-schema
+        vendorDetail: {} // needed for multi-schema
       }, {
         validate: false
       }, (error, result) => {

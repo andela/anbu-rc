@@ -150,6 +150,9 @@ function composer(props, onData) {
   let media;
   let editable;
   const viewAs = Reaction.Router.getQueryParam("as");
+  const productId = Reaction.Router.getParam("handle");
+  const variantId = Reaction.Router.getParam("variantId");
+  const product = ReactionProduct.setProduct(productId, variantId);
 
   if (!props.media) {
     // Fetch media based on props
@@ -160,7 +163,15 @@ function composer(props, onData) {
   if (viewAs === "customer") {
     editable = false;
   } else {
-    editable = Reaction.hasPermission(props.permission || ["createProduct"]);
+  	let vendor = null;
+    if (product.vendorDetail) {
+      vendor = product.vendorDetail.userId;
+    }
+    if (Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId) {
+      editable = true;
+    } else if ((Meteor.user().profile.vendor[0] && Meteor.userId() === vendor)) {
+      editable = true;
+    }
   }
 
   onData(null, {

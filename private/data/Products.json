@@ -18,6 +18,7 @@
   "isLowQuantity": false,
   "isSoldOut": false,
   "isBackorder": false,
+	"vendorDetail": {},
   "metafields": [{
     "key": "Material",
     "value": "Cotton"
@@ -31,7 +32,7 @@
   "updatedAt": {
     "$date": "2014-06-01T12:17:13.949-0700"
   },
-  "vendor": "Example Manufacturer"
+  "vendor": "Reaction"
 }, {
   "_id": "6qiqPwBkeJdtdQc4G",
   "ancestors": [
