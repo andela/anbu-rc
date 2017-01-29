@@ -43,3 +43,4 @@ imports/plugins/custom/*
 chromedriver
 geckodriver
 selenium-server-standalone-3.0.1.jar
+.vscode

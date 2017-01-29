@@ -30,7 +30,6 @@ class ProductDetailContainer extends Component {
     let quantity;
     const currentVariant = ReactionProduct.selectedVariant();
     const currentProduct = ReactionProduct.selectedProduct();
-    // console.log(currentProduct);
 
     if (currentVariant) {
       if (currentVariant.ancestors.length === 1) {
