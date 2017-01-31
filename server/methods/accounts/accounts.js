@@ -495,7 +495,9 @@ Meteor.methods({
       "tag",
       "index",
       "cart/checkout",
-      "cart/completed"
+      "cart/completed",
+      "reaction-shipping",
+      "shipping"
     ];
     check(userId, String);
     check(vendorRoles, Match.OneOf(String, Array));

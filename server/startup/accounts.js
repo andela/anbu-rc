@@ -95,7 +95,9 @@ export default function () {
       "tag",
       "index",
       "cart/checkout",
-      "cart/completed"
+      "cart/completed",
+      "reaction-shipping",
+      "shipping"
     ];
     const roles = {};
     const additionals = {
