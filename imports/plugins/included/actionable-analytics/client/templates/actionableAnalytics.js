@@ -2,6 +2,7 @@ import _ from "lodash";
 import { Template } from "meteor/templating";
 import { Orders, ProductSearch } from "/lib/collections";
 import { formatPriceString } from "/client/api";
+import { ReactiveDict } from "meteor/reactive-dict";
 
 /**
  * Function to fetch the total of all sales made

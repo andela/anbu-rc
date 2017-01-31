@@ -1,5 +1,6 @@
 import { Products, Revisions } from "/lib/collections";
 import { Reaction } from "/server/api";
+import { Logger } from "/server/api";
 
 /**
  * products publication
