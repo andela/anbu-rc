@@ -1,7 +1,7 @@
 <template name="actionableAnalytics">
   <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#overview">Overview</a></li>
-    <li><a data-toggle="tab" href="#menu1"><strong>Sales per Day</strong></a></li>
+    <li class="active"><a data-toggle="tab" href="#overview"><strong>Overview</strong></a></li>
+    <li><a data-toggle="tab" href="#menu1"><strong>Popular products</strong></a></li>
     <li><a data-toggle="tab" href="#menu2"><strong>Top Sellers</strong></a></li>
     <li><a data-toggle="tab" href="#menu3"><strong>Top Earners</strong></a></li>
     <li><a data-toggle="tab" href="#menu4"><strong>Statements</strong></a></li>
@@ -13,7 +13,7 @@
       {{> overview ordersPlaced=ordersPlaced totalSales=totalSales totalItemsPurchased=totalItemsPurchased totalShippingCost=totalShippingCost salesPerDay=salesPerDay}}
     </div>
     <div id="menu1" class="tab-pane fade">
-      {{> dailySales }}
+      {{> popularity products=products}}
     </div>
     <div id="menu2" class="tab-pane fade">
       {{> topSeller bestSelling=bestSelling}}
@@ -153,8 +153,26 @@
   </div>
 </template>
 
-<template name="dailySales">
+<template name="popularity">
   <div class="card" style="margin:20px">
-    <h2>Products sales on a daily basis</h2>
+    <h2>See which products your customers are interested in</h2>
+    <table class="table table-striped table-hover table-responsive table-bordered">
+      <thead>
+        <tr>
+          <th>Total Views</th>
+          <th>Product</th>
+          <th>Handle</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each products}}
+        <tr>
+          <td>{{views}}</td>
+          <td>{{title}}</td>
+          <td>{{handle}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
   </div>
 </template>

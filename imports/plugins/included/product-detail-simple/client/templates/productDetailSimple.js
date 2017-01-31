@@ -1,6 +1,12 @@
 import { ProductDetailContainer } from "../containers";
 import { isRevisionControlEnabled } from "/imports/plugins/core/revisions/lib/api";
 import { Template } from "meteor/templating";
+import { Reaction } from "/client/api";
+
+Template.productDetailSimple.onCreated(() => {
+  const handle = Reaction.Router.current().params.handle;
+  Meteor.call("products/updateViews", handle);
+});
 
 Template.productDetailSimple.helpers({
   isEnabled() {

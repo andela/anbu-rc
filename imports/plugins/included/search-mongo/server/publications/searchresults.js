@@ -71,7 +71,8 @@ getResults.products = function (searchTerm, facets, maxResults, userId) {
         price: 1,
         vendor: 1,
         createdAt: 1,
-        quantitySold: 1
+        quantitySold: 1,
+        views: 1
       },
       sort: {score: {$meta: "textScore"}},
       limit: maxResults
@@ -164,4 +165,9 @@ Meteor.publish("SearchResults", function (collection, searchTerm, facets, maxRes
     return this.ready();
   }
   return getResults[collection](searchTerm, facets, maxResults, this.userId);
+});
+
+Meteor.publish("searchresults/actionableAnalytics", () => {
+  const subResults =  ProductSearch.find({});
+  return subResults;
 });

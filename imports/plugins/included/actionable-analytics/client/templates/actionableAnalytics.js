@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { Template } from "meteor/templating";
-import { Orders } from "/lib/collections";
+import { Orders, ProductSearch } from "/lib/collections";
 import { formatPriceString } from "/client/api";
 
 /**
@@ -60,22 +60,9 @@ function extractAnalyticsItems(allOrders) {
     return Date.parse(order.createdAt);
   });
   const difference = daysDifference(Date.parse(oldestOrder.createdAt), Date.parse(latestOrder.createdAt));
-  const salesPerDay = totalSales / difference;
+  const salesPerDay = difference === 0 ? totalSales : totalSales / difference;
   return {totalSales, totalItemsPurchased, totalShippingCost, salesPerDay, analytics, analyticsStatement, ordersAnalytics};
 }
-
-
-/**
- * Helper function to fetch the total number of items purchased
- * from all orders
-function extractTotalItemsPurchased(allOrders) {
-  let totalItems = 0;
-  allOrders.forEach((order) => {
-    totalItems += order.items.length;
-  });
-  return totalItems;
-}
-*/
 
 /**
  * Helper function to calculate the differnce (in days)
@@ -99,25 +86,41 @@ Template.actionableAnalytics.onCreated(function () {
     ordersPlaced: 0,
     totalSales: 0,
     totalItemsPurchased: 0,
-    totalShippingCost: formatPriceString(0),
+    totalShippingCost: 0,
     salesPerDay: 0,
     analytics: {},
     analyticsStatement: {},
-    ordersAnalytics: []
+    ordersAnalytics: [],
+    productsAnalytics: {}
   });
   this.autorun(() => {
-    const sub = this.subscribe("Orders");
-    if (sub.ready()) {
+    const productsSearchSub = this.subscribe("searchresults/actionableAnalytics");
+    if (productsSearchSub.ready()) {
+      const products = ProductSearch.find().fetch();
+      const pAnalytics = {};
+      products.forEach((product) => {
+        if (pAnalytics[product._id]) {
+          pAnalytics[product._id].views += 1;
+        } else {
+          pAnalytics[product._id] = {title: product.title, views: product.views, handle: product.handle};
+        }
+      });
+      this.state.set("productsAnalytics", pAnalytics);
+    }
+    const ordersSub = this.subscribe("Orders");
+    if (ordersSub.ready()) {
       const allOrders = Orders.find().fetch();
-      const analyticsItems = extractAnalyticsItems(allOrders);
-      this.state.set("ordersPlaced", allOrders.length);
-      this.state.set("totalSales", analyticsItems.totalSales);
-      this.state.set("totalItemsPurchased", analyticsItems.totalItemsPurchased);
-      this.state.set("salesPerDay", formatPriceString(analyticsItems.salesPerDay));
-      this.state.set("totalShippingCost", formatPriceString(analyticsItems.totalShippingCost));
-      this.state.set("analytics", analyticsItems.analytics);
-      this.state.set("analyticsStatement", analyticsItems.analyticsStatement);
-      this.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
+      if (allOrders) {
+        const analyticsItems = extractAnalyticsItems(allOrders);
+        this.state.set("ordersPlaced", allOrders.length);
+        this.state.set("totalSales", analyticsItems.totalSales);
+        this.state.set("totalItemsPurchased", analyticsItems.totalItemsPurchased);
+        this.state.set("salesPerDay", analyticsItems.salesPerDay);
+        this.state.set("totalShippingCost", analyticsItems.totalShippingCost);
+        this.state.set("analytics", analyticsItems.analytics);
+        this.state.set("analyticsStatement", analyticsItems.analyticsStatement);
+        this.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
+      }
     }
   });
 });
@@ -138,11 +141,11 @@ Template.actionableAnalytics.helpers({
   },
   totalShippingCost() {
     const instance = Template.instance();
-    return instance.state.get("totalShippingCost");
+    return formatPriceString(instance.state.get("totalShippingCost"));
   },
   salesPerDay() {
     const instance = Template.instance();
-    return instance.state.get("salesPerDay");
+    return formatPriceString(instance.state.get("salesPerDay"));
   },
   bestSelling() {
     const products = [];
@@ -211,6 +214,22 @@ Template.actionableAnalytics.helpers({
         order.taxes = formatPriceString(order.taxes);
         order.shipping = formatPriceString(order.shipping);
         return Date.parse(order.date);
+      },
+      "desc"
+    );
+  },
+  products() {
+    const instance = Template.instance();
+    const productsAnalytics = instance.state.get("productsAnalytics");
+    const products = [];
+    for (key in productsAnalytics) {
+      if (key) {
+        products.push(productsAnalytics[key]);
+      }
+    }
+    return _.orderBy(products,
+      (product) => {
+        return product.views;
       },
       "desc"
     );
