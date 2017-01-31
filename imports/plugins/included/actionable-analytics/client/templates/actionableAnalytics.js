@@ -151,7 +151,7 @@ Template.actionableAnalytics.helpers({
     const products = [];
     const instance = Template.instance();
     const analytics = instance.state.get("analytics");
-    for (key in analytics) {
+    for (const key in analytics) {
       if (key) {
         products.push({
           product: key,
@@ -171,7 +171,7 @@ Template.actionableAnalytics.helpers({
     const products = [];
     const instance = Template.instance();
     const analytics = instance.state.get("analytics");
-    for (key in analytics) {
+    for (const key in analytics) {
       if (key) {
         products.push({
           product: key,
@@ -192,7 +192,7 @@ Template.actionableAnalytics.helpers({
     const statements = [];
     const instance = Template.instance();
     const analyticsStatement = instance.state.get("analyticsStatement");
-    for (key in analyticsStatement) {
+    for (const key in analyticsStatement) {
       if (key) {
         statements.push(analyticsStatement[key]);
         analyticsStatement[key].totalSales = formatPriceString(analyticsStatement[key].totalSales);
@@ -222,7 +222,7 @@ Template.actionableAnalytics.helpers({
     const instance = Template.instance();
     const productsAnalytics = instance.state.get("productsAnalytics");
     const products = [];
-    for (key in productsAnalytics) {
+    for (const key in productsAnalytics) {
       if (key) {
         products.push(productsAnalytics[key]);
       }

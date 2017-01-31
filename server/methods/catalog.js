@@ -1279,7 +1279,6 @@ Meteor.methods({
   "products/updateViews": (handle) => {
     check(handle, String);
     const product = Products.findOne({handle: handle});
-    console.log(`Handle: ${handle}: ${product._id}, Views: ${product.views}`);
     const price = product.price || {range: "0.00 - 0.00", min: 0.00, max: 0.00};
     const update = Object.assign({}, product, {views: (product.views + 1), price});
     const result = Products.upsert(product._id, {$set: update}, {
