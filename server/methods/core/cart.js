@@ -335,7 +335,7 @@ Meteor.methods({
     if (product.vendorDetail) {
       vendorId = product.vendorDetail.userId;
     } else {
-      vendorId = false;
+      vendorId = "";
     }
     // performs calculations admissibility of adding product to cart
     const quantity = quantityProcessing(product, variant, itemQty);

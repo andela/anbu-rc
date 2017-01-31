@@ -70,7 +70,7 @@ Meteor.methods({
         // check that a product with the _id exists so we don't end up creating a new product with upsert
         if (product) {
           const newQuantitySold = product.quantitySold + item.quantity;
-          const productUpdate = Object.assign({}, product, {quantitySold: newQuantitySold});
+          const productUpdate = Object.assign({}, product, {quantitySold: newQuantitySold}, {price: {}});
           // Might be a bug, but "update" refused to work, hence the use of the "upsert"" method.
           Products.upsert({_id}, {$set: productUpdate}, {selector: {type: "simple"}});
         }

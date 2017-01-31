@@ -5,6 +5,7 @@ import { MediaGallery } from "../components";
 import { Reaction } from "/client/api";
 import { ReactionProduct } from "/lib/api";
 import { Media } from "/lib/collections";
+import { Meteor } from "meteor/meteor";
 
 function uploadHandler(files) {
   // TODO: It would be cool to move this logic to common ValidatedMethod, but
@@ -163,7 +164,7 @@ function composer(props, onData) {
   if (viewAs === "customer") {
     editable = false;
   } else {
-  	let vendor = null;
+    let vendor = null;
     if (product.vendorDetail) {
       vendor = product.vendorDetail.userId;
     }
