@@ -1,0 +1,31 @@
+import { Meteor } from "meteor/meteor";
+import { check } from "meteor/check";
+import { StaticPages } from  "/lib/collections";
+import * as Collections from "/lib/collections";
+import * as Schemas from "/lib/collections/schemas";
+
+Meteor.methods({
+  "insertPage"(title, slug, content, shopId, pageOwner) {
+    check(title, String);
+    check(slug, String);
+    check(content, String);
+    check(shopId, String);
+    check(pageOwner, String);
+
+    const page = {
+      title,
+      slug,
+      content,
+      shopId,
+      pageOwner,
+      createdAt: new Date,
+      updatedAt: new Date
+    };
+    check(page, Schemas.StaticPages);
+    Collections.StaticPages.insert(page);
+  },
+  "deletePage"(pageId) {
+    check(pageId, String);
+    StaticPages.remove(pageId);
+  }
+});
