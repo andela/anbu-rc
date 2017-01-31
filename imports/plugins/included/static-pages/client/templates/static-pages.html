@@ -1,0 +1,58 @@
+<template name="staticPages">
+  <div class="container">
+    <div class="col-md-8">
+      <h1>Create a New Page</h1>
+      <hr>
+      <form class="new_page">
+        <div class="form-group">
+          <label for="page-title">Page Title:</label>
+          <!--<input type="text" class="form-control" name="title" id="title" placeholder="Enter page title">-->
+          <input type="text" class="form-control" name="title" id="static-page-title" placeholder="Enter page title">
+          
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon" id="basic-addon3">{{baseUrl}}/</span>
+          <input type="text" class="form-control" id="static-page-slug" aria-describedby="basic-addon3" placeholder="slug">
+        </div>
+        <h4>Page Content:</h4>
+        <textarea cols="20" rows="10" name="body" id="static-page-content"></textarea>
+        <script>
+          CKEDITOR.replace("static-page-content");
+        </script>
+        <br>
+        <div class="form-group">
+          <div class="pull-left">
+            <button type="submit" class="btn btn-info" id="btn-update">Create Page</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-4">
+      <h3>Manage Your Custom Pages</h3>
+      <hr>
+      <ul>
+        {{ #each displayPages }}
+          {{> displayPageName }}
+        {{ /each }}
+      </ul>
+    </div>
+  </div>
+</template>
+
+<template name="displayPageName">
+  <table class="pageNames">
+    <tr>
+      <td style="width: 250px">
+        <span> <strong> {{ pageName }} </strong></span>
+      </td>
+      <td>
+        <div>
+          <button class="btn btn-info edit">Edit</button>
+          <a class="btn btn-success preview" href="/{{ pageRoute }}">Preview</a>
+          <button class="btn btn-danger delete">Delete</button>
+        </div>
+      </td>
+    </tr>
+    <br>
+  </table>
+</template>
