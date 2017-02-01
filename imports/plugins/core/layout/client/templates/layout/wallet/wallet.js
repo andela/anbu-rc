@@ -15,7 +15,7 @@ Template.wallet.onCreated(function bodyOnCreated() {
   });
 });
 
-getPaystackSettings = () => {
+const getPaystackSettings = () => {
   const settings = Packages.findOne({
     name: "paystack-paymentmethod",
     shopId: Reaction.getShopId()
@@ -23,7 +23,7 @@ getPaystackSettings = () => {
   return settings;
 };
 
-finalizeDeposit = (paystackMethod) => {
+const finalizeDeposit = (paystackMethod) => {
   Meteor.call("wallet/transaction", Meteor.userId(), paystackMethod.transactions, (err, res) => {
     if (res) {
       document.getElementById("depositAmount").value = "";
@@ -34,14 +34,14 @@ finalizeDeposit = (paystackMethod) => {
   });
 };
 
-getExchangeRate = () => {
+const getExchangeRate = () => {
   const shop = Shops.find(Reaction.getShopId()).fetch();
   return shop[0].currencies.NGN.rate;
 };
 
-function handlePayment(response) {
+function handlePayment(result) {
   const type = "deposit";
-  const transactionId = response.reference;
+  const transactionId = result.reference;
   const paystackConfig = getPaystackSettings();
   HTTP.call("GET", `https://api.paystack.co/transaction/verify/${transactionId}`, {
     headers: {
@@ -80,7 +80,7 @@ function handlePayment(response) {
 }
 
 // Paystack payment
-payWithPaystack = (email, amount) => {
+const payWithPaystack = (email, amount) => {
   const paystackConfig = getPaystackSettings();
   const handler = PaystackPop.setup({
     key: paystackConfig.settings.publicKey,

@@ -6,16 +6,16 @@ import { Cart, Shops, Accounts, Packages } from "/lib/collections";
 
 import "./paystack.html";
 
-getExchangeRate = () => {
+const getExchangeRate = () => {
   const shop = Shops.find(Reaction.getShopId()).fetch();
   return shop[0].currencies.NGN.rate;
 };
 
-generateTransactionID = () => {
+const generateTransactionID = () => {
   return Random.id(16);
 };
 
-getCustomerEmail = () => {
+const getCustomerEmail = () => {
   const user = Meteor.users.findOne(Meteor.userId());
   return user.emails[0].address;
 };
@@ -48,7 +48,7 @@ handlePayment = (transactionId, type) => {
     } else {
       const exchangeRate = getExchangeRate();
       const paystackResponse = response.data.data;
-      paystackMethod = {
+      const paystackMethod = {
         processor: "Paystack",
         storedCard: paystackResponse.authorization.last4,
         method: "Paystack",
@@ -72,7 +72,7 @@ handlePayment = (transactionId, type) => {
   });
 };
 
-finalizePayment = (paystackMethod) => {
+const finalizePayment = (paystackMethod) => {
   Meteor.call("cart/submitPayment", paystackMethod);
 };
 
