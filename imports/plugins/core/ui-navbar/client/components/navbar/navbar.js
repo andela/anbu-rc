@@ -1,9 +1,21 @@
+import { Meteor } from "meteor/meteor";
+import { Template } from "meteor/templating";
 import { FlatButton } from "/imports/plugins/core/ui/client/components";
 import { Reaction } from "/client/api";
 import { Tags } from "/lib/collections";
 
 Template.CoreNavigationBar.onCreated(function () {
   this.state = new ReactiveDict();
+  this.notifications = ReactiveVar();
+  this.autorun(() => {
+    const instance = this;
+    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
+      console.log("call result", res, err);
+      instance.notifications.set(!!res);
+      console.log("instance result", instance.notifications.get());
+    });
+  });
+  console.log("trace");
 });
 
 /**
@@ -71,5 +83,64 @@ Template.CoreNavigationBar.helpers({
         instance.toggleMenuCallback = callback;
       }
     };
+  }
+});
+
+// notification template session
+
+Template.notificationItem.onCreated(function () {
+  this.notifications = ReactiveVar();
+  // Create an auto run to Check for notifications on page load
+  // and set the notification reactive variable.
+  this.autorun(() => {
+    const instance = this;
+    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
+      console.log(res);
+      instance.notifications.set(res);
+    });
+  });
+});
+
+Template.notificationDropdown.onCreated(function () {
+  this.notifications = ReactiveVar();
+
+  // Create an auto run to Check for notifications on page load
+  // and set the notification reactive variable.
+  this.autorun(() => {
+    const instance = this;
+    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
+      instance.notifications.set(res.length);
+    });
+  });
+});
+
+Template.dropDownNotifications.events({
+    /**
+   * Clear Notifications
+   * @param  {Event} event - jQuery Event
+   * @return {void}
+   */
+  "click #clearNotifications": (event) => {
+    event.preventDefault();
+    Meteor.call("notifications/clearNotifications", Meteor.userId());
+  }
+});
+
+Template.notificationDropdown.helpers({
+  NotificationIcon() {
+  // Check if the user has pending notifications
+  // and set the appropriate Icon
+    return (Template.instance().notifications.get() > 0)
+    ? "fa fa-bell"
+    : "fa fa-bell-o";
+  },
+  checkNotification() {
+    return (Template.instance().notifications.get() > 0);
+  }
+});
+Template.notificationItem.helpers({
+  showNotification() {
+    // Change the display state of the notification to show the latest notification when clicked
+    return Template.instance().notifications.get();
   }
 });

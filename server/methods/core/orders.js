@@ -6,9 +6,10 @@ import Future from "fibers/future";
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import { getSlug } from "/lib/api";
-import { Cart, Media, Orders, Products, Shops } from "/lib/collections";
+import { Cart, Media, Orders, Products, Shops, Notifications } from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import { Logger, Reaction } from "/server/api";
+import { HTTP } from "meteor/http";
 
 /**
  * Reaction Order Methods
@@ -315,6 +316,41 @@ Meteor.methods({
     return false;
   },
 
+/* START NOTIFICATION*/
+    /**
+      * Get user notifications
+      * @param {String} currentUserId - ID of the current user
+      * @return {Boolean} - the notification object or false
+      */
+  "notifications/getNotifications": function (currentUserId) {
+    try {
+      check(currentUserId, String);
+      // console.log(currentUserId);
+     // TODO: add  'seen' criteria to the notification
+     // to check if the user has opened the notification.
+      const notification = Notifications.find({userId: currentUserId}).fetch();
+      return notification ? notification : [false];
+    } catch (e) {
+     // Fail silently if the userId is not matched.
+      return false;
+    }
+  },
+
+   /**
+  * Clear user notifications
+  * @param {String} currentUserId - ID of the current user
+  */
+
+  "notifications/clearNotifications": function (currentUserId) {
+    try {
+      check(currentUserId, String);
+      Notifications.remove({userId: currentUserId});
+    } catch (e) {
+     // Fail silently if the userId is not matched.
+    }
+  },
+/*  End of first part*/
+
   /**
    * orders/sendNotification
    *
@@ -332,9 +368,153 @@ Meteor.methods({
 
     this.unblock();
 
+    // sms login details
+    const smsLoginDetail = {
+      cmd: "login",
+      owneremail: Meteor.settings.SMS.OWNEREMAIL,
+      subacct: Meteor.settings.SMS.SUBACCT,
+      subacctpwd: Meteor.settings.SMS.SUBACCTPWD
+    };
+
     // Get Shop information
+
+    // Update the notification collection
+    const notification = {
+      userId: Meteor.userId(),
+      name: "Order Created",
+      type: "new",
+      message: "Order creation successful!",
+      orderId: order._id
+    };
+
+    // if (order.workflow.status === "coreOrderWorkflow/processing") {
+    //   notification.name = "Order Shipped";
+    //   notification.type = "Completed";
+    //   notification.message = "Your order has been shipped!";
+    // }
+
+    // Order processing message
+    if (order.workflow.status === "coreOrderWorkflow/processing") {
+      notification.name = "Order Processed";
+      notification.type = "Processing";
+      notification.message = "Your order is been process!";
+    }
+    // Order shipped message
+    if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
+      notification.name = "Order Shipped";
+      notification.type = "shipped";
+      notification.message = "Your order has been shipped!";
+    }
+    // order completed message
+    if (order.workflow.status === "coreOrderWorkflow/completed") {
+      notification.name = "Order Completed";
+      notification.type = "completed";
+      notification.message = "Your order has been Delivered!";
+    }
+
+    // canceled order
+    if (order.workflow.status === "canceled") {
+      notification.name = "Order Canceled";
+      notification.type = "canceled";
+      notification.message = "Your order has been cancel!";
+    }
+
+
+    check(notification, Schemas.Notifications);
+       // Insert new order into the notifications database.
+    Notifications.insert(notification);
+
+       // Get the total number of items ordered and send notifications for each item.
+    const numberOfItems = order.items.length;
+
+    console.log("Buyer Phone Number", order.billing[0].address.phone);
+    console.log("TOTAL Amount", order.billing[0].invoice.total);
+
+       // Send SMS to the buyers phone using the billing address number.
+    const buyerPhoneNumber = order.billing[0].address.phone;
+
     const shop = Shops.findOne(order.shopId);
     const shopContact = shop.addressBook[0];
+
+    // Use a loop to send to all vendors and buyers for all products.
+    // TODO: concatenate all products so that a single message can be sent to the buyer containing all the products he bought.
+    let products = "";
+    for (let i = 0; i < numberOfItems; i += 1) {
+      products += ` ${order.items[i].title},`;
+
+      // Get Shop information
+      const vendorShop = Shops.findOne(order.items[i].shopId);
+      const vendorAddress = vendorShop.shopDetails;
+
+        // Send SMS to the vendor
+      const vendorPhoneNumber = (vendorShop.name === "REACTION") ? shopContact.phone : vendorAddress.shopPhone;
+      const vendorMsgContent = {
+        to: vendorPhoneNumber,
+        from: "New Order",
+        message: `An order has been placed for ${order.items[i].title}, visit your reaction commerce dashboard to view and process orders.`
+      };
+      if (order.workflow.status === "new") {
+        Meteor.call("send/sms/alert", vendorMsgContent.message, vendorMsgContent.to, (error, result) => {
+          if (error) {
+            Logger.info("ERROR", error);
+          } else {
+            Logger.warn("SMS SENT", result);
+          }
+        });
+      }
+    }
+
+    const buyerMsgContent = {
+      to: buyerPhoneNumber,
+      from: "Reaction",
+      message: `Your order for ${products} has been received and is now being processed. Thanks for your patronage.`
+    };
+    if (order.workflow.status === "new") {
+      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+        if (error) {
+          Logger.info("ERROR", error);
+        } else {
+          Logger.warn("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "coreOrderWorkflow/processing") {
+      buyerMsgContent.message = "The order you placed on reaction commerce store is been process.";
+      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
+      buyerMsgContent.message = "The order you placed on reaction commerce store has been shipped.";
+      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "coreOrderWorkflow/completed") {
+      buyerMsgContent.message = "The order you placed on reaction commerce store has been delivered.";
+      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "canceled") {
+      buyerMsgContent.message = "The order you placed on reaction commerce store has been canceled.";
+      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    }
+
 
     // Get shop logo, if available
     let emailLogo;
@@ -850,5 +1030,27 @@ Meteor.methods({
       throw new Meteor.Error(
         "Attempt to refund transaction failed", result.error);
     }
+  },
+
+  "send/sms/alert": function (message, sendTo) {
+    check(message, String);
+    check(sendTo, String);
+    HTTP.call("GET", Meteor.settings.SMS.URL,
+      {
+        params:
+        {
+          cmd: "sendquickmsg",
+          owneremail: Meteor.settings.SMS.OWNEREMAIL,
+          subacct: Meteor.settings.SMS.SUBACCT,
+          subacctpwd: Meteor.settings.SMS.SUBACCTPWD,
+          message: message,
+          sender: "ANBU-SQUAD",
+          sendto: sendTo,
+          msgtype: 0
+        }
+      }, (error, result) => {
+        error ? Logger.warn("ERROR IN SEDING THE SMS", error) : Logger.info("New order sms alert sent to ", sendTo);
+      }
+    );
   }
 });
