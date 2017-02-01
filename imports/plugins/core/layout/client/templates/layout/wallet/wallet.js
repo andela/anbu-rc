@@ -1,7 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
-import { Accounts, Packages, Wallets } from "/lib/collections";
+import { Accounts, Packages, Wallets, Shops } from "/lib/collections";
 
 Template.wallet.onCreated(function bodyOnCreated() {
   this.state = new ReactiveDict();
