@@ -1,6 +1,5 @@
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
-import Alerts from "sweetalert2";
 import { Reaction } from "/client/api";
 import { Accounts, Packages, Wallets } from "/lib/collections";
 
@@ -16,7 +15,7 @@ Template.wallet.onCreated(function bodyOnCreated() {
   });
 });
 
-const getPaystackSettings = () => {
+getPaystackSettings = () => {
   const settings = Packages.findOne({
     name: "paystack-paymentmethod",
     shopId: Reaction.getShopId()

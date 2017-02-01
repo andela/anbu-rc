@@ -1,5 +1,4 @@
 /* eslint camelcase: 0 */
-import Alerts from "sweetalert2";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
