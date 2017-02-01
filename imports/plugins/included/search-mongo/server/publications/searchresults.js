@@ -168,6 +168,6 @@ Meteor.publish("SearchResults", function (collection, searchTerm, facets, maxRes
 });
 
 Meteor.publish("searchresults/actionableAnalytics", () => {
-  const subResults =  ProductSearch.find({});
+  const subResults =  ProductSearch.find();
   return subResults;
 });

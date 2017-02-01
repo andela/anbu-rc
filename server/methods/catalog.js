@@ -1273,19 +1273,23 @@ Meteor.methods({
 
   /**
    * update the number of times a product has been viewed (for analytics purposes)
-   * @param{String} productId - Id of the product views to be updated
+   * @param{String} handle - handle of the product views to be updated
    * @return{Object} - Updated product
    */
   "products/updateViews": (handle) => {
     check(handle, String);
     const product = Products.findOne({handle: handle});
-    const price = product.price || {range: "0.00 - 0.00", min: 0.00, max: 0.00};
-    const update = Object.assign({}, product, {views: (product.views + 1), price});
-    const result = Products.upsert(product._id, {$set: update}, {
-      selector: {
-        type: product.type
-      }
-    });
+    let result = {};
+    if (product) {
+      const price = product.price || {range: "0.00 - 0.00", min: 0.00, max: 0.00};
+      product.views = product.views + 1;
+      product.price = price;
+      result = Products.upsert(product._id, {$set: product}, {
+        selector: {
+          type: product.type
+        }
+      });
+    }
     return result;
   }
 });

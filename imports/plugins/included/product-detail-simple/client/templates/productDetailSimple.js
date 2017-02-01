@@ -2,10 +2,20 @@ import { ProductDetailContainer } from "../containers";
 import { isRevisionControlEnabled } from "/imports/plugins/core/revisions/lib/api";
 import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
+import { Meteor } from "meteor/meteor";
+Template.productDetailSimple.onDestroyed(() => {
+  const handle = this.state.get("handle");
+  if (handle) {
+    Meteor.call("products/updateViews", handle);
+  }
+});
 
 Template.productDetailSimple.onCreated(() => {
-  const handle = Reaction.Router.current().params.handle;
-  Meteor.call("products/updateViews", handle);
+  this.state = new ReactiveDict();
+  this.state.setDefault({
+    handle: ""
+  });
+  this.state.set("handle", Reaction.Router.current().params.handle);
 });
 
 Template.productDetailSimple.helpers({

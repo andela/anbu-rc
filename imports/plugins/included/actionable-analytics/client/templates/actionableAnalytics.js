@@ -80,7 +80,6 @@ function daysDifference(date1, date2) {
   // Convert back to days and return
   return Math.round(difference / oneDay);
 }
-
 Template.actionableAnalytics.onCreated(function () {
   this.state = new ReactiveDict();
   this.state.setDefault({
@@ -92,24 +91,12 @@ Template.actionableAnalytics.onCreated(function () {
     analytics: {},
     analyticsStatement: {},
     ordersAnalytics: [],
-    productsAnalytics: {}
+    productsAnalytics: []
   });
+  this.subscribe("Orders");
+  this.subscribe("searchresults/actionableAnalytics");
   this.autorun(() => {
-    const productsSearchSub = this.subscribe("searchresults/actionableAnalytics");
-    if (productsSearchSub.ready()) {
-      const products = ProductSearch.find().fetch();
-      const pAnalytics = {};
-      products.forEach((product) => {
-        if (pAnalytics[product._id]) {
-          pAnalytics[product._id].views += 1;
-        } else {
-          pAnalytics[product._id] = {title: product.title, views: product.views, handle: product.handle};
-        }
-      });
-      this.state.set("productsAnalytics", pAnalytics);
-    }
-    const ordersSub = this.subscribe("Orders");
-    if (ordersSub.ready()) {
+    if (this.subscriptionsReady()) {
       const allOrders = Orders.find().fetch();
       if (allOrders) {
         const analyticsItems = extractAnalyticsItems(allOrders);
@@ -121,6 +108,10 @@ Template.actionableAnalytics.onCreated(function () {
         this.state.set("analytics", analyticsItems.analytics);
         this.state.set("analyticsStatement", analyticsItems.analyticsStatement);
         this.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
+        const products = ProductSearch.find().fetch();
+        if (products) {
+          this.state.set("productsAnalytics", products);
+        }
       }
     }
   });
@@ -222,13 +213,7 @@ Template.actionableAnalytics.helpers({
   products() {
     const instance = Template.instance();
     const productsAnalytics = instance.state.get("productsAnalytics");
-    const products = [];
-    for (const key in productsAnalytics) {
-      if (key) {
-        products.push(productsAnalytics[key]);
-      }
-    }
-    return _.orderBy(products,
+    return _.orderBy(productsAnalytics,
       (product) => {
         return product.views;
       },
