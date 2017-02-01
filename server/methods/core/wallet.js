@@ -7,9 +7,8 @@ Meteor.methods({
 
   /**
   * wallet/deposit method to deposit money into user's account
-  * @param {string} userId, the id of the user
-  * @param {object} transaction, details of the transaction
-  * @param {string} type, type of transaction done
+  * @param {string} userId the id of the user
+  * @param {object} transaction details of the transaction
   * @return {boolean} true or false if the db operation was successful
   */
   "wallet/transaction": (userId, transactions) => {
@@ -49,11 +48,11 @@ Meteor.methods({
   /**
   * wallet/refund method to return fund when an order is canceled
   * @param {string} userId the id of the logged in user
-  * @param {string} orderid, the order reference id
+  * @param {string} orderid the order reference id
   * @param {int} amount the amount to refund
   * @return {boolean} true if the refund was successful
   */
-  "wallet/refund": (orderInfo) => {
+  "wallet/refund": (orderInfo, userId) => {
     check(orderInfo, Schemas.Order);
     let amount = orderInfo.billing[0].invoice.total;
     if (orderInfo.workflow.status === "coreOrderWorkflow/completed") {

@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
+import Alerts from "sweetalert2";
 import { Reaction } from "/client/api";
 import { Accounts, Packages, Wallets } from "/lib/collections";
 
