@@ -3,6 +3,8 @@ import { isRevisionControlEnabled } from "/imports/plugins/core/revisions/lib/ap
 import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
 import { Meteor } from "meteor/meteor";
+import { ReactiveDict } from "meteor/reactive-dict";
+
 Template.productDetailSimple.onDestroyed(() => {
   const handle = this.state.get("handle");
   if (handle) {
