@@ -1,9 +1,7 @@
 import { StaticPages } from "/lib/collections";
-Meteor.publish("staticPages", function() {
+Meteor.publish("staticPages", () => {
   if (this.userId === null) {
     return this.ready();
   }
-  return StaticPages.find({
-    pageOwner: this.userId
-  });
+  return StaticPages.find();
 });

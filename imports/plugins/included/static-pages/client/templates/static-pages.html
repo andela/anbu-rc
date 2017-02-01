@@ -2,13 +2,12 @@
   <div class="container">
     <div class="col-md-8">
       <h1 id="header">Create a New Page</h1>
+      <a href="#" class="create-page">Add Page <i class="fa fa-plus" aria-hidden="true"></i></a>
       <hr>
       <form class="new_page">
         <div class="form-group">
           <label for="page-title">Page Title:</label>
-          <!--<input type="text" class="form-control" name="title" id="title" placeholder="Enter page title">-->
           <input type="text" class="form-control" name="title" id="static-page-title" placeholder="Enter page title">
-          
         </div>
         <div class="input-group">
           <span class="input-group-addon" id="basic-addon3">{{baseUrl}}/</span>
@@ -17,7 +16,7 @@
         <h4>Page Content:</h4>
         <textarea cols="20" rows="10" name="body" id="static-page-content"></textarea>
         <script>
-          CKEDITOR.replace("static-page-content");
+          
         </script>
         <br>
         <div class="form-group">
@@ -28,9 +27,7 @@
       </form>
     </div>
     <div class="col-md-4">
-      <h3>Manage Your Custom Pages</h3>
-       <a href="#" class="create-page"><i class="fa fa-plus" aria-hidden="true"></i></a>
-      <hr>
+      <h3 class="text-center">Manage Your Custom Pages</h3>
       <ul>
         {{ #each displayPages }}
           {{> displayPageName }}
@@ -46,13 +43,6 @@
       <td style="width: 250px">
         <span> <strong> {{ title }} </strong></span>
       </td>
-      <!--<td>
-        <div>
-          <button class="btn btn-info edit"><span class="fa fa-pencil-square-o" aria-hidden="true"></span></button>
-          <a class="btn btn-success preview" href="/{{ slug }}"><span class="fa fa-eye" aria-hidden="true"></span></a>
-          <button class="btn btn-danger delete"><span class="fa fa-trash-o text-danger" aria-hidden="true"></span></button>
-        </div>
-      </td>-->
       <td>
         <button type="button" title="Edit Page" class="btn btn-default edit-page" aria-label="Edit Page">
         <span class="fa fa-pencil-square-o" aria-hidden="true"></span>

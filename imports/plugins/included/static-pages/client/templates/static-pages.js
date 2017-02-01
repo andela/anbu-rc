@@ -4,9 +4,13 @@ import "./static-pages.html";
 import { StaticPages } from "/lib/collections";
 import { Reaction } from "/client/api";
 
-Template.staticPages.onCreated(function () {
+Template.staticPages.onCreated(() => {
    // Subscribe to Pages publication
-  this.subscribe("staticPages");
+  Meteor.subscribe("staticPages");
+});
+
+Template.staticPages.onRendered(() => {
+  CKEDITOR.replace("static-page-content");
 });
 
 Template.staticPages.helpers({
@@ -67,10 +71,12 @@ Template.staticPages.events({
     $("#static-page-slug").val(pageDetails.slug);
     $("#btn-update").text("Edit Page");
     $("#header").text(`Edit ${pageDetails.title}`);
+    $(".create-page").show();
     CKEDITOR.instances["static-page-content"].setData(pageDetails.content);
   },
   "click .create-page"(event) {
     event.preventDefault();
+    $(".create-page").hide();
     $("#btn-update").text("Create Page");
     $("#header").text("Create a New Page");
     $("#static-page-title").val("");
