@@ -29,17 +29,25 @@ Template.staticPages.events({
     const shopId = Reaction.shopId;
     const pageOwner = Meteor.user()._id;
 
-    Meteor.call("insertPage", title, slug, content, shopId, pageOwner, error => {
-      if (error) {
-        console.log(error);
-        Alerts.toast(error.reason, "error");
-      } else {
-        Alerts.toast("Created New Static Page", "success");
-      }
-    });
+    if ($("#btn-update").text() === "Edit Page") {
+      Meteor.call("updatePage", Session.get("editId"), title, slug, content,  error => {
+        if (error) {
+          Alerts.toast(error.reason, "error");
+        } else {
+          Alerts.toast("Page Update Successful!", "success");
+        }
+      });
+    } else {
+      Meteor.call("insertPage", title, slug, content, shopId, pageOwner, error => {
+        if (error) {
+          Alerts.toast(error.reason, "error");
+        } else {
+          Alerts.toast("Created New Static Page", "success");
+        }
+      });
+    }
   },
   "click .delete-page"() {
-    // Meteor.call("deletePage", this._id);
     Alerts.alert({
       title: "Delete this page?",
       showCancelButton: true,
@@ -47,9 +55,26 @@ Template.staticPages.events({
       confirmButtonText: "Yes"
     }, (confirmed) => {
       if (confirmed) {
-        // const _id = $(event.currentTarget).parents("tr").attr("id");
         Meteor.call("deletePage", this._id);
       }
     });
+  },
+  "click .edit-page"() {
+    const _id = this._id;
+    Session.set("editId", _id);
+    const pageDetails = StaticPages.findOne(_id);
+    $("#static-page-title").val(pageDetails.title);
+    $("#static-page-slug").val(pageDetails.slug);
+    $("#btn-update").text("Edit Page");
+    $("#header").text(`Edit ${pageDetails.title}`);
+    CKEDITOR.instances["static-page-content"].setData(pageDetails.content);
+  },
+  "click .create-page"(event) {
+    event.preventDefault();
+    $("#btn-update").text("Create Page");
+    $("#header").text("Create a New Page");
+    $("#static-page-title").val("");
+    $("#static-page-slug").val("");
+    CKEDITOR.instances["static-page-content"].setData("");
   }
 });

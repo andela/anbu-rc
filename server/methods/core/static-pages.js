@@ -22,10 +22,25 @@ Meteor.methods({
       updatedAt: new Date
     };
     check(page, Schemas.StaticPages);
-    Collections.StaticPages.insert(page);
+    StaticPages.insert(page);
   },
   "deletePage"(pageId) {
     check(pageId, String);
     StaticPages.remove(pageId);
+  },
+  "updatePage"(pageId, title, slug, content) {
+    check(pageId, String);
+    check(title, String);
+    check(slug, String);
+    check(content, String);
+
+    StaticPages.update(pageId, {
+      $set: {
+        title,
+        slug,
+        content,
+        updatedAt: new Date
+      }
+    });
   }
 });

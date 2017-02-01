@@ -1,7 +1,7 @@
 <template name="staticPages">
   <div class="container">
     <div class="col-md-8">
-      <h1>Create a New Page</h1>
+      <h1 id="header">Create a New Page</h1>
       <hr>
       <form class="new_page">
         <div class="form-group">
@@ -29,6 +29,7 @@
     </div>
     <div class="col-md-4">
       <h3>Manage Your Custom Pages</h3>
+       <a href="#" class="create-page"><i class="fa fa-plus" aria-hidden="true"></i></a>
       <hr>
       <ul>
         {{ #each displayPages }}
@@ -58,7 +59,7 @@
         </button>
       </td>
       <td>
-        <a href="/pages/{{userPage.slug}}">
+        <a href="/pages/{{slug}}">
           <button type="button" title="Preview" class="btn btn-default" aria-label="Preview">
             <span class="fa fa-eye" aria-hidden="true"></span>
           </button>
