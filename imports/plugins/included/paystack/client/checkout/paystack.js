@@ -15,11 +15,6 @@ const generateTransactionID = () => {
   return Random.id(16);
 };
 
-const getCustomerEmail = () => {
-  const user = Meteor.users.findOne(Meteor.userId());
-  return user.emails[0].address;
-};
-
 const getOrderPrice = () => {
   const cart = Cart.findOne();
   const exchangeRate =  getExchangeRate();
@@ -32,6 +27,10 @@ const getPaystackSettings = () => {
     shopId: Reaction.getShopId()
   });
   return settings;
+};
+
+const finalizePayment = (paystackMethod) => {
+  Meteor.call("cart/submitPayment", paystackMethod);
 };
 
 handlePayment = (transactionId, type) => {
@@ -70,10 +69,6 @@ handlePayment = (transactionId, type) => {
       }
     }
   });
-};
-
-const finalizePayment = (paystackMethod) => {
-  Meteor.call("cart/submitPayment", paystackMethod);
 };
 
 // Paystack payment
