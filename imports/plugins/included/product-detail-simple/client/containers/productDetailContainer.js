@@ -240,7 +240,7 @@ function composer(props, onData) {
       let editable = false;
       let hasAdminPermission = false;
 
-      const setData = function () {
+      const setData = () => {
         onData(null, {
           product: productRevision || product,
           priceRange,
