@@ -108,13 +108,13 @@ Template.wallet.events({
 
   "submit #transfer": (event) => {
     event.preventDefault();
-    let amount = parseInt(document.getElementById("transferAmount").value, 10);
+    const exchangeRate = getExchangeRate();
+    let amount = parseInt(document.getElementById("transferAmount").value, 10) / exchangeRate;
     if (amount > Template.instance().state.get("details").balance) {
       Alerts.toast("Insufficient Balance", "error");
       return false;
     }
     const recipient = document.getElementById("recipient").value;
-    amount /= getExchangeRate();
     const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit" };
     Meteor.call("wallet/transaction", Meteor.userId(), transaction, (err, res) => {
       if (res === 2) {
