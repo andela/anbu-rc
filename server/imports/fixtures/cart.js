@@ -1,97 +1,58 @@
 import faker from "faker";
 import { Factory } from "meteor/dburles:factory";
-import { Cart, Products } from "/lib/collections";
-import "./shops";
+import { Accounts }  from "/lib/collections";
 import { getShop } from "./shops";
-import { getAddress } from "./accounts";
-import { addProduct } from "./products";
 
 /**
- *
- * @param {Object} [options] - Options object (optional)
- * @param {string} [options._id] - id of CartItem
- * @param {string} [options.productId] - _id of product that item came from
- * @param {string} [options.shopId] - _id of shop that item came from
- * @param {number} [options.quantity] - quantity of item in CartItem
- * @param {Object} [options.variants] - _single_ variant object. ¯\_(ツ)_/¯ why called variants
- *
- * @returns {Object} - randomly generated cartItem/orderItem data object
+ * Factory account
  */
-export function getCartItem(options = {}) {
-  const product = addProduct();
-  const variant = Products.findOne({ ancestors: [product._id] });
-  const childVariants = Products.find({ ancestors: [
-    product._id, variant._id
-  ] }).fetch();
-  const selectedOption = Random.choice(childVariants);
+
+export function getUser() {
+  const existingUser = Meteor.users.findOne();
+  return existingUser || Factory.create("user");
+}
+
+export function getAddress(options = {}) {
   const defaults = {
-    _id: Random.id(),
-    productId: product._id,
-    shopId: getShop()._id,
-    quantity: _.random(1, selectedOption.inventoryQuantity),
-    variants: selectedOption,
-    title: "cart title"
+    fullName: faker.name.findName(),
+    address1: faker.address.streetAddress(),
+    address2: faker.address.secondaryAddress(),
+    city: faker.address.city(),
+    company: faker.company.companyName(),
+    phone: faker.phone.phoneNumber(),
+    region: faker.address.stateAbbr(),
+    postal: faker.address.zipCode(),
+    country: faker.address.countryCode(),
+    isCommercial: faker.random.boolean(),
+    isShippingDefault: faker.random.boolean(),
+    isBillingDefault: faker.random.boolean(),
+    metafields: []
   };
   return _.defaults(options, defaults);
 }
 
+export function createAccountFactory() {
+  Factory.define("account", Accounts, {
+    shopId: getShop()._id,
+    userId: getUser()._id,
+    emails: [{
+      address: faker.internet.email(),
+      verified: faker.random.boolean()
+    }],
+    acceptsMarketing: true,
+    state: "new",
+    note: faker.lorem.sentences(),
+    profile: {
+      addressBook: [
+        getAddress()
+      ]
+    },
+    metafields: [],
+    createdAt: new Date,
+    updatedAt: new Date()
+  });
+}
 
 export default function () {
-  /**
-   * Cart Factory
-   * @summary define cart Factory
-   */
-
-  const cart = {
-    shopId: getShop()._id,
-    userId: Factory.get("user"),
-    sessionId: Random.id(),
-    email: faker.internet.email(),
-    items: [
-      getCartItem(),
-      getCartItem()
-    ],
-    shipping: [],
-    billing: [],
-    workflow: {
-      status: "new",
-      workflow: []
-    },
-    createdAt: faker.date.past(),
-    updatedAt: new Date()
-  };
-  const addressForOrder = getAddress();
-  const cartToOrder = {
-    shopId: getShop()._id,
-    shipping: [
-      {
-        _id: Random.id(),
-        address: addressForOrder
-      }
-    ],
-    billing: [
-      {
-        _id: Random.id(),
-        address: addressForOrder
-      }
-    ],
-    workflow: {
-      status: "checkoutPayment",
-      workflow: [
-        "checkoutLogin",
-        "checkoutAddressBook",
-        "coreCheckoutShipping",
-        "checkoutReview",
-        "checkoutPayment"
-      ]
-    }
-  };
-
-  const anonymousCart = {
-    userId: Factory.get("anonymous")
-  };
-
-  Factory.define("cart", Cart, Object.assign({}, cart));
-  Factory.define("cartToOrder", Cart, Object.assign({}, cart, cartToOrder));
-  Factory.define("anonymousCart", Cart, Object.assign({}, cart, anonymousCart));
+  createAccountFactory();
 }

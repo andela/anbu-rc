@@ -107,11 +107,11 @@
     }
   },
   "scripts": {
+    "selenium": "java -jar selenium-server-standalone-3.0.1.jar",
     "create-report": "allure generate allure-results/ -o ~/allure-report",
     "open-report": "cd && allure report open",
     "del-report": "rm -rf ~/allure-report && rm -rf allure-results",
     "test-local": "wdio tests/runner/local.conf.js",
     "test-browserstack": "wdio tests/runner/browserstack.conf.js; kill $(ps aux | grep '[b]rowserstack' | awk '{print $2}')"
   }
-
 }
