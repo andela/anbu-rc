@@ -136,6 +136,7 @@ class ProductDetail extends Component {
 
 
               <div className="vendor">
+                 <strong><em>Vendor</em>: </strong>
                 <ProductField
                   editable={false}
                   fieldName="vendor"
