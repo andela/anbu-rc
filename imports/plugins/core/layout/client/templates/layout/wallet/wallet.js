@@ -109,7 +109,7 @@ Template.wallet.events({
   "submit #transfer": (event) => {
     event.preventDefault();
     const exchangeRate = getExchangeRate();
-    let amount = parseInt(document.getElementById("transferAmount").value, 10) / exchangeRate;
+    const amount = parseInt(document.getElementById("transferAmount").value, 10) / exchangeRate;
     if (amount > Template.instance().state.get("details").balance) {
       Alerts.toast("Insufficient Balance", "error");
       return false;
