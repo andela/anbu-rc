@@ -1,4 +1,3 @@
-import { Meteor } from "meteor/meteor";
 import faker from "faker";
 import { Products, Tags, Accounts } from "/lib/collections";
 import { getShop } from "./shops";
@@ -149,9 +148,9 @@ export default function () {
     type: "simple",
     vendor: faker.company.companyName(),
     vendorDetail: {
-      userId: "F2KJNdk7cpFaRQgaN" || getUser()._id,
+      userId: getUser()._id,
       shopName: faker.company.companyName(),
-      shopPhone: _.random(0, 1000000),
+      shopPhone: _.random(0, 1000000).toString(),
       shopAddress: faker.lorem.sentence()
     },
     price: priceRange,
