@@ -78,7 +78,7 @@ export const methods = {
    */
   "shipping/provider/add": function (doc) {
     check(doc, Object);
-		doc.vendorId = Meteor.userId();
+    doc.vendorId = Meteor.userId();
     if (!Reaction.hasPermission("shipping")) {
       throw new Meteor.Error(403, "Access Denied");
     }

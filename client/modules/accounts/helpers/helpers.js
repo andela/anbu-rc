@@ -45,6 +45,6 @@ export const LoginFormSharedHelpers = {
     return !!Package["accounts-password"];
   },
   showVendorForm() {
-    return Session.get("vendorForm")
+    return Session.get("vendorForm");
   }
 };

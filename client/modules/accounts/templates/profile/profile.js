@@ -116,9 +116,9 @@ Template.accountProfile.helpers({
       return false;
     }
     for (email of Meteor.user().emails) {
-      console.log(email.verified)
       return email.verified ? true : false;
     }
+    return false;
   }
 });
 // event to upgrade to seller account on profile
@@ -132,7 +132,7 @@ Template.accountProfile.events({
     const shopName = Template.instance().find(".shop-name").value;
     const shopPhone = Template.instance().find(".shop-phone").value;
     const shopAddress = Template.instance().find(".shop-address").value;
-    const dbShopName = Meteor.user().profile.vendor[1] ? Meteor.user().profile.vendor[1].shopName : undefined;
+    // const dbShopName = Meteor.user().profile.vendor[1] ? Meteor.user().profile.vendor[1].shopName : undefined;
     if (!/\w+/g.test(shopName) && shopName.length <= 20) {
       errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
     } else if (allShops.includes(shopName) && addShop) {
