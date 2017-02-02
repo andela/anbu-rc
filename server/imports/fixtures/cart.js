@@ -124,9 +124,3 @@ export default function () {
   Factory.define("cartToOrder", Cart, Object.assign({}, cart, cartToOrder));
   Factory.define("anonymousCart", Cart, Object.assign({}, cart, anonymousCart));
 }
-
-
-  Factory.define("cart", Cart, Object.assign({}, cart));
-  Factory.define("cartToOrder", Cart, Object.assign({}, cart, cartToOrder));
-  Factory.define("anonymousCart", Cart, Object.assign({}, cart, anonymousCart));
-}
