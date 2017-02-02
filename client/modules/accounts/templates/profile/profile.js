@@ -112,13 +112,10 @@ Template.accountProfile.helpers({
     return Template.instance().updateShop.get();
   },
   isNotGuestOrAdmin: function () {
-    if (Reaction.hasPermission("admin")) {
+    if (Reaction.hasPermission("admin") || Reaction.hasPermission("anonymous")) {
       return false;
     }
-    for (email of Meteor.user().emails) {
-      return email.verified ? true : false;
-    }
-    return false;
+    return true;
   }
 });
 // event to upgrade to seller account on profile
@@ -128,11 +125,16 @@ Template.accountProfile.events({
     const templateInstance = Template.instance();
     const errors = {};
     templateInstance.formMessages.set({});
-    // const isVendorNow = Meteor.user().profile.vendor[0];
     const shopName = Template.instance().find(".shop-name").value;
     const shopPhone = Template.instance().find(".shop-phone").value;
     const shopAddress = Template.instance().find(".shop-address").value;
-    // const dbShopName = Meteor.user().profile.vendor[1] ? Meteor.user().profile.vendor[1].shopName : undefined;
+    let emailVerified;
+    for (let theEmail of Meteor.user().emails) {
+      emailVerified = theEmail.verified ? true : false;
+      if (emailVerified === false) {
+        break;
+      }
+    }
     if (!/\w+/g.test(shopName) && shopName.length <= 20) {
       errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
     } else if (allShops.includes(shopName) && addShop) {
@@ -140,12 +142,7 @@ Template.accountProfile.events({
         i18nKeyReason: "Hello! Shop name has already been taken.",
         reason: "Hello! Shop name has already been taken."
       };
-    } /* else if (isVendorNow && (shopName !== (dbShopName || undefined))) {
-      errors.shopName = {
-        i18nKeyReason: "Cheating Huh! You shouldn't do this.",
-        reason: "Cheating Huh! You shouldn't do this."
-      };
-    } */
+    }
     if (!/\d+(-)?/g.test(shopPhone) && shopPhone.length <= 14) {
       errors.shopPhone = { i18nKeyReason: "invalid shop phone number", reason: "invalid shop phone number"};
     }
@@ -153,6 +150,7 @@ Template.accountProfile.events({
     if (!/\w+/g.test(shopAddress) && shopAddress.length <= 250) {
       errors.shopAddress = { i18nKeyReason: "invalid shop address", reason: "invalid shop address"};
     }
+
     if ($.isEmptyObject(errors) === false) {
       templateInstance.formMessages.set({
         errors: errors
@@ -161,24 +159,32 @@ Template.accountProfile.events({
       return;
     }
     const vendorDetail = {shopName, shopPhone, shopAddress};
-    Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] } } });
+    const resetUpdateShopMessage = () => {
+      return setTimeout(function () {
+        templateInstance.updateShop.set("");
+      }, 3000);
+    };
 
-    Template.instance().updateShop.set("shop details updated");
-    const template = Template.instance();
-    setTimeout(function () {
-      template.updateShop.set("");
-    }, 2000);
-
-    Meteor.call("accounts/addVendorPermissions", Meteor.userId(), (err, result) => {
-      if (!err && !allShops.includes(shopName) && !Meteor.user().profile.vendor[0]) {
-        Meteor.call("shopNames/update", shopName, (e, res) => {
-          if (e) {
-            return e;
-          }
-          return res;
-        });
-      }
-      return err ? err : result;
-    });
+    if (emailVerified === false) {
+      Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] } } });
+      templateInstance.updateShop.set("shop details updated");
+      resetUpdateShopMessage();
+      templateInstance.updateShop.set("please verify your email first, to start selling ");
+      resetUpdateShopMessage();
+    } else {
+      templateInstance.updateShop.set("vendor details updated");
+      resetUpdateShopMessage();
+      Meteor.call("accounts/addVendorPermissions", Meteor.userId(), (err, result) => {
+        if (!err && !allShops.includes(shopName) && !Meteor.user().profile.vendor[0]) {
+          Meteor.call("shopNames/update", shopName, (e, res) => {
+            if (e) {
+              return e;
+            }
+            return res;
+          });
+        }
+        return err ? err : result;
+      });
+    }
   }
 });

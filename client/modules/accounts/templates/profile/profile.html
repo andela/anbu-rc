@@ -44,14 +44,14 @@
         </div>
       </div>
     </div>
-  {{#if isNotGuest }}
+  {{#if isNotGuestOrAdmin }}
     <!-- Upgrading button -->
     <div class="flex-item">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title" >{{shopFormHeader}}</h3>
-          <i class="fa fa-chevron-down" aria-hidden="true" data-toggle="collapse" data-target="#showVendorForm" style="float:right"></i>
-					<span style="color:green; float:right">{{updatedShop}}</span>
+          <i class="fa fa-chevron-down" aria-hidden="true" data-toggle="collapse" data-target="#showVendorForm" style="float:right;margin-top: -15px;"></i>
+					<span style="color:green; float:right;margin-top: -15px;margin-right:30px;">{{updatedShop}}</span>
         </div>
         <!-- show vendor form -->
         <div class="panel-content">
