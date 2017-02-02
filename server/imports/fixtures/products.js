@@ -1,7 +1,6 @@
 import faker from "faker";
-import { Products, Tags, Accounts } from "/lib/collections";
+import { Products, Tags } from "/lib/collections";
 import { getShop } from "./shops";
-import { Factory } from "meteor/dburles:factory";
 
 
 /**
@@ -105,10 +104,6 @@ export function getProducts(limit = 2) {
   return products;
 }
 
-export function getUser() {
-  const existingUser = Accounts.findOne();
-  return existingUser || Factory.create("user");
-}
 
 export default function () {
   /**
@@ -148,7 +143,7 @@ export default function () {
     type: "simple",
     vendor: faker.company.companyName(),
     vendorDetail: {
-      userId: getUser()._id,
+      userId: "tteettsssii3344",
       shopName: faker.company.companyName(),
       shopPhone: _.random(0, 1000000).toString(),
       shopAddress: faker.lorem.sentence()
