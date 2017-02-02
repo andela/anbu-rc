@@ -5,10 +5,10 @@ import { Accounts, Packages, Wallets, Shops } from "/lib/collections";
 
 Template.wallet.onCreated(function bodyOnCreated() {
   this.state = new ReactiveDict();
+  this.state.setDefault({
+    details: { balance: 0, transactions: [] }
+  });
   this.autorun(() => {
-    this.state.setDefault({
-      details: { balance: 0, transactions: [] }
-    });
     this.subscribe("transactionDetails", Meteor.userId());
     const transactionInfo = Wallets.find().fetch();
     this.state.set("details", transactionInfo[0]);

@@ -25,7 +25,7 @@ AutoForm.hooks({
     },
     onError: function (operation, error) {
       Alerts.removeSeen();
-      return Alerts.add("Paystack settings update failed. " + error, "danger");
+      return Alerts.add(`Paystack settings update failed. ${error}`, "danger");
     }
   }
 });

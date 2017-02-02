@@ -68,8 +68,3 @@ Meteor.methods({
     }
   }
 });
-
-Meteor.publish("transactionDetails", (userId) => {
-  check(userId, String);
-  return Wallets.find({userId});
-});
