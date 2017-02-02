@@ -240,7 +240,7 @@ function composer(props, onData) {
       let editable = false;
       let hasAdminPermission = false;
 
-      setData = function () {
+      const setData = function () {
         onData(null, {
           product: productRevision || product,
           priceRange,
@@ -253,14 +253,10 @@ function composer(props, onData) {
       };
 
       if (Reaction.hasPermission(["createProduct"])) {
-        let vendor = null;
-        if (product.vendorDetail) {
-          vendor = product.vendorDetail.userId;
-        }
         if (Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId) {
           editable = true;
           hasAdminPermission = true;
-        } else if ((Meteor.user().profile.vendor[0] && Meteor.userId() === vendor)) {
+        } else if ((Reaction.hasPermission("createProduct") && Meteor.userId() === product.vendorDetail.userId)) {
           editable = true;
           hasAdminPermission = true;
         }
