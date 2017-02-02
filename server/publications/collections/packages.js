@@ -1,3 +1,5 @@
+/* eslint quote-props: 0 */
+/*  eslint-env es6 */
 import { Packages } from "/lib/collections";
 import { Reaction } from "/server/api";
 
