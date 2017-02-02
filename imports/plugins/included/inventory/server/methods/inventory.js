@@ -7,7 +7,8 @@ import { Logger, Reaction } from "/server/api";
 
 
 export function registerInventory(product) {
-  check(product);
+  Logger.info(product);
+  check(product, Match.OneOf(Schemas.ProductVariant, Schemas.Product));
   let type;
   switch (product.type) {
     case "variant":
