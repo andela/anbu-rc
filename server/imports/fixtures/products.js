@@ -143,7 +143,7 @@ export default function () {
     type: "simple",
     vendor: faker.company.companyName(),
     vendorDetail: {
-      userId: getUser()._id,
+      userId: "ZSDt9Euyo7FeGNjYw",
       shopName: faker.company.companyName(),
       shopPhone: _.random(0, 1000000),
       shopAddress: faker.company.companyName()
