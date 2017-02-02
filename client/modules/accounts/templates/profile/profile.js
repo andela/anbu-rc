@@ -128,8 +128,8 @@ Template.accountProfile.events({
     const shopName = Template.instance().find(".shop-name").value;
     const shopPhone = Template.instance().find(".shop-phone").value;
     const shopAddress = Template.instance().find(".shop-address").value;
-    let emailVerified = false; 
-    for (let theEmail of Meteor.user().emails) {
+    let emailVerified = false;
+    for (theEmail of Meteor.user().emails) {
       emailVerified = theEmail.verified ? true : false;
       if (emailVerified === false) {
         break;
