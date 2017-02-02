@@ -103,7 +103,6 @@ Meteor.methods({
     }
 
     const shippingMethods = Shipping.find(selector);
-
     shippingMethods.forEach(function (shipping) {
       const _results = [];
       for (const method of shipping.methods) {

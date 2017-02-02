@@ -1,6 +1,7 @@
 import * as Collections from "/lib/collections";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
+import { Reaction } from "/client/api";
 
 let allShops = [];
 
@@ -109,6 +110,15 @@ Template.accountProfile.helpers({
   },
   updatedShop: function () {
     return Template.instance().updateShop.get();
+  },
+  isNotGuestOrAdmin: function () {
+    if (Reaction.hasPermission("admin")) {
+      return false;
+    }
+    for (email of Meteor.user().emails) {
+      console.log(email.verified)
+      return email.verified ? true : false;
+    }
   }
 });
 // event to upgrade to seller account on profile

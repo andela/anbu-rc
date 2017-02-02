@@ -170,8 +170,11 @@ function composer(props, onData) {
     }
     if (Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId) {
       editable = true;
-    } else if ((Meteor.user().profile.vendor[0] && Meteor.userId() === vendor)) {
-      editable = true;
+    } else if (Reaction.hasPermission("createProduct") && 
+    product.vendorDetail && (Meteor.userId() === product.vendorDetail.userId)) {
+      if (Meteor.user().profile && Meteor.user().profile.vendor[0]){
+        editable = true;
+      }
     }
   }
 

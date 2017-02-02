@@ -30,3 +30,5 @@ import "./templates/workflow/workflow.js";
 
 import "./templates/orders.html";
 import "./templates/orders.js";
+import "./templates/workflow/cancelOrder.html";
+import "./templates/workflow/cancelOrder.js";

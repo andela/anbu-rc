@@ -162,9 +162,11 @@ Template.addShippingMethod.events({
  */
 Template.shippingProviderTable.helpers({
   shipping() {
+    const allShipping = Shipping.find().fetch();
+    console.log(allShipping)
     return Reaction.hasPermission(["admin"])
-		  ? Shipping.find()
-			: Shipping.findOne({vendorId: Meteor.userId()}, (err, data) => err ? err : [data]);
+		  ? allShipping
+      : allShipping.filter(shipping => shipping.vendorId === Meteor.userId());
   },
   selectedShippingMethod() {
     const session = Session.get("selectedShippingMethod");
