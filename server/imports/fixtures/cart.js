@@ -1,126 +1,116 @@
 import faker from "faker";
-import { Factory } from "meteor/dburles:factory";
-import { Cart, Products } from "/lib/collections";
 import "./shops";
 import { getShop } from "./shops";
-import { getAddress } from "./accounts";
-import { addProduct } from "./products";
+import moment from "moment";
 
-/**
- *
- * @param {Object} [options] - Options object (optional)
- * @param {string} [options._id] - id of CartItem
- * @param {string} [options.productId] - _id of product that item came from
- * @param {string} [options.shopId] - _id of shop that item came from
- * @param {number} [options.quantity] - quantity of item in CartItem
- * @param {Object} [options.variants] - _single_ variant object. ¯\_(ツ)_/¯ why called variants
- *
- * @returns {Object} - randomly generated cartItem/orderItem data object
- */
-export function getCartItem(options = {}) {
-  const product = addProduct();
-  const variant = Products.findOne({ ancestors: [product._id] });
-  const childVariants = Products.find({ ancestors: [
-    product._id, variant._id
-  ] }).fetch();
-  const selectedOption = Random.choice(childVariants);
-  const defaults = {
-    _id: Random.id(),
-    productId: product._id,
-    shopId: getShop()._id,
-    quantity: _.random(1, selectedOption.inventoryQuantity),
-    variants: selectedOption,
-    title: "cart title"
-  };
-  return _.defaults(options, defaults);
+export function getUser() {
+  const existingUser = Meteor.users.findOne();
+  return existingUser || Factory.create("user");
+}
+
+export function getUsers(limit = 2) {
+  const users = [];
+  const existingUsers = Meteor.users.find({}, {limit: limit}).fetch();
+  for (let i = 0; i < limit; i = i + 1) {
+    const user = existingUsers[i] || Factory.create("user");
+    users.push(user);
+  }
+  return users;
 }
 
 
-export default function () {
-  /**
-   * Cart Factory
-   * @summary define cart Factory
-   */
+/**
+ * User Factory
+ * @summary define user Factory
+ */
+const user = {
+  username: function () {
+    return faker.internet.userName() + _.random(0, 1000);
+  },
 
-  const cart = {
-    shopId: getShop()._id,
-    userId: Factory.get("user"),
-    sessionId: Random.id(),
-    email: faker.internet.email(),
-    items: [
-      getCartItem(),
-      getCartItem()
-    ],
-    shipping: [],
-    billing: [],
-    workflow: {
-      status: "new",
-      workflow: []
+  name: function () {
+    return faker.name.findName();
+  },
+
+  emails: function () {
+    const email = faker.internet.email();
+    return [{
+      address: email,
+      verified: true
+    }];
+  },
+
+  profile: function () {
+    return {
+      name: this.name,
+      email: faker.internet.email(),
+      profilePictureUrl: faker.image.imageUrl()
+    };
+  },
+
+  gender: function () {
+    return ["Either", "Male", "Female"][_.random(0, 2)];
+  },
+
+  description: function () {
+    return faker.lorem.paragraphs(3);
+  },
+
+  startTime: function () {
+    // needs moment.js package
+    // some date within the next month
+    return moment().add(_.random(0, 31), "days").add(_.random(0, 24),
+      "hours").toDate();
+  },
+
+  createdAt: new Date()
+};
+
+const registered = {
+  roles: {
+    [getShop()._id]: [
+      "account/profile",
+      "guest",
+      "product",
+      "tag",
+      "index",
+      "cart/checkout",
+      "cart/completed"
+    ]
+  },
+  services: {
+    password: {
+      bcrypt: Random.id(29)
     },
-    createdAt: faker.date.past(),
-    updatedAt: new Date()
-  };
-  const addressForOrder = getAddress();
-  const cartToOrder = {
-    shopId: getShop()._id,
-    shipping: [
-      {
-        _id: Random.id(),
-        address: addressForOrder
-      }
-    ],
-    billing: [
-      {
-        _id: Random.id(),
-        address: addressForOrder
-      }
-    ],
-    workflow: {
-      status: "checkoutPayment",
-      workflow: [
-        "checkoutLogin",
-        "checkoutAddressBook",
-        "coreCheckoutShipping",
-        "checkoutReview",
-        "checkoutPayment"
+    resume: {
+      loginTokens: [
+        {
+          when: moment().add(_.random(0, 31), "days").add(_.random(0, 24),
+            "hours").toDate()
+        }
       ]
     }
-  };
+  }
+};
 
-  const anonymousCart = {
-    userId: Factory.get("anonymous")
-  };tAddress();
-  const cartToOrder = {
-    shopId: getShop()._id,
-    shipping: [
-      {
-        _id: Random.id(),
-        address: addressForOrder
-      }
-    ],
-    billing: [
-      {
-        _id: Random.id(),
-        address: addressForOrder
-      }
-    ],
-    workflow: {
-      status: "checkoutPayment",
-      workflow: [
-        "checkoutLogin",
-        "checkoutAddressBook",
-        "coreCheckoutShipping",
-        "checkoutReview",
-        "checkoutPayment"
-      ]
-    }
-  };
+const anonymous = {
+  roles: {
+    [getShop()._id]: [
+      "guest",
+      "anonymous",
+      "product",
+      "tag",
+      "index",
+      "cart/checkout",
+      "cart/completed"
+    ]
+  }
+};
 
-  const anonymousCart = {
-    userId: Factory.get("anonymous")
-  };
+export default function () {
+  Factory.define("user", Meteor.users, user);
+  Factory.define("registeredUser", Meteor.users,
+    Object.assign({}, user, registered));
 
-  Factory.define("cart", Cart, Object.assign({}, cart));
-  Factory.define("cartToOrder", Cart, Object.assign({}, cart, cartToOrder));
-  Factory.define("anonymousCart", Cart, Object.assign({}, cart, anonymousCart));
+  Factory.define("anonymous", Meteor.users, Object.assign({}, user, anonymous));
 }
