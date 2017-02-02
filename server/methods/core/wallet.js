@@ -47,8 +47,8 @@ Meteor.methods({
 
   /**
   * wallet/refund method to return fund when an order is canceled
-  * @param {string} userId the id of the logged in user
-  * @param {string} orderInfo the order reference id
+  * @param {string} orderInfo the id of the logged in user
+  * @param {string} userId the order reference id
   * @param {int} amount the amount to refund
   * @return {boolean} true if the refund was successful
   */
