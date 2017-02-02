@@ -1,4 +1,5 @@
 /* eslint camelcase: 0 */
+/* eslint no-undef: 0 */
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
