@@ -110,6 +110,7 @@ class ProductField extends Component {
 
     return (
       <div className="pdp field">
+        <strong><em>Vendor</em>: </strong>
         {this.value}
       </div>
     );
