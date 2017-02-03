@@ -60,8 +60,11 @@ function extractAnalyticsItems(allOrders) {
   const oldestOrder = _.minBy(allOrders, (order) => {
     return Date.parse(order.createdAt);
   });
-  const difference = daysDifference(Date.parse(oldestOrder.createdAt), Date.parse(latestOrder.createdAt));
-  const salesPerDay = difference === 0 ? totalSales : totalSales / difference;
+  let salesPerDay = 0;
+  if (oldestOrder && latestOrder) {
+    const difference = daysDifference(Date.parse(oldestOrder.createdAt), Date.parse(latestOrder.createdAt));
+    salesPerDay = difference === 0 ? totalSales : totalSales / difference;
+  }
   return {totalSales, totalItemsPurchased, totalShippingCost, salesPerDay, analytics, analyticsStatement, ordersAnalytics};
 }
 
@@ -93,10 +96,10 @@ Template.actionableAnalytics.onCreated(function () {
     ordersAnalytics: [],
     productsAnalytics: []
   });
-  this.subscribe("Orders");
-  this.subscribe("searchresults/actionableAnalytics");
   this.autorun(() => {
-    if (this.subscriptionsReady()) {
+    const orderSub = Meteor.subscribe("Orders");
+    const productSub = Meteor.subscribe("searchresults/actionableAnalytics");
+    if (orderSub.ready()) {
       const allOrders = Orders.find().fetch();
       if (allOrders) {
         const analyticsItems = extractAnalyticsItems(allOrders);
@@ -108,11 +111,19 @@ Template.actionableAnalytics.onCreated(function () {
         this.state.set("analytics", analyticsItems.analytics);
         this.state.set("analyticsStatement", analyticsItems.analyticsStatement);
         this.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
-        const products = ProductSearch.find().fetch();
+      }
+      orderSub.stop();
+      if (productSub.ready()) {
+        const products = ProductSearch.find({isVisible: true}, {
+          views: 1,
+          title: 1,
+          quantitySold: 1
+        }).fetch();
         if (products) {
           this.state.set("productsAnalytics", products);
         }
       }
+      productSub.stop();
     }
   });
 });
