@@ -5,6 +5,7 @@ import { MediaGallery } from "../components";
 import { Reaction } from "/client/api";
 import { ReactionProduct } from "/lib/api";
 import { Media } from "/lib/collections";
+import { Meteor } from "meteor/meteor";
 
 function uploadHandler(files) {
   // TODO: It would be cool to move this logic to common ValidatedMethod, but
@@ -150,6 +151,9 @@ function composer(props, onData) {
   let media;
   let editable;
   const viewAs = Reaction.Router.getQueryParam("as");
+  const productId = Reaction.Router.getParam("handle");
+  const variantId = Reaction.Router.getParam("variantId");
+  const product = ReactionProduct.setProduct(productId, variantId);
 
   if (!props.media) {
     // Fetch media based on props
@@ -160,7 +164,14 @@ function composer(props, onData) {
   if (viewAs === "customer") {
     editable = false;
   } else {
-    editable = Reaction.hasPermission(props.permission || ["createProduct"]);
+    if (Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId) {
+      editable = true;
+    } else if (Reaction.hasPermission("createProduct") &&
+    product.vendorDetail && (Meteor.userId() === product.vendorDetail.userId)) {
+      if (Meteor.user().profile && Meteor.user().profile.vendor[0]) {
+        editable = true;
+      }
+    }
   }
 
   onData(null, {
