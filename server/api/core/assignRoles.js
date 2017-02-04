@@ -45,7 +45,7 @@ function getRouteName(packageName, registryItem) {
  */
 
 export function assignOwnerRoles(shopId, pkgName, registry) {
-  const defaultRoles = ["owner", "admin", "createProduct", "guest", pkgName];
+  const defaultRoles = ["vendor", "owner", "admin", "createProduct", "guest", pkgName];
   const globalRoles = defaultRoles;
 
   if (registry) {
