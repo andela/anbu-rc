@@ -2,7 +2,7 @@ import { Themes } from "/lib/collections";
 
 /**
  * Themes
- * @returns {Object} thtmes - themes cursor
+ * @returns {Object} themes - themes cursor
  */
 
 Meteor.publish("Themes", function () {
