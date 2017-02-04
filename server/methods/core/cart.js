@@ -462,7 +462,7 @@ Meteor.methods({
 
     // if quantity lets convert to negative and increment
     const removeQuantity = Math.abs(quantity) * -1;
-    return Collections.Cart.update({
+    return Collections.Cart.upsert({
       "_id": cart._id,
       "items._id": cartItem._id
     }, {
