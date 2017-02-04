@@ -281,11 +281,11 @@ Meteor.publish("Products", function (productScrollLimit = 24, productFilters, so
         }).observe({
           added: (revision) => {
             let product;
-            if (!revision.documentType || revision.documentType === "product") {		
+            if (!revision.documentType || revision.documentType === "product") {
               product = Products.findOne(revision.documentId);
             } else if (revision.documentType === "image" || revision.documentType === "tag") {
               product = Products.findOne(revision.parentDocument);
-            }		
+            }
             if (product) {
               this.added("Products", product._id, product);
               this.added("Revisions", revision._id, revision);
