@@ -2,6 +2,7 @@ import _ from "lodash";
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import * as Collections from "/lib/collections";
+import * as Schemas from "/lib/collections/schemas";
 import { Logger, Reaction } from "/server/api";
 
 /**
@@ -237,7 +238,7 @@ Meteor.methods({
     const anonymousUser = Roles.userIsInRole(userId, "anonymous", shopId);
     const sessionCartCount = getSessionCarts(userId, sessionId, shopId).length;
 
-    Logger.debug("create cart: shopId", shopId);
+    Logger.info("create cart: shopId", shopId);
     Logger.debug("create cart: userId", userId);
     Logger.debug("create cart: sessionId", sessionId);
     Logger.debug("create cart: sessionCarts.count", sessionCartCount);
@@ -305,10 +306,12 @@ Meteor.methods({
     // `quantityProcessing`?
     let product;
     let variant;
+    let vendorId;
+
     Collections.Products.find({ _id: { $in: [
       productId,
       variantId
-    ] } }).forEach(doc => {
+    ]}}).forEach(doc => {
       if (doc.type === "simple") {
         product = doc;
       } else {
@@ -328,6 +331,11 @@ Meteor.methods({
       Logger.warn(`Product variant: ${ variantId } was not found in database`);
       throw new Meteor.Error(404, "ProductVariant not found",
         "ProductVariant with such id was not found!");
+    }
+    if (product.vendorDetail) {
+      vendorId = product.vendorDetail.userId;
+    } else {
+      vendorId = "";
     }
     // performs calculations admissibility of adding product to cart
     const quantity = quantityProcessing(product, variant, itemQty);
@@ -376,7 +384,8 @@ Meteor.methods({
           quantity: quantity,
           variants: variant,
           title: product.title,
-          type: product.type
+          type: product.type,
+          vendorId
         }
       }
     }, function (error, result) {
@@ -735,7 +744,7 @@ Meteor.methods({
    */
   "cart/setShipmentAddress": function (cartId, address) {
     check(cartId, String);
-    check(address, Reaction.Schemas.Address);
+    check(address, Schemas.Address);
 
     const cart = Collections.Cart.findOne({
       _id: cartId,
@@ -819,7 +828,7 @@ Meteor.methods({
    */
   "cart/setPaymentAddress": function (cartId, address) {
     check(cartId, String);
-    check(address, Reaction.Schemas.Address);
+    check(address, Schemas.Address);
 
     const cart = Collections.Cart.findOne({
       _id: cartId,
@@ -889,7 +898,7 @@ Meteor.methods({
     const selector = {
       _id: cart._id
     };
-    const update = { $unset: {} };
+    const update = { $unset: {}};
     // user could turn off the checkbox in address to not to be default, then we
     // receive `type` arg
     if (typeof type === "string") {
@@ -942,7 +951,7 @@ Meteor.methods({
    * @return {String} returns update result
    */
   "cart/submitPayment": function (paymentMethod) {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+    check(paymentMethod, Schemas.PaymentMethod);
 
     const checkoutCart = Collections.Cart.findOne({
       userId: Meteor.userId()

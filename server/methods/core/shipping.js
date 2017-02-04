@@ -67,7 +67,7 @@ Meteor.methods({
     }
   },
 
-  /**
+    /**
    * shipping/getShippingRates
    * @summary just gets rates, without updating anything
    * @param {Object} cart - cart object
@@ -89,21 +89,20 @@ Meteor.methods({
     // create an array of shops, allowing
     // the cart to have products from multiple shops
     for (const product of products) {
-      if (product.shopId) {
-        shops.push(product.shopId);
+      if (product.vendorId) {
+        shops.push(product.vendorId);
       }
     }
     // if we have multiple shops in cart
     if ((shops !== null ? shops.length : void 0) > 0) {
       selector = {
-        shopId: {
+        vendorId: {
           $in: shops
         }
       };
     }
 
     const shippingMethods = Shipping.find(selector);
-
     shippingMethods.forEach(function (shipping) {
       const _results = [];
       for (const method of shipping.methods) {
@@ -121,7 +120,7 @@ Meteor.methods({
           carrier: shipping.provider.label,
           method: method,
           rate: rate,
-          shopId: shipping.shopId
+          shopId: shipping.vendorId
         }));
       }
       return _results;
