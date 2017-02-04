@@ -43,7 +43,6 @@ export const methods = {
     if (!Reaction.hasPermission("shipping")) {
       throw new Meteor.Error(403, "Access Denied");
     }
-
     return Shipping.update({
       "_id": providerId,
       "methods._id": methodId
@@ -79,6 +78,7 @@ export const methods = {
    */
   "shipping/provider/add": function (doc) {
     check(doc, Object);
+    doc.vendorId = Meteor.userId();
     if (!Reaction.hasPermission("shipping")) {
       throw new Meteor.Error(403, "Access Denied");
     }
@@ -108,6 +108,6 @@ export const methods = {
     }
     return Shipping.remove(providerId);
   }
-}
+};
 
 Meteor.methods(methods);
