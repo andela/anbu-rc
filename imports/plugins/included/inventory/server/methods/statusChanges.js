@@ -64,17 +64,6 @@ Meteor.methods({
 
     // update inventory status for cartItems
     for (const item of cartItems) {
-      // if (reservationStatus === "sold") {
-      //   const _id = item.productId;
-      //   const product = Products.findOne(_id);
-      //   // check that a product with the _id exists so we don't end up creating a new product with upsert
-      //   if (product) {
-      //     const newQuantitySold = product.quantitySold + item.quantity;
-      //     const productUpdate = Object.assign({}, product, {quantitySold: newQuantitySold}, {price: {}});
-      //     // Might be a bug, but "update" refused to work, hence the use of the "upsert"" method.
-      //     Products.upsert({_id}, {$set: productUpdate}, {selector: {type: "simple"}});
-      //   }
-      // }
       // check of existing reserved inventory for this cart
       const existingReservations = Inventory.find({
         productId: item.productId,
