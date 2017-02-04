@@ -69,10 +69,10 @@ describe("Order Publication", function () {
       expect(data.shopId).to.equal(order.shopId);
     });
 
-    it("should not return shop orders for non admin", function () {
+    it("should not return shop orders for non admin or non vendor", function () {
       sandbox.stub(Collections.Orders._hookAspects.insert.before[0], "aspect");
       sandbox.stub(Collections.Orders._hookAspects.update.before[0], "aspect");
-      sandbox.stub(Reaction, "hasPermission", () => true);
+      sandbox.stub(Reaction, ["createProduct"], () => true);
       sandbox.stub(Meteor.server.method_handlers, "inventory/register", function () {
         check(arguments, [Match.Any]);
       });
