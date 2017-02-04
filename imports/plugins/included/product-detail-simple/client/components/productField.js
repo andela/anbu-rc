@@ -48,6 +48,7 @@ class ProductField extends Component {
 
   renderEditButton() {
     if (this.showEditControls) {
+      console.log(this.props.editable)
       return (
         <span className="edit-controls">
           <EditContainer

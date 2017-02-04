@@ -257,8 +257,8 @@ function composer(props, onData) {
           editable = true;
           hasAdminPermission = true;
         } else if ((Reaction.hasPermission("createProduct") && Meteor.userId() === product.vendorDetail.userId)) {
-          editable = true;
           hasAdminPermission = true;
+          editable = true;
         }
         setData();
       } else {

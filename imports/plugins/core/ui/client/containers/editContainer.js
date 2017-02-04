@@ -162,7 +162,7 @@ function composer(props, onData) {
   if (props.disabled === true || viewAs === "customer") {
     hasPermission = false;
   } else {
-    hasPermission = Reaction.hasPermission(props.premissions);
+    hasPermission = props.permissions;
   }
 
   onData(null, {
