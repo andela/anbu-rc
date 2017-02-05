@@ -59,7 +59,7 @@ Meteor.methods({
       amount -= orderInfo.billing[0].invoice.shipping;
     }
     const orderId = orderInfo._id;
-    userId = order.userId;
+    userId = orderInfo.userId;
     const transaction = {amount, orderId, transactionType: "Refund"};
     try {
       Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
