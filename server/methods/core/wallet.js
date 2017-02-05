@@ -52,13 +52,14 @@ Meteor.methods({
   * @param {int} amount the amount to refund
   * @return {boolean} true if the refund was successful
   */
-  "wallet/refund": (orderInfo, userId) => {
+  "wallet/refund": (orderInfo) => {
     check(orderInfo, Schemas.Order);
     let amount = orderInfo.billing[0].invoice.total;
     if (orderInfo.workflow.status === "coreOrderWorkflow/completed") {
       amount -= orderInfo.billing[0].invoice.shipping;
     }
     const orderId = orderInfo._id;
+    userId = order.userId;
     const transaction = {amount, orderId, transactionType: "Refund"};
     try {
       Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
