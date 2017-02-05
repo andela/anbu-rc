@@ -1,0 +1,16 @@
+<template name="paystackSettings">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">Paystack Settings</div>
+      Don't have PAYSTACK API key? <a href="https://paystack.com" target="_blank">Get it here.</a> (you'll need an account)
+    </div>
+    <div class="panel-body">
+      {{#autoForm collection=Collections.Packages schema=PaystackPackageConfig doc=packageData type="update" id="paystack-update-form"}}
+        {{>afQuickField name='settings.secretKey'}}
+        {{>afQuickField name='settings.publicKey'}}
+        <button type="submit" class="btn btn-primary pull-right">Update</button>
+      {{/autoForm}}
+    </div>
+  </div>
+
+</template>

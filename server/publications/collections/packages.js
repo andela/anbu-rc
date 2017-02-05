@@ -1,3 +1,5 @@
+/* eslint quote-props: 0 */
+/*  eslint-env es6 */
 import { Packages } from "/lib/collections";
 import { Reaction } from "/server/api";
 
@@ -37,8 +39,9 @@ Meteor.publish("Packages", function (shopCursor) {
         "enabled": 1,
         "registry": 1,
         "layout": 1,
-        "settings.general.enabled": 1,
-        "settings.public": 1
+        "settings": 1
+        // "settings.general.enabled": 1,
+        // "settings.public": 1
       }
     });
   }
