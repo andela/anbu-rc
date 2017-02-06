@@ -15,23 +15,10 @@ Template.accountProfile.onCreated(() => {
   });
   template.userHasPassword = ReactiveVar(false);
   template.updateShop = ReactiveVar("");
-  template.emailVerified = ReactiveVar(false);
   template.formMessages = new ReactiveVar({});
   Meteor.call("accounts/currentUserHasPassword", (error, result) => {
     template.userHasPassword.set(result);
   });
-
-  for (theEmail of Meteor.user().emails) {
-    template.emailVerified.set(theEmail.verified ? true : false);
-    if (template.emailVerified.get() === false) {
-      break;
-    }
-  }
-  if (template.emailVerified.get() && Meteor.user().profile.vendor[0] && !Meteor.user().roles[Reaction.getShopId().includes("createProduct")]) {
-    Meteor.call("accounts/addVendorPermissions", Meteor.userId(), (err, result) => {
-      return err ? err : result;
-    });
-  }
 });
 
 /**
@@ -104,7 +91,7 @@ Template.accountProfile.helpers({
   },
   // to check if user is a vendor
   isVendor: function () {
-    if (Meteor.user().profile.vendor[0] && Template.instance().emailVerified.get()) {
+    if (Meteor.user().profile.vendor[0]) {
       return true;
     }
     return false;
@@ -116,22 +103,25 @@ Template.accountProfile.helpers({
     return { shopName: "", shopPhone: "", shopAddress: ""};
   },
   shopFormHeader: function () {
-    return Meteor.user().profile.vendor[0] && Template.instance().emailVerified.get() ? "Update Vendor Info" : "Become A Seller";
+    return Meteor.user().profile.vendor[0] ? "Update Vendor Info" : "Become A Seller";
   },
   shopFormButtonText: function () {
-    return Meteor.user().profile.vendor[0] && Template.instance().emailVerified.get() ? "Update Shop Info" : "Create Shop";
+    return Meteor.user().profile.vendor[0] ? "Update Shop Info" : "Create Shop";
   },
   updatedShop: function () {
     return Template.instance().updateShop.get();
   },
   isNotGuestOrAdmin: function () {
-    if (Reaction.hasPermission("admin") || Reaction.hasPermission("anonymous")) {
+    if (Reaction.hasPermission("admin")) {
       return false;
     }
     return true;
+    // for (email of Meteor.user().emails) {
+    //   console.log(email.verified)
+    //   return email.verified ? true : false;
+    // }
   }
 });
-
 // event to upgrade to seller account on profile
 Template.accountProfile.events({
   "click .register-shop-button": function (event) {
@@ -139,9 +129,11 @@ Template.accountProfile.events({
     const templateInstance = Template.instance();
     const errors = {};
     templateInstance.formMessages.set({});
+    // const isVendorNow = Meteor.user().profile.vendor[0];
     const shopName = Template.instance().find(".shop-name").value;
     const shopPhone = Template.instance().find(".shop-phone").value;
     const shopAddress = Template.instance().find(".shop-address").value;
+    const dbShopName = Meteor.user().profile.vendor[1] ? Meteor.user().profile.vendor[1].shopName : undefined;
     if (!/\w+/g.test(shopName) && shopName.length <= 20) {
       errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
     } else if (allShops.includes(shopName) && addShop) {
@@ -149,7 +141,12 @@ Template.accountProfile.events({
         i18nKeyReason: "Hello! Shop name has already been taken.",
         reason: "Hello! Shop name has already been taken."
       };
-    }
+    } /* else if (isVendorNow && (shopName !== (dbShopName || undefined))) {
+      errors.shopName = {
+        i18nKeyReason: "Cheating Huh! You shouldn't do this.",
+        reason: "Cheating Huh! You shouldn't do this."
+      };
+    } */
     if (!/\d+(-)?/g.test(shopPhone) && shopPhone.length <= 14) {
       errors.shopPhone = { i18nKeyReason: "invalid shop phone number", reason: "invalid shop phone number"};
     }
@@ -157,7 +154,6 @@ Template.accountProfile.events({
     if (!/\w+/g.test(shopAddress) && shopAddress.length <= 250) {
       errors.shopAddress = { i18nKeyReason: "invalid shop address", reason: "invalid shop address"};
     }
-
     if ($.isEmptyObject(errors) === false) {
       templateInstance.formMessages.set({
         errors: errors
@@ -166,32 +162,24 @@ Template.accountProfile.events({
       return;
     }
     const vendorDetail = {shopName, shopPhone, shopAddress};
-    const resetUpdateShopMessage = () => {
-      return setTimeout(function () {
-        templateInstance.updateShop.set("");
-      }, 3000);
-    };
+    Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] } } });
 
-    if (templateInstance.emailVerified.get() === false) {
-      Meteor.users.update(Meteor.userId(), {$set: { profile: { vendor: [true, vendorDetail] } } });
-      templateInstance.updateShop.set("shop details updated");
-      resetUpdateShopMessage();
-      templateInstance.updateShop.set("please verify your email first, to start selling ");
-      resetUpdateShopMessage();
-    } else {
-      templateInstance.updateShop.set("vendor details updated");
-      resetUpdateShopMessage();
-      Meteor.call("accounts/addVendorPermissions", Meteor.userId(), (err, result) => {
-        if (!err && !allShops.includes(shopName) && !Meteor.user().profile.vendor[0]) {
-          Meteor.call("shopNames/update", shopName, (e, res) => {
-            if (e) {
-              return e;
-            }
-            return res;
-          });
-        }
-        return err ? err : result;
-      });
-    }
+    Template.instance().updateShop.set("shop details updated");
+    const template = Template.instance();
+    setTimeout(function () {
+      template.updateShop.set("");
+    }, 2000);
+
+    Meteor.call("accounts/addVendorPermissions", Meteor.userId(), (err, result) => {
+      if (!err && !allShops.includes(shopName) && !Meteor.user().profile.vendor[0]) {
+        Meteor.call("shopNames/update", shopName, (e, res) => {
+          if (e) {
+            return e;
+          }
+          return res;
+        });
+      }
+      return err ? err : result;
+    });
   }
 });
