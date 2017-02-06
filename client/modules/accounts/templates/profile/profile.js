@@ -129,11 +129,9 @@ Template.accountProfile.events({
     const templateInstance = Template.instance();
     const errors = {};
     templateInstance.formMessages.set({});
-    // const isVendorNow = Meteor.user().profile.vendor[0];
     const shopName = Template.instance().find(".shop-name").value;
     const shopPhone = Template.instance().find(".shop-phone").value;
     const shopAddress = Template.instance().find(".shop-address").value;
-    const dbShopName = Meteor.user().profile.vendor[1] ? Meteor.user().profile.vendor[1].shopName : undefined;
     if (!/\w+/g.test(shopName) && shopName.length <= 20) {
       errors.shopName = { i18nKeyReason: "invalid shop name", reason: "invalid shop name"};
     } else if (allShops.includes(shopName) && addShop) {
@@ -141,12 +139,7 @@ Template.accountProfile.events({
         i18nKeyReason: "Hello! Shop name has already been taken.",
         reason: "Hello! Shop name has already been taken."
       };
-    } /* else if (isVendorNow && (shopName !== (dbShopName || undefined))) {
-      errors.shopName = {
-        i18nKeyReason: "Cheating Huh! You shouldn't do this.",
-        reason: "Cheating Huh! You shouldn't do this."
-      };
-    } */
+    }
     if (!/\d+(-)?/g.test(shopPhone) && shopPhone.length <= 14) {
       errors.shopPhone = { i18nKeyReason: "invalid shop phone number", reason: "invalid shop phone number"};
     }

@@ -333,7 +333,6 @@ Meteor.methods({
    */
   "orders/sendNotification": function (order) {
     check(order, Object);
-
     if (!this.userId) {
       Logger.error("orders/sendNotification: Access denied");
       throw new Meteor.Error("access-denied", "Access Denied");
