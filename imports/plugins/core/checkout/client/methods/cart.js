@@ -8,7 +8,7 @@ import { Cart } from "/lib/collections";
 // Stubs with matching server methods.
 Meteor.methods({
   "cart/submitPayment": function (paymentMethod) {
-    check(paymentMethod, Reaction.Schemas.PaymentMethod);
+    // check(paymentMethod, Reaction.Schemas.PaymentMethod);
     const checkoutCart = Cart.findOne({
       userId: Meteor.userId()
     });
