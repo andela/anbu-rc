@@ -164,6 +164,10 @@ function composer(props, onData) {
   if (viewAs === "customer") {
     editable = false;
   } else {
+    let vendor = null;
+    if (product.vendorDetail) {
+      vendor = product.vendorDetail.userId;
+    }
     if (Reaction.hasPermission("admin") && Reaction.getShopId() === product.shopId) {
       editable = true;
     } else if (Reaction.hasPermission("createProduct") &&

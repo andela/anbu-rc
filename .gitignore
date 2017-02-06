@@ -1,44 +1,92 @@
 .DS_Store
+
 .fileStorage/
+
 .idea
+
+.env
+
+geckodriver
+
+chromedriver
+
+selenium-server-standalone-3.0.1.jar
+
 *.csv
+
 *.dat
+
 *.gz
+
 *.log
+
 *.out
+
 *.pid
+
 *.seed
+
 *.sublime-project
+
 *.sublime-workspace
 
+
+
 jsdoc.json
+
 lib-cov
+
 logs
+
 node_modules
+
 npm-debug.log
+
 pids
+
 results
+
 allure-results
 
+
+
 client/plugins.js
+
 server/plugins.js
 
+
+
 custom/client/*
+
 !custom/client/.gitkeep
 
+
+
 custom/server/*
+
 !custom/server/.gitkeep
 
+
+
 public/custom/*
+
 !public/custom/.gitkeep
 
+
+
 private/custom/*
+
 !private/custom/.gitkeep
 
+
+
 imports/plugins/custom/*
+
 !imports/plugins/custom/.gitkeep
 
+
+
 .reaction/config.json
-.env
-geckodriver
-selenium-server-standalone-3.0.1.jar
+
+.vscode
+settings.json

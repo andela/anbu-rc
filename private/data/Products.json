@@ -33,12 +33,11 @@
   },
   "vendor": "Reaction",
   "vendorDetail" : {
-        "userId" : "ZSDt9Euyo7FeGNjYw",
-        "shopName" : "telle",
-        "shopPhone" : "07066900599",
-        "shopAddress" : "7 Brown Dr.Blacksburg, VA 24060"
-    },
-}, {
+    "userId" : "ZSDt9Euyo7FeGNjYw",
+    "shopName" : "telle",
+    "shopPhone" : "07066900599",
+    "shopAddress" : "7 Brown Dr.Blacksburg, VA 24060"
+  },
   "_id": "6qiqPwBkeJdtdQc4G",
   "ancestors": [
     "BCTMZ6HTxFSppJESk"

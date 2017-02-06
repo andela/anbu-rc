@@ -672,7 +672,12 @@ Meteor.methods({
       return Products.insert({
         type: "simple",
         vendor: "Reaction",
-        vendorDetail: {} // needed for multi-schema
+        vendorDetail: {
+          userId: "andelasquad",
+          shopName: "Reaction",
+          shopPhone: "08166910264",
+          shopAddress: "Ikorodu Road, Lagos"
+        }// needed for multi-schema
       }, {
         validate: false
       }, (error, result) => {

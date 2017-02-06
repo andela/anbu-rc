@@ -58,7 +58,13 @@ Template.shippingProviderTable.helpers({
   shipping() {
     const instance = Template.instance();
     if (instance.subscriptionsReady()) {
+<<<<<<< HEAD
       return Shipping.find({ methods: { vendorId: Meteor.userId() } });
+=======
+      return Shipping.find({
+      	methods: {vendorId: Meteor.userId()}
+      });
+>>>>>>> mv-test
     }
   }
 });
@@ -161,7 +167,13 @@ Template.addShippingMethod.events({
 Template.shippingProviderTable.helpers({
   shipping() {
     const allShipping = Shipping.find().fetch();
+<<<<<<< HEAD
     return Reaction.hasPermission(["admin"]) ? allShipping
+=======
+    console.log(allShipping)
+    return Reaction.hasPermission(["admin"])
+		  ? allShipping
+>>>>>>> mv-test
       : allShipping.filter(shipping => shipping.vendorId === Meteor.userId());
   },
   selectedShippingMethod() {
