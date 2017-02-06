@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { Template } from "meteor/templating";
 import "./static-pages.html";
 import { StaticPages } from "/lib/collections";

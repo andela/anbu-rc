@@ -10,7 +10,7 @@
           <input type="text" class="form-control" name="title" id="static-page-title" placeholder="Enter page title">
         </div>
         <div class="input-group">
-          <span class="input-group-addon" id="basic-addon3">{{baseUrl}}/</span>
+          <span class="input-group-addon" id="basic-addon3">{{baseUrl}}/pages/</span>
           <input type="text" class="form-control" id="static-page-slug" aria-describedby="basic-addon3" placeholder="slug">
         </div>
         <h4>Page Content:</h4>
@@ -27,11 +27,13 @@
       </form>
     </div>
     <div class="col-md-4">
-      <h3 class="text-center">Manage Your Custom Pages</h3>
       <ul>
-        {{ #each displayPages }}
-          {{> displayPageName }}
-        {{ /each }}
+        {{#if displayPages }}
+         <h3 class="text-center">Manage Your Custom Pages</h3>
+          {{ #each displayPages }}
+            {{> displayPageName }}
+          {{ /each }}
+        {{/if}}
       </ul>
     </div>
   </div>

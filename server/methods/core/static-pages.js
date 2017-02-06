@@ -20,6 +20,9 @@ Meteor.methods({
       createdAt: new Date,
       updatedAt: new Date
     };
+    if (StaticPages.find({slug: slug}).count()) {
+      throw new Meteor.Error("error", "Slug already exists");
+    }
     check(page, Schemas.StaticPages);
     StaticPages.insert(page);
   },

@@ -75,6 +75,7 @@
   {{/each}}
 </template>
 <template name="staticPageNav">
+  {{#if staticPages}}
   <div class="dropdown" role="menu">
     <div class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="1000">
       <span id="logged-in-display-name"> More <b class="caret"></b></span>
@@ -92,4 +93,5 @@
       {{/each}}
     </div>
   </div>
+  {{/if}}
 </template>
