@@ -89,3 +89,4 @@ imports/plugins/custom/*
 .reaction/config.json
 
 .vscode
+settings.json

@@ -115,10 +115,11 @@ Template.accountProfile.helpers({
     if (Reaction.hasPermission("admin")) {
       return false;
     }
-    for (email of Meteor.user().emails) {
-      console.log(email.verified)
-      return email.verified ? true : false;
-    }
+    return true;
+    // for (email of Meteor.user().emails) {
+    //   console.log(email.verified)
+    //   return email.verified ? true : false;
+    // }
   }
 });
 // event to upgrade to seller account on profile

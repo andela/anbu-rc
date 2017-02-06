@@ -18,7 +18,12 @@
   "isLowQuantity": false,
   "isSoldOut": false,
   "isBackorder": false,
-	"vendorDetail": {},
+  "vendorDetail": {
+    "userId": "andelasquad",
+    "shopName": "Reaction",
+    "shopPhone": "08166910264",
+    "shopAddress": "Ikorodu Road, Lagos"
+  },
   "metafields": [{
     "key": "Material",
     "value": "Cotton"

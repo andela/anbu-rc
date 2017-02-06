@@ -73,7 +73,6 @@ Meteor.methods({
     }
     this.unblock();
     const userId = accountUserId || Meteor.userId();
-    console.log(userId)
     // required default id
     if (!address._id) {
       address._id = Random.id();
