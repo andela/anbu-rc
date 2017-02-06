@@ -39,6 +39,8 @@ Template.dashboardOrdersList.helpers({
     return shop !== null ? shop.name : void 0;
   },
   hasComment() {
-    return this.comments.length > 0;
+    if (this.workflow.status === "canceled") {
+      return this.comments ? this.comments.length > 0 : "";
+    }
   }
 });

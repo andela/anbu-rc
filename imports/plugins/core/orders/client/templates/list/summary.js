@@ -8,7 +8,6 @@ Template.ordersListSummary.onCreated(function () {
   this.autorun(() => {
     const currentData = Template.currentData();
     const order = currentData.order;
-
     this.state.set("order", order);
   });
 });
