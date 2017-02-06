@@ -69,6 +69,7 @@ Template.coreOrderCancelOrder.events({
 
     const state = template.state;
     const order = state.get("order");
+    order.comments = newComment;
 
     Alerts.alert({
       title: "Are you sure you want to cancel this order.",
