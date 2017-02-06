@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { Wallets, Accounts } from "/lib/collections";
+import { Wallets, Accounts, Notifications } from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import { check } from "meteor/check";
 
@@ -15,9 +15,18 @@ Meteor.methods({
     check(userId, String);
     check(transactions, Schemas.Transaction);
     let balanceOptions;
-    const {amount, transactionType} = transactions;
+    const {amount, transactionType, from, date} = transactions;
+    let notification = {};
+
     if (transactionType === "Credit") {
       balanceOptions = {balance: amount};
+      notification = {
+        userId: userId,
+        name: "Credit Transaction",
+        type: transactionType,
+        message: `Credit Alert! ${amount} has been credited into your account by ${from} on ${date}, Balance: ${balanceOptions.balance}`,
+        orderId: transactions.referenceId || "00000"
+      };
     }
     if (transactionType === "Debit") {
       if (transactions.to) {
@@ -33,12 +42,26 @@ Meteor.methods({
           date: new Date(),
           transactionType: "Credit"
         });
+        notification = {
+          userId: userId,
+          name: "Debit Transaction",
+          type: transactionType,
+          message: `Debit Alert! ${amount} has been transfer from your account to ${recipient._id}`,
+          orderId: transactions.referenceId || "00000"
+        };
       }
       balanceOptions = {balance: -amount};
     }
 
     try {
       Wallets.update({userId}, {$push: {transactions: transactions}, $inc: balanceOptions}, {upsert: true});
+      Notifications.insert(notification);
+      const smsContent = {
+        to: "08166910264",
+        message: `Debit Alert! ${amount} has been transfer from your account to ${recipient._id}`
+      };
+      Meteor.call("send/sms/alert", smsContent.message, smsContent.to);
+
       return 1;
     } catch (error) {
       return 0;
@@ -60,8 +83,25 @@ Meteor.methods({
     }
     const orderId = orderInfo._id;
     const transaction = {amount, orderId, transactionType: "Refund"};
+
+    const notification = {
+      userId: userId,
+      name: "Money Refund",
+      type: "Refund",
+      message: `Refund! ${amount} has be refunded into your account based on canceled order ${orderId}`,
+      orderId: orderId || "0000"
+    };
+
+    const smsContent = {
+      to: "08166910264",
+      message: `Refund! ${amount} has be refunded into your account based on canceled order ${orderId}`
+    };
+
+    Meteor.call("send/sms/alert", smsContent.message, smsContent.to);
+
     try {
       Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
+      Notifications.insert(notification);
       return true;
     } catch (error) {
       return false;
