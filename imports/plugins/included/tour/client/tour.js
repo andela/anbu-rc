@@ -348,7 +348,7 @@ const updateTakenTour = () => {
   if (!Accounts.findOne(Meteor.userId()).takenTour) {
     Accounts.update({_id: Meteor.userId()}, {$set: {takenTour: true}});
   }
-}
+};
 
 export function playTour() {
   let tourSteps;
