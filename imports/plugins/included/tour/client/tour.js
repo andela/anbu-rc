@@ -3,6 +3,7 @@ import { Reaction } from "/client/api";
 import { Meteor} from "meteor/meteor";
 import { Accounts } from "/lib/collections";
 
+const tour = introJs.introJs();
 const adminTourSteps = [
   {
     intro: `<h2>Welcome to <strong>Reaction</strong> Commerce</h2>
@@ -15,7 +16,6 @@ const adminTourSteps = [
     </div>`
   },
   {
-    element: "#main",
     intro: `<h2>Products</h2>
     <hr>
     <div>
@@ -165,7 +165,6 @@ const registeredBuyerTourSteps = [
     </div>`
   },
   {
-    element: "#main",
     intro: `<h2>Products</h2>
     <hr>
     <div>
@@ -266,7 +265,6 @@ const unregisteredBuyerTourSteps = [
     </div>`
   },
   {
-    element: "#main",
     intro: `<h2>Products</h2>
     <hr>
     <div>
@@ -346,8 +344,13 @@ const unregisteredBuyerTourSteps = [
   }
 ];
 
+const updateTakenTour = () => {
+  if (!Accounts.findOne(Meteor.userId()).takenTour) {
+    Accounts.update({_id: Meteor.userId()}, {$set: {takenTour: true}});
+  }
+}
+
 export function playTour() {
-  const tour = introJs.introJs();
   let tourSteps;
   if (Reaction.hasPermission("admin")) {
     tourSteps = adminTourSteps;
@@ -357,15 +360,14 @@ export function playTour() {
     tourSteps = unregisteredBuyerTourSteps;
   }
   tour.setOptions({
-    showBullets: false,
+    showBullets: true,
     showProgress: true,
+    scrollToElement: true,
+    showStepNumbers: false,
     tooltipPosition: "auto",
     steps: tourSteps
   });
-  tour.onexit(() => {
-    if (!Accounts.findOne(Meteor.userId()).takenTour) {
-      Accounts.update({_id: Meteor.userId()}, {$set: {takenTour: true}});
-    }
-  });
+  tour.onexit(updateTakenTour)
+  .oncomplete(updateTakenTour);
   tour.start();
 }
