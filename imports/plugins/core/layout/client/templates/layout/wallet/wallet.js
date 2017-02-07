@@ -54,7 +54,7 @@ function handlePayment(result) {
     } else if (response.data.data.status !== "success") {
       Alerts.toast("Payment was unsuccessful", "error");
     } else {
-      const exchangeRate = getExchangeRate();
+      const exchangeRate = +getExchangeRate();
       const paystackResponse = response.data.data;
       paystackMethod = {
         processor: "Paystack",
@@ -98,7 +98,6 @@ Template.wallet.events({
     const accountDetails = Accounts.find(Meteor.userId()).fetch();
     const userMail = accountDetails[0].emails[0].address;
     const amount = Number(document.getElementById("depositAmount").value);
-
     const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
     if (!mailRegex.test(userMail)) {
       Alerts.toast("Invalid email address", "error");
@@ -112,7 +111,6 @@ Template.wallet.events({
 
   "submit #transfer": (event) => {
     event.preventDefault();
-    const exchangeRate = getExchangeRate();
     const amount = Number(document.getElementById("transferAmount").value);
     const recipient = document.getElementById("recipient").value;
     const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
@@ -136,24 +134,20 @@ Template.wallet.events({
         document.getElementById("transferAmount").value = "";
         Alerts.toast("The transfer was successful", "success");
         return true;
-      } else {
-        Alerts.toast("An error occured, please try again", "error");
-        return false;
       }
+      Alerts.toast("An error occured, please try again", "error");
+      return false;
     });
   }
 });
 
 Template.wallet.helpers({
   balance() {
-    return Template.instance().state.get("details").balance;
+    return Template.instance().state.get("details");
   },
 
   getTransactions() {
-    const transactions = Template.instance().state.get("details").transactions;
-    if (transactions.length > 0) {
-      return transactions;
-    }
-    return false;
+    const details = Template.instance().state.get("details");
+    return  details ? details.transactions : [];
   }
 });

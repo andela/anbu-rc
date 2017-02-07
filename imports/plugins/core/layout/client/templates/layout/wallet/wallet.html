@@ -7,7 +7,7 @@
           <h3 class="panel-title">Your Balance</h3>
         </div>
         <div class="panel-content">
-          <span style="font-weight: bolder; font-size: 4.2em">{{formatPrice balance}}</span>
+          <span style="font-weight: bolder; font-size: 4.2em">{{formatPrice balance.balance}}</span>
         </div>
 
       </div>
@@ -69,7 +69,7 @@
             </tr>
           </thead>
           <tbody>
-            {{#if getTransactions }}
+            {{#if getTransactions 'gt' 0}}
               {{#each transaction in getTransactions }}
               <tr>
                 <td>{{capitalize transaction.transactionType}}</td>
