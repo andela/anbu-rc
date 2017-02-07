@@ -30,7 +30,14 @@
 </template>
 
 <template name="dropDownNotifications">
- <div class="dropdown-menu" role="menu">
+  <style>
+    .dropdown-menu {
+      color: green;
+      left: 50%;
+			width: 35%;
+    }
+  </style>
+ <div class="dropdown-menu" role="menu" >
   <div class="user-notifications-dropdown">
     <div class="user-notifications-dropdown-content">
      {{> DropdownApps}}

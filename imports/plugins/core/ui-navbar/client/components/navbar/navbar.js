@@ -10,12 +10,9 @@ Template.CoreNavigationBar.onCreated(function () {
   this.autorun(() => {
     const instance = this;
     Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
-      console.log("call result", res, err);
       instance.notifications.set(!!res);
-      console.log("instance result", instance.notifications.get());
     });
   });
-  console.log("trace");
 });
 
 /**
@@ -44,12 +41,6 @@ Template.CoreNavigationBar.helpers({
       component: FlatButton,
       icon: "fa fa-search",
       kind: "flat"
-      // onClick() {
-      //   Blaze.renderWithData(Template.searchModal, {
-      //   }, $("body").get(0));
-      //   $("body").css("overflow-y", "hidden");
-      //   $("#search-input").focus();
-      // }
     };
   },
   onMenuButtonClick() {
@@ -95,7 +86,6 @@ Template.notificationItem.onCreated(function () {
   this.autorun(() => {
     const instance = this;
     Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
-      console.log(res);
       instance.notifications.set(res);
     });
   });
@@ -123,6 +113,7 @@ Template.dropDownNotifications.events({
   "click #clearNotifications": (event) => {
     event.preventDefault();
     Meteor.call("notifications/clearNotifications", Meteor.userId());
+    Meteor._reload.reload();
   }
 });
 
@@ -131,7 +122,7 @@ Template.notificationDropdown.helpers({
   // Check if the user has pending notifications
   // and set the appropriate Icon
     return (Template.instance().notifications.get() > 0)
-    ? "fa fa-bell"
+    ? "fa fa-bell fa-spin fa-fw"
     : "fa fa-bell-o";
   },
   checkNotification() {
