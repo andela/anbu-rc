@@ -316,7 +316,6 @@ Meteor.methods({
     return false;
   },
 
-/* START NOTIFICATION*/
     /**
       * Get user notifications
       * @param {String} currentUserId - ID of the current user
@@ -344,12 +343,14 @@ Meteor.methods({
   "notifications/clearNotifications": function (currentUserId) {
     try {
       check(currentUserId, String);
-      Notifications.remove({userId: currentUserId});
+      const selector = {
+        userId: currentUserId
+      };
+      Notifications.remove(selector);
     } catch (e) {
      // Fail silently if the userId is not matched.
     }
   },
-/*  End of first part*/
 
   /**
    * orders/sendNotification
@@ -368,16 +369,6 @@ Meteor.methods({
 
     this.unblock();
 
-    // sms login details
-    const smsLoginDetail = {
-      cmd: "login",
-      owneremail: Meteor.settings.SMS.OWNEREMAIL,
-      subacct: Meteor.settings.SMS.SUBACCT,
-      subacctpwd: Meteor.settings.SMS.SUBACCTPWD
-    };
-
-    // Get Shop information
-
     // Update the notification collection
     const notification = {
       userId: Meteor.userId(),
@@ -387,24 +378,13 @@ Meteor.methods({
       orderId: order._id
     };
 
-    // if (order.workflow.status === "coreOrderWorkflow/processing") {
-    //   notification.name = "Order Shipped";
-    //   notification.type = "Completed";
-    //   notification.message = "Your order has been shipped!";
-    // }
-
-    // Order processing message
-    if (order.workflow.status === "coreOrderWorkflow/processing") {
-      notification.name = "Order Processed";
-      notification.type = "Processing";
-      notification.message = "Your order is been process!";
-    }
     // Order shipped message
     if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
       notification.name = "Order Shipped";
       notification.type = "shipped";
       notification.message = "Your order has been shipped!";
     }
+
     // order completed message
     if (order.workflow.status === "coreOrderWorkflow/completed") {
       notification.name = "Order Completed";
@@ -427,10 +407,7 @@ Meteor.methods({
        // Get the total number of items ordered and send notifications for each item.
     const numberOfItems = order.items.length;
 
-    console.log("Buyer Phone Number", order.billing[0].address.phone);
-    console.log("TOTAL Amount", order.billing[0].invoice.total);
-
-       // Send SMS to the buyers phone using the billing address number.
+    // Send SMS to the buyers phone using the billing address number.
     const buyerPhoneNumber = order.billing[0].address.phone;
 
     const shop = Shops.findOne(order.shopId);
@@ -443,11 +420,11 @@ Meteor.methods({
       products += ` ${order.items[i].title},`;
 
       // Get Shop information
-      const vendorShop = Shops.findOne(order.items[i].shopId);
-      const vendorAddress = vendorShop.shopDetails;
+      const vendorId = order.items[i].vendorId;
+      const vendorInfo = Meteor.users.findOne(vendorId);
+      const vendorPhoneNumber = vendorInfo.profile.vendor[1].shopPhone || "08166910264";
+		  // const vendorEmail = vendorInfo.emails[0].address;
 
-        // Send SMS to the vendor
-      const vendorPhoneNumber = (vendorShop.name === "REACTION") ? shopContact.phone : vendorAddress.shopPhone;
       const vendorMsgContent = {
         to: vendorPhoneNumber,
         from: "New Order",
@@ -475,15 +452,6 @@ Meteor.methods({
           Logger.info("ERROR", error);
         } else {
           Logger.warn("SMS SENT", result);
-        }
-      });
-    } else if (order.workflow.status === "coreOrderWorkflow/processing") {
-      buyerMsgContent.message = "The order you placed on reaction commerce store is been process.";
-      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
-        if (error) {
-          Logger.warn("ERROR", error);
-        } else {
-          Logger.info("SMS SENT", result);
         }
       });
     } else if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
@@ -514,7 +482,6 @@ Meteor.methods({
         }
       });
     }
-
 
     // Get shop logo, if available
     let emailLogo;
