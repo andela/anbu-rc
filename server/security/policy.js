@@ -34,6 +34,9 @@ BrowserPolicy.content.allowOriginForAll("*.facebook.com");
 BrowserPolicy.content.allowOriginForAll("*.fbcdn.net");
 BrowserPolicy.content.allowOriginForAll("connect.facebook.net");
 BrowserPolicy.content.allowOriginForAll("*.googleusercontent.com");
+BrowserPolicy.content.allowOriginForAll("http://cdn.ckeditor.com");
+BrowserPolicy.content.allowOriginForAll("http://loader.webspellchecker.net");
+BrowserPolicy.content.allowOriginForAll("https://www.webspellchecker.net/images/fck/fck.html");
 
 BrowserPolicy.content.allowOriginForAll("*.disqus.com");
 BrowserPolicy.content.allowOriginForAll("https://disqus.com");
@@ -58,3 +61,6 @@ BrowserPolicy.content.allowOriginForAll("fonts.gstatic.com");
 
 BrowserPolicy.content.allowOriginForAll("enginex.kadira.io");
 BrowserPolicy.content.allowOriginForAll("*.stripe.com");
+
+BrowserPolicy.content.allowOriginForAll("http://js.paystack.co");
+BrowserPolicy.content.allowOriginForAll("http://paystack.com");
