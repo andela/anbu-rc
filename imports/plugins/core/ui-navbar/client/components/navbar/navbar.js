@@ -1,9 +1,14 @@
 import { FlatButton } from "/imports/plugins/core/ui/client/components";
 import { Reaction } from "/client/api";
 import { Tags } from "/lib/collections";
+import { playTour } from "/imports/plugins/included/tour/client/tour.js";
 
 Template.CoreNavigationBar.onCreated(function () {
   this.state = new ReactiveDict();
+});
+
+Template.CoreNavigationBar.onRendered(function () {
+  playTour();
 });
 
 /**
@@ -38,6 +43,16 @@ Template.CoreNavigationBar.helpers({
       //   $("body").css("overflow-y", "hidden");
       //   $("#search-input").focus();
       // }
+    };
+  },
+  TourButtonComponent() {
+    return {
+      component: FlatButton,
+      icon: "fa fa-taxi",
+      kind: "flat",
+      onClick() {
+        playTour();
+      }
     };
   },
   onMenuButtonClick() {

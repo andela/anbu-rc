@@ -43,6 +43,7 @@
     "i18next-browser-languagedetector": "^1.0.0",
     "i18next-localstorage-cache": "^0.3.0",
     "i18next-sprintf-postprocessor": "^0.2.2",
+    "intro.js": "^2.4.0",
     "jquery": "^3.1.1",
     "jquery-i18next": "^1.1.0",
     "later": "^1.2.0",
@@ -113,5 +114,4 @@
     "test-local": "wdio tests/runner/local.conf.js",
     "test-browserstack": "wdio tests/runner/browserstack.conf.js; kill $(ps aux | grep '[b]rowserstack' | awk '{print $2}')"
   }
-
 }
