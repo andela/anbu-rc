@@ -1,6 +1,7 @@
 import introJs from "intro.js";
 import { Reaction } from "/client/api";
 import { Meteor} from "meteor/meteor";
+import { Accounts } from "/lib/collections";
 
 const adminTourSteps = [
   {
@@ -360,6 +361,11 @@ export function playTour() {
     showProgress: true,
     tooltipPosition: "auto",
     steps: tourSteps
+  });
+  tour.onexit(() => {
+    if (!Accounts.findOne(Meteor.userId()).takenTour) {
+      Accounts.update({_id: Meteor.userId()}, {$set: {takenTour: true}});
+    }
   });
   tour.start();
 }

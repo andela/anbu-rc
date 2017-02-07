@@ -1,6 +1,6 @@
 import { FlatButton } from "/imports/plugins/core/ui/client/components";
 import { Reaction } from "/client/api";
-import { Tags } from "/lib/collections";
+import { Tags, Accounts } from "/lib/collections";
 import { playTour } from "/imports/plugins/included/tour/client/tour.js";
 
 Template.CoreNavigationBar.onCreated(function () {
@@ -8,7 +8,9 @@ Template.CoreNavigationBar.onCreated(function () {
 });
 
 Template.CoreNavigationBar.onRendered(function () {
-  playTour();
+  if (!Accounts.findOne(Meteor.userId()).takenTour) {
+    playTour();
+  }
 });
 
 /**
