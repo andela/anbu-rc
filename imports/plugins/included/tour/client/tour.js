@@ -76,12 +76,41 @@ const adminTourSteps = [
     </div>`
   },
   {
-    element: ".accounts",
+    element: "#accounts",
     intro: `<h2>Account Options</h2>
     <hr>
-    <div>
+    <div style="height:200px; overflow-y: scroll;">
       Here we have several other options to help you customize your account, and also get the best out of 
-      <strong>Reaction</strong> Commerce. Just choose from one of the following options available in the screen shot
+      <strong>Reaction</strong> Commerce. Just choose from one of the following options available in the dropdown shown in the screen shot below
+      <ol>
+        <li>
+          <strong>Profile: </strong>view and update your profile details.
+        </li>
+        <li>
+          <strong>Wallet: </strong>  Fund your wallet, transfer funds to other users wallet and more.
+        </li>
+        <li>
+          <strong>Dashboard: </strong> View your dashboard. Manage the various packages offered by <strong>Reaction</strong>
+        </li>
+        <li>
+          <strong>Orders: </strong> Checkout orders for your products and carry out actions related to your customers orders
+        </li>
+        <li>
+          <strong>Add Products: </strong> Add new products to your shop
+        </li>
+        <li>
+          <strong>Account: </strong> View and manage accounts of your clients.
+        </li>
+        <li>
+          <strong>Actionable Analytics: </strong> Analyse data from your users and products to guide in making improving 
+          your market strategies
+        </li>
+        <li>
+          <strong>Sign out: </strong> Though we hate to see you leave, if need arises you can always logout to keep your account 
+          safe from unathorized access. <br>
+          You can always log back in by clicking the same account button next time.
+        <l/i>
+      <ol>
       <img src= "/resources/admin_account.png" class="product-grid-item-images img-responsive">
     </div>`
   },
@@ -89,13 +118,30 @@ const adminTourSteps = [
     element: ".admin-controls-menu",
     intro: `<h2>Admin Controls</h2>
     <hr>
-    <div>
+    <div style="height:200px; overflow-y: scroll;">
       There are several functionalities available to you as an Admin/Vendor to futher customize you experience on your store.
       Quick access to this functionalities are available through the controls which appear here.
       Do note that besides the functionalities which appear here, you can view and manage all packages available to you by clicking on the 
       dashboard control
       <br>
       Examples are:
+      <ol>
+        <li>
+          <strong>Dashboard: <span></strong><img src= "/resources/dashboard.png" class="product-grid-item-images img-responsive"></span>
+        </li>
+        <li>
+          <strong>Orders: <span></strong><img src= "/resources/orders.png" class="product-grid-item-images img-responsive"></span>
+        </li>
+        <li>
+          <strong>Accounts: <span></strong><img src= "/resources/admin_accounts.png" class="product-grid-item-images img-responsive"></span>
+        </li>
+        <li>
+          <strong>Actionable Analytics: <span></strong><img src= "/resources/actionable_analytics.png" class="product-grid-item-images img-responsive"></span>
+        </li>
+        <li>
+          <strong>Add Products: <span></strong><img src= "/resources/add_product.png" class="product-grid-item-images img-responsive"></span>
+        </li>
+      </ol>
     </div>`
   },
   {
@@ -178,20 +224,24 @@ const registeredBuyerTourSteps = [
     </div>`
   },
   {
-    element: ".accounts",
+    element: "#accounts",
     intro: `<h2>Account Options</h2>
     <hr>
     <div>
-      Here we have several other options to help you customize your account:
+      Here you can access several other account related options by clicking to reveal the dropdown:
       <ol>
         <li>
           <strong>Profile:</strong> view your profile, update your profile and even upgrade your account to a Vendor account
+        </li>
+        <li>
+          <strong>Wallet:</strong> Fund your wallet, transfer funds to other users wallet and more.
         </li>
         <li>
           <strong>Sign-out:</strong> Though we hate to see you leave, if need arises you can always logout to keep your account 
           safe from unathorized access. <br>
           You can always log back in by clicking the same account button next time.
         </li>
+        <img src= "/resources/guest_account.png" class="product-grid-item-images img-responsive">
       </ol>
     </div>`
   },
@@ -210,7 +260,7 @@ const unregisteredBuyerTourSteps = [
     intro: `<h2>Welcome to <strong>Reaction</strong> Commerce</h2>
     <hr>
     <div>
-      <strong>Reaction</strong> Commererce is you one stop ecommerce platform for all types of goods and services.<br>
+      <strong>Reaction</strong> Commererce is your one stop ecommerce platform for all types of goods and services.<br>
       This brief tour would help you get up and running with our platform.
     </div>`
   },
@@ -275,7 +325,7 @@ const unregisteredBuyerTourSteps = [
     </div>`
   },
   {
-    element: ".accounts",
+    element: "#accounts",
     intro: `<h2>Account Options</h2>
     <hr>
     <div>
