@@ -1034,7 +1034,8 @@ Meteor.methods({
           msgtype: 0
         }
       }, (error, result) => {
-        error ? Logger.warn("ERROR IN SEDING THE SMS", error) : Logger.info("New order sms alert sent to ", smsContent.to);
+        error ? Logger.warn("ERROR IN SEDING THE SMS", error)
+        : Logger.info("New order sms alert sent to ", smsContent.to, result);
       }
     );
   }

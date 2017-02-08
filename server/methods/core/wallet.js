@@ -57,13 +57,16 @@ Meteor.methods({
           userId: userId,
           name: "Debit Transaction",
           type: transactionType,
-          message: `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made; '\n' Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`,
+          message: `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made;\
+           '\n' Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`,
           orderId: transactions.orderId || "00000"
         };
         alertPhone = Accounts.findOne(userId).profile.addressBook[0].phone;
         smsContent = {
           to: alertPhone,
-          message: `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made; '\n' Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`
+          message:
+          `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made;\
+           Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`
         };
       }
       balanceOptions = {balance: -amount};
