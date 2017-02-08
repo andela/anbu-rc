@@ -3,6 +3,7 @@ import { Tags } from "/lib/collections";
 import { Session } from "meteor/session";
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
+import { StaticPages } from "/lib/collections";
 
 Template.loginDropdown.events({
 
@@ -77,5 +78,15 @@ Template.loginDropdown.events({
       Reaction.Router.go(route);
     }
     template.$(".dropdown-toggle").dropdown("toggle");
+  }
+});
+
+Template.staticPageNav.onCreated(() => {
+  Meteor.subscribe("staticPages");
+});
+
+Template.staticPageNav.helpers({
+  staticPages() {
+    return StaticPages.find({shopId: Reaction.shopId}).fetch();
   }
 });

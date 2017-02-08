@@ -21,6 +21,8 @@ import "./templates/workflow/orderCompleted.html";
 import "./templates/workflow/orderSummary.html";
 import "./templates/workflow/shippingInvoice.html";
 import "./templates/workflow/shippingInvoice.js";
+import "./templates/workflow/cancelOrder.html";
+import "./templates/workflow/cancelOrder.js";
 import "./templates/workflow/shippingSummary.html";
 import "./templates/workflow/shippingSummary.js";
 import "./templates/workflow/shippingTracking.html";
