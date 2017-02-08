@@ -13,14 +13,15 @@ Meteor.methods({
   */
   "wallet/transaction": (userId, transactions) => {
     transactions.amount = transactions.amount;
-    // console.log(transactions.amount)
+    let notification = {};
+    let smsContent = {};
+    let alertPhone;
     check(userId, String);
     check(transactions, Schemas.Transaction);
     let balanceOptions;
-    const {amount, transactionType, from, date} = transactions;
-    let notification = {};
-
+    const {amount, transactionType} = transactions;
     if (transactionType === "Credit") {
+      const { from, date } = transactions;
       balanceOptions = {balance: amount};
       notification = {
         userId: userId,
@@ -37,13 +38,6 @@ Meteor.methods({
         if (!recipient) {
           return 2;
         }
-        // deposit for the recipient
-        Meteor.call("wallet/transaction", recipient._id, {
-          amount,
-          from: sender.emails[0].address,
-          date: new Date(),
-          transactionType: "Credit"
-        });
         notification = {
           userId: userId,
           name: "Debit Transaction",
@@ -51,19 +45,35 @@ Meteor.methods({
           message: `Debit Alert! ${amount} has been transfer from your account to ${recipient._id}`,
           orderId: transactions.referenceId || "00000"
         };
+        // deposit for the recipient
+        Meteor.call("wallet/transaction", recipient._id, {
+          amount,
+          from: sender.emails[0].address,
+          date: new Date(),
+          transactionType: "Credit"
+        });
+      } else {
+        notification = {
+          userId: userId,
+          name: "Debit Transaction",
+          type: transactionType,
+          message: `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made; '\n' Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`,
+          orderId: transactions.orderId || "00000"
+        };
+        alertPhone = Accounts.findOne(userId).profile.addressBook[0].phone;
+        smsContent = {
+          to: alertPhone,
+          message: `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made; '\n' Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`
+        };
       }
       balanceOptions = {balance: -amount};
     }
 
     try {
-      Wallets.update({userId}, {$push: {transactions: transactions}, $inc: balanceOptions}, {upsert: true});
+      check(notification, Schemas.Notifications);
       Notifications.insert(notification);
-      const smsContent = {
-        to: "08166910264",
-        message: `Debit Alert! ${amount} has been transfer from your account to ${recipient._id}`
-      };
-      Meteor.call("send/sms/alert", smsContent.message, smsContent.to);
-
+      Meteor.call("send/sms/alert", smsContent);
+      Wallets.update({userId}, {$push: {transactions: transactions}, $inc: balanceOptions}, {upsert: true});
       return 1;
     } catch (error) {
       return 0;
@@ -84,10 +94,8 @@ Meteor.methods({
       amount -= orderInfo.billing[0].invoice.shipping;
     }
     const orderId = orderInfo._id;
-
     userId = orderInfo.userId;
     const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt};
-
     const notification = {
       userId: userId,
       name: "Money Refund",
@@ -95,17 +103,11 @@ Meteor.methods({
       message: `Refund! ${amount} has be refunded into your account based on canceled order ${orderId}`,
       orderId: orderId || "0000"
     };
-
-    const smsContent = {
-      to: "08166910264",
-      message: `Refund! ${amount} has be refunded into your account based on canceled order ${orderId}`
-    };
-
-    Meteor.call("send/sms/alert", smsContent.message, smsContent.to);
-
     try {
-      Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
+      check(notification, Schemas.Notifications);
       Notifications.insert(notification);
+      // Meteor.call("send/sms/alert", smsContent);
+      Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
       return true;
     } catch (error) {
       return false;

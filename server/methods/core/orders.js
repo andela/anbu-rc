@@ -447,50 +447,25 @@ Meteor.methods({
        // Insert new order into the notifications database.
     Notifications.insert(notification);
 
-       // Get the total number of items ordered and send notifications for each item.
-    const numberOfItems = order.items.length;
-
     // Send SMS to the buyers phone using the billing address number.
-    const buyerPhoneNumber = order.billing[0].address.phone;
+    const customerPhoneNumber = order.billing[0].address.phone;
 
     const shop = Shops.findOne(order.shopId);
     const shopContact = shop.addressBook[0];
 
-    // Use a loop to send to all vendors and buyers for all products.
-    // TODO: concatenate all products so that a single message can be sent to the buyer containing all the products he bought.
-    let products = "";
+    //  Loop through orders to get vendor information and send notification to them
+    const numberOfItems = order.items.length;
+    let products;
     for (let i = 0; i < numberOfItems; i += 1) {
       products += ` ${order.items[i].title},`;
-
-      // Get Shop information
-      const vendorId = order.items[i].vendorId;
-      const vendorInfo = Meteor.users.findOne(vendorId);
-      const vendorPhoneNumber = vendorInfo.profile.vendor[1].shopPhone || "08166910264";
-		  // const vendorEmail = vendorInfo.emails[0].address;
-
-      const vendorMsgContent = {
-        to: vendorPhoneNumber,
-        from: "New Order",
-        message: `An order has been placed for ${order.items[i].title}, visit your reaction commerce dashboard to view and process orders.`
-      };
-      if (order.workflow.status === "new") {
-        Meteor.call("send/sms/alert", vendorMsgContent.message, vendorMsgContent.to, (error, result) => {
-          if (error) {
-            Logger.info("ERROR", error);
-          } else {
-            Logger.warn("SMS SENT", result);
-          }
-        });
-      }
     }
 
-    const buyerMsgContent = {
-      to: buyerPhoneNumber,
-      from: "Reaction",
-      message: `Your order for ${products} has been received and is now being processed. Thanks for your patronage.`
+    const customerMessageContent = {
+      to: customerPhoneNumber,
+      message: `Your order for ${products} has been received and is now being processed. Thanks.`
     };
     if (order.workflow.status === "new") {
-      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
         if (error) {
           Logger.info("ERROR", error);
         } else {
@@ -498,8 +473,8 @@ Meteor.methods({
         }
       });
     } else if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
-      buyerMsgContent.message = "The order you placed on reaction commerce store has been shipped.";
-      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+      customerMessageContent.message = "The order you placed on reaction commerce store has been shipped.";
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
         if (error) {
           Logger.warn("ERROR", error);
         } else {
@@ -507,8 +482,8 @@ Meteor.methods({
         }
       });
     } else if (order.workflow.status === "coreOrderWorkflow/completed") {
-      buyerMsgContent.message = "The order you placed on reaction commerce store has been delivered.";
-      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+      customerMessageContent.message = "The order you placed on reaction commerce store has been delivered.";
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
         if (error) {
           Logger.warn("ERROR", error);
         } else {
@@ -516,8 +491,8 @@ Meteor.methods({
         }
       });
     } else if (order.workflow.status === "canceled") {
-      buyerMsgContent.message = "The order you placed on reaction commerce store has been canceled.";
-      Meteor.call("send/sms/alert", buyerMsgContent.message, buyerMsgContent.to, (error, result) => {
+      customerMessageContent.message = "The order you placed on reaction commerce store has been canceled.";
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
         if (error) {
           Logger.warn("ERROR", error);
         } else {
@@ -1042,9 +1017,9 @@ Meteor.methods({
     }
   },
 
-  "send/sms/alert": function (message, sendTo) {
-    check(message, String);
-    check(sendTo, String);
+  "send/sms/alert": function (smsContent) {
+    check(smsContent, Object);
+    // check(sendTo, String);
     HTTP.call("GET", Meteor.settings.SMS.URL,
       {
         params:
@@ -1053,13 +1028,13 @@ Meteor.methods({
           owneremail: Meteor.settings.SMS.OWNEREMAIL,
           subacct: Meteor.settings.SMS.SUBACCT,
           subacctpwd: Meteor.settings.SMS.SUBACCTPWD,
-          message: message,
+          message: smsContent.message,
           sender: "ANBU-SQUAD",
-          sendto: sendTo,
+          sendto: smsContent.to,
           msgtype: 0
         }
       }, (error, result) => {
-        error ? Logger.warn("ERROR IN SEDING THE SMS", error) : Logger.info("New order sms alert sent to ", sendTo);
+        error ? Logger.warn("ERROR IN SEDING THE SMS", error) : Logger.info("New order sms alert sent to ", smsContent.to);
       }
     );
   }
