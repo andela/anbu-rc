@@ -341,6 +341,7 @@ Template.searchModal.events({
     event.preventDefault();
     const searchQuery = templateInstance.find("#search-input").value;
     templateInstance.state.set("searchQuery", searchQuery);
+    templateInstance.state.set("filterVendors", []);
     $(".search-modal-header:not(.active-search)").addClass(".active-search");
     if (!$(".search-modal-header").hasClass("active-search")) {
       $(".search-modal-header").addClass("active-search");
