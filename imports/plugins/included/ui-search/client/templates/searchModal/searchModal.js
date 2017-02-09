@@ -82,15 +82,17 @@ function sortProductSearchResults(sortOption, productSearchResults) {
  * @param{Array} productSearchResults - Array containing current product search results.
  * @return{Array} Array containing products by the specified vendor
  */
-function filterSearchByVendor(vendor, productSearchResults) {
-  if (vendor === "All Brands") {
+function filterSearchByVendors(vendors, productSearchResults) {
+  if (vendors.length === 0) {
     return productSearchResults;
   }
   const filteredSearchResult = [];
   productSearchResults.forEach((product) => {
-    if (product.vendor === vendor) {
-      filteredSearchResult.push(product);
-    }
+    vendors.forEach((vendor) => {
+      if (product.vendor === vendor) {
+        filteredSearchResult.push(product);
+      }
+    });
   });
   return filteredSearchResult;
 }
@@ -107,7 +109,7 @@ Template.searchModal.onCreated(function () {
     searchQuery: "",
     productSearchResults: [],
     tagSearchResults: [],
-    filterBrand: "All Brands",
+    filterVendors: [],
     sortOption: "descPrice", // default sort option (descending price)
     productSearchVendors: [] // holds all brands found
   });
@@ -132,8 +134,7 @@ Template.searchModal.onCreated(function () {
     const facets = this.state.get("facets") || [];
     const sortOption = this.state.get("sortOption");
     const sub = this.subscribe("SearchResults", searchCollection, searchQuery, facets);
-    const filterBrand = this.state.get("filterBrand");
-
+    const filterVendors = this.state.get("filterVendors");
     if (sub.ready()) {
       /*
        * Product Search
@@ -141,7 +142,7 @@ Template.searchModal.onCreated(function () {
       if (searchCollection === "products") {
         const productResults = ProductSearch.find().fetch();
         const productResultsCount = productResults.length;
-        this.state.set("productSearchResults", filterSearchByVendor(filterBrand, sortProductSearchResults(sortOption, productResults)));
+        this.state.set("productSearchResults", filterSearchByVendors(filterVendors, sortProductSearchResults(sortOption, productResults)));
         this.state.set("productSearchCount", productResultsCount);
 
         const hashtags = [];
@@ -213,6 +214,90 @@ Template.searchModal.onCreated(function () {
  * searchModal helpers
  */
 Template.searchModal.helpers({
+  productOptions() {
+    const sortOptions = [{
+      label: "Highest Price", value: "Highest Price"
+    }, {
+      label: "Lowest Price", value: "Lowest Price"
+    }, {
+      label: "Newest Item", value: "Newest Item"
+    }, {
+      label: "Best Seller", value: "Best Seller"
+    }];
+    return sortOptions;
+  },
+  productSelectOptions() {
+    const instance = Template.instance();
+    return {
+      buttonClass: "btn btn-white",
+      nonSelectedText: "Check option",
+      maxHeight: 200,
+      buttonWidth: "290px",
+      dropRight: true,
+      onChange(option) {
+        const selection = $(option).val();
+        // sort in Ascending price
+        if (selection === "Highest Price") {
+          instance.state.set("sortOption", "descPrice");
+        }
+        // sort in Descending price
+        if (selection === "Lowest Price") {
+          instance.state.set("sortOption", "ascPrice");
+        }
+        // sort by Newest item (date created)
+        if (selection === "Newest Item") {
+          instance.state.set("sortOption", "newest");
+        }
+        // sort by Best seller
+        if (selection === "Best Seller") {
+          instance.state.set("sortOption", "quantitySold");
+        }
+      }
+    };
+  },
+  vendorOptions() {
+    const instance = Template.instance();
+    const templateVendors = instance.state.get("productSearchVendors");
+    const options = [];
+    templateVendors.forEach((vendor) => {
+      const option = {
+        label: vendor,
+        value: vendor
+      };
+      options.push(option);
+    });
+
+    return options;
+  },
+  vendorSelectOptions() {
+    const instance = Template.instance();
+    return {
+      buttonClass: "btn btn-white",
+      nonSelectedText: "Check option",
+      maxHeight: 200,
+      buttonWidth: "290px",
+      templates: {
+        filter: `<li class="multiselect-item filter"><div class="input-group"><span class="input-group-addon">
+        <i class="fa fa-search"></i></span><input class="form-control multiselect-search" type="text"></div></li>`,
+        filterClearBtn: `<span class="input-group-btn"><button class="btn btn-default multiselect-clear-filter" type="button">
+        <i class="fa fa-times"></i></button></span>`
+      },
+      selectAllText: "All Vendors",
+      enableFiltering: true,
+      onChange(option, checked) {
+        const filterVendor = $(option).val();
+        if (checked) {
+          const newFilterVendors = instance.state.get("filterVendors");
+          newFilterVendors.push(filterVendor);
+          instance.state.set("filterVendors", newFilterVendors);
+        } else {
+          const newFilterVendors = instance.state.get("filterVendors");
+          newFilterVendors.splice(newFilterVendors.indexOf(filterVendor), 1);
+          instance.state.set("filterVendors", newFilterVendors);
+        }
+      }
+    };
+  },
   IconButtonComponent() {
     const instance = Template.instance();
     const view = instance.view;
@@ -241,11 +326,6 @@ Template.searchModal.helpers({
   },
   showSearchResults() {
     return false;
-  },
-  sortOptions: ["Higest Price", "Lowest Price", "Newest Item", "Best Seller"],
-  productSearchVendors() {
-    const instance = Template.instance();
-    return instance.state.get("productSearchVendors");
   }
 });
 
@@ -258,7 +338,6 @@ Template.searchModal.events({
   "keyup input": (event, templateInstance) => {
     event.preventDefault();
     const searchQuery = templateInstance.find("#search-input").value;
-    templateInstance.state.set("filterBrand", "All Brands");
     templateInstance.state.set("searchQuery", searchQuery);
     $(".search-modal-header:not(.active-search)").addClass(".active-search");
     if (!$(".search-modal-header").hasClass("active-search")) {
@@ -300,31 +379,6 @@ Template.searchModal.events({
     $("#search-input").focus();
 
     templateInstance.state.set("searchCollection", searchCollection);
-  },
-  "change [data-event-action=sortSearchResult]": function (event, templateInstance) {
-    event.preventDefault();
-    const selection = event.target.value;
-    // sort in Ascending price
-    if (selection === this.sortOptions[0]) {
-      templateInstance.state.set("sortOption", "descPrice");
-    }
-    // sort in Descending price
-    if (selection === this.sortOptions[1]) {
-      templateInstance.state.set("sortOption", "ascPrice");
-    }
-    // sort by Newest item (date created)
-    if (selection === this.sortOptions[2]) {
-      templateInstance.state.set("sortOption", "newest");
-    }
-    // sort by Best seller
-    if (selection === this.sortOptions[3]) {
-      templateInstance.state.set("sortOption", "quantitySold");
-    }
-  },
-  "change [data-event-action=filterByVendor]": function (event, templateInstance) {
-    event.preventDefault();
-    const brand = event.target.value;
-    templateInstance.state.set("filterBrand", brand);
   }
 });
 

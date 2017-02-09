@@ -99,3 +99,4 @@ lmieulet:meteor-coverage
 practicalmeteor:mocha@2.4.5_6
 practicalmeteor:mocha-console-runner
 nimble:restivus
+jss:bootstrap-multi-select
