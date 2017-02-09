@@ -284,6 +284,8 @@ Template.searchModal.helpers({
       },
       selectAllText: "All Vendors",
       enableFiltering: true,
+      enableCaseInsensitiveFiltering: true,
+      disableIfEmpty: true,
       onChange(option, checked) {
         const filterVendor = $(option).val();
         if (checked) {
