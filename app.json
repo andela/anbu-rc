@@ -40,7 +40,7 @@
   },
   "formation": {
   },
-  "addons": [
+  "addons": [is
     "mongolab",
     "papertrail"
   ],
