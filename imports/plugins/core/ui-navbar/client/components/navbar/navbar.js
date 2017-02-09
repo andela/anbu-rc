@@ -1,9 +1,21 @@
 import { FlatButton } from "/imports/plugins/core/ui/client/components";
-import { Reaction } from "/client/api";
-import { Tags } from "/lib/collections";
+import { Reaction, Router } from "/client/api";
+import { Tags, Accounts } from "/lib/collections";
+import { playTour } from "/imports/plugins/included/tour/client/tour.js";
 
 Template.CoreNavigationBar.onCreated(function () {
   this.state = new ReactiveDict();
+});
+
+Template.CoreNavigationBar.onRendered(function () {
+  currentRoute = Router.getRouteName();
+  this.autorun(() => {
+    if (Accounts.findOne(Meteor.userId())) {
+      if (!Accounts.findOne(Meteor.userId()).takenTour && Accounts.findOne(Meteor.userId()).emails[0]) {
+        playTour();
+      }
+    }
+  });
 });
 
 /**
@@ -38,6 +50,16 @@ Template.CoreNavigationBar.helpers({
       //   $("body").css("overflow-y", "hidden");
       //   $("#search-input").focus();
       // }
+    };
+  },
+  TourButtonComponent() {
+    return {
+      component: FlatButton,
+      icon: "fa fa-taxi",
+      kind: "flat",
+      onClick() {
+        playTour();
+      }
     };
   },
   onMenuButtonClick() {
