@@ -71,9 +71,7 @@ Template.ordersListSummary.events({
     const validateComment = (comment) => {
       check(comment, Match.OptionalOrNull(String));
       const reasons = [
-        "Failed delivery",
-        "Damaged Item",
-        "Wrong Item",
+        "Late Delivery",
         "Customer Changed Mind"
       ];
       // Valid
