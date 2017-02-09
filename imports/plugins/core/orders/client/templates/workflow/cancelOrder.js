@@ -1,21 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 
-const validateComment = (comment) => {
-  check(comment, Match.OptionalOrNull(String));
-
-  // Valid
-  if (comment.length >= 10) {
-    return true;
-  }
-
-  // Invalid
-  return {
-    error: "INVALID_COMMENT",
-    reason: "The reason must be at least 10 characters long."
-  };
-};
-
 Template.coreOrderCancelOrder.onCreated(function () {
   const template = Template.instance();
 
@@ -38,6 +23,27 @@ Template.coreOrderCancelOrder.onCreated(function () {
 Template.coreOrderCancelOrder.events({
   "submit form[name=cancelOrderForm]"(event, template) {
     event.preventDefault();
+
+    const validateComment = (comment) => {
+      check(comment, Match.OptionalOrNull(String));
+      const reasons = [
+        " Item Out Of Stock",
+        "Item Damaged",
+        "Shipping Type Unavailable",
+        "Cannot Ship To Location",
+        "Customer Changed Mind"
+      ];
+      // Valid
+      if (reasons.includes(comment)) {
+        return true;
+      }
+
+      // Invalid
+      return {
+        error: "INVALID_COMMENT",
+        reason: "Please select a reason for cancellation."
+      };
+    };
 
     const commentInput = template.$(".input-comment");
 
