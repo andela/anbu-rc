@@ -27,7 +27,7 @@ Meteor.methods({
         userId: userId,
         name: "Credit Transaction",
         type: transactionType,
-        message: `Credit Alert! ${amount} has been credited into your account by ${from} on ${date}, Balance: ${balanceOptions.balance}`,
+        message: `Credit Alert! \u20A6${amount} has been credited into your account by ${from} on ${date}, Balance: ${balanceOptions.balance}`,
         orderId: transactions.referenceId || "00000"
       };
     }
@@ -42,7 +42,7 @@ Meteor.methods({
           userId: userId,
           name: "Debit Transaction",
           type: transactionType,
-          message: `Debit Alert! ${amount} has been transfer from your account to ${recipient._id}`,
+          message: `Debit Alert! \u20A6${amount} has been transfer from your account to ${recipient._id}`,
           orderId: transactions.referenceId || "00000"
         };
         // deposit for the recipient
@@ -57,16 +57,16 @@ Meteor.methods({
           userId: userId,
           name: "Debit Transaction",
           type: transactionType,
-          message: `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made;\
-           '\n' Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`,
+          message: `Debit Alert! \u20A6${amount} was deducted from your account for the payment of the order you made;\
+          \n Order Id: ${transactions.orderId} \n Date: ${transactions.date}`,
           orderId: transactions.orderId || "00000"
         };
         alertPhone = Accounts.findOne(userId).profile.addressBook[0].phone;
         smsContent = {
           to: alertPhone,
           message:
-          `Debit Alert! ${amount} naira was deducted from your account for the payment of the order you made;\
-           Order Id: ${transactions.orderId} '\n' Date: ${transactions.date}`
+          `Debit Alert! \u20A6${amount} was deducted from your account for the payment of the order you made;\
+           Order Id: ${transactions.orderId} \n Date: ${transactions.date}`
         };
       }
       balanceOptions = {balance: -amount};
@@ -103,13 +103,13 @@ Meteor.methods({
       userId: userId,
       name: "Money Refund",
       type: "Refund",
-      message: `Refund! ${amount} has be refunded into your account based on canceled order ${orderId}`,
+      message: `Refund! \u20A6${amount} has be refunded into your account based on canceled order ${orderId}`,
       orderId: orderId || "0000"
     };
     try {
       check(notification, Schemas.Notifications);
       Notifications.insert(notification);
-      // Meteor.call("send/sms/alert", smsContent);
+      Meteor.call("send/sms/alert", smsContent);
       Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
       return true;
     } catch (error) {

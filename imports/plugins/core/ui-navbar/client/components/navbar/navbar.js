@@ -144,8 +144,11 @@ Template.notificationDropdown.helpers({
   // Check if the user has pending notifications
   // and set the appropriate Icon
     return (Template.instance().notifications.get() > 0)
-    ? "fa fa-bell fa-spin fa-fw"
+    ? "fa fa-bell"
     : "fa fa-bell-o";
+  },
+  NotificationCount() {
+    return Template.instance().notifications.get();
   },
   checkNotification() {
     return (Template.instance().notifications.get() > 0);
