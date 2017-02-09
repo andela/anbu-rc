@@ -1,6 +1,7 @@
-import { Template } from "meteor/templating";
-import { Media } from "/lib/collections";
+import { Template }     from "meteor/templating";
+import { Media }        from "/lib/collections";
 import { NumericInput } from "/imports/plugins/core/ui/client/components";
+import { Reaction}      from "/client/api";
 
 /**
  * ordersListItems helpers
@@ -34,6 +35,9 @@ Template.ordersListItems.helpers({
     if (order) {
       // Lopp through all items in the order. The items are split into indivital items
       for (const orderItem of order.items) {
+        if (!Reaction.hasPermission("owner") || orderItem.vendorId !== Meteor.userId()) {
+          continue;
+        }
         // Find an exising item in the combinedItems array
         const foundItem = combinedItems.find((combinedItem) => {
           // If and item variant exists, then we return true

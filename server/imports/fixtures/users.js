@@ -1,3 +1,4 @@
+import { Meteor } from "meteor/meteor";
 import faker from "faker";
 import "./shops";
 import { getShop } from "./shops";
@@ -44,7 +45,8 @@ const user = {
     return {
       name: this.name,
       email: faker.internet.email(),
-      profilePictureUrl: faker.image.imageUrl()
+      profilePictureUrl: faker.image.imageUrl(),
+      vendor: [ true, { shopName: "hello", shopPhone: "hello0706", shopAddress: "hello" } ]
     };
   },
 

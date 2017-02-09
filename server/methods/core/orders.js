@@ -15,6 +15,15 @@ import { Logger, Reaction } from "/server/api";
  */
 Meteor.methods({
   /**
+   * vendor orders
+   * @param {String} userId - user id
+   * @returns {Boolean} returns - true or false
+   */
+  "vendorOrders": function (userId) {
+    check(userId, String);
+    return Meteor.users.findOne({_id: userId}).profile.vendor[0];
+  },
+  /**
    * orders/shipmentTracking
    * @summary wraps addTracking and triggers workflow update
    * @param {Object} order - order Object

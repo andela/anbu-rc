@@ -65,32 +65,34 @@
               </tr>
             {{/if}}
             {{#each methods}}
-              <tr class="edit-shipping-method" data-event-action="editShippingMethod">
-                <td>{{name}}</td>
-                <td>{{label}}</td>
-                <td>{{group}}</td>
-                <td>{{formatPrice cost}}</td>
-                <td>{{formatPrice handling}}</td>
-                <td>{{formatPrice rate}}</td>
-                <td>
-                  {{#if enabled}}
-                    <i class="fa fa-check text-success" title="Enabled"></i>
-                  {{else}}
-                    <i class="fa fa-ban text-danger" title="Disabled"></i>
-                  {{/if}}
-                </td>
-                <td class="text-right">
-                  <i class="fa fa-cog edit-shipping-method" title="{{i18n 'shipping.editShippingMethod' 'Edit shipping method'}}" data-event-action="editShippingMethod"></i>
-                  <i class="fa fa-trash delete-shipping-method" data-provider-id="{{../_id}}" title="{{i18n 'shipping.deleteShippingMethod' 'Delete shipping method'}}" data-event-action="deleteShippingMethod"></i>
-                </td>
-              </tr>
-              {{#if selectedShippingMethod}}
-              <tr class="active">
-                <td colspan="8">
-                  {{> editShippingMethod}}
-                </td>
-              </tr>
-              {{/if}}
+						  {{#if checkVendorId vendorId}}
+								<tr class="edit-shipping-method" data-event-action="editShippingMethod">
+									<td>{{name}}</td>
+									<td>{{label}}</td>
+									<td>{{group}}</td>
+									<td>{{formatPrice cost}}</td>
+									<td>{{formatPrice handling}}</td>
+									<td>{{formatPrice rate}}</td>
+									<td>
+										{{#if enabled}}
+											<i class="fa fa-check text-success" title="Enabled"></i>
+										{{else}}
+											<i class="fa fa-ban text-danger" title="Disabled"></i>
+										{{/if}}
+									</td>
+									<td class="text-right">
+										<i class="fa fa-cog edit-shipping-method" title="{{i18n 'shipping.editShippingMethod' 'Edit shipping method'}}" data-event-action="editShippingMethod"></i>
+										<i class="fa fa-trash delete-shipping-method" data-provider-id="{{../_id}}" title="{{i18n 'shipping.deleteShippingMethod' 'Delete shipping method'}}" data-event-action="deleteShippingMethod"></i>
+									</td>
+								</tr>
+								{{#if selectedShippingMethod}}
+								<tr class="active">
+									<td colspan="8">
+										{{> editShippingMethod}}
+									</td>
+								</tr>
+								{{/if}}
+							{{/if}}
             {{/each}}
             </tbody>
           </table>

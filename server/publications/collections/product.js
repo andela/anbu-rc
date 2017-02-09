@@ -64,7 +64,7 @@ Meteor.publish("Product", function (productId) {
 
   // Authorized content curators fo the shop get special publication of the product
   // all all relevant revisions all is one package
-  if (Roles.userIsInRole(this.userId, ["owner", "admin", "createProduct"], shop._id)) {
+  if (Roles.userIsInRole(this.userId, ["owner", "guest", "admin", "createProduct"], shop._id)) {
     selector.isVisible = {
       $in: [true, false, undefined]
     };

@@ -108,6 +108,7 @@
     }
   },
   "scripts": {
+    "selenium": "java -jar selenium-server-standalone-3.0.1.jar",
     "create-report": "allure generate allure-results/ -o ~/allure-report",
     "open-report": "cd && allure report open",
     "del-report": "rm -rf ~/allure-report && rm -rf allure-results",

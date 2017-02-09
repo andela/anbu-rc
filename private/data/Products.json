@@ -31,7 +31,13 @@
   "updatedAt": {
     "$date": "2014-06-01T12:17:13.949-0700"
   },
-  "vendor": "Example Manufacturer"
+  "vendor": "Reaction",
+  "vendorDetail" : {
+        "userId" : "ZSDt9Euyo7FeGNjYw",
+        "shopName" : "telle",
+        "shopPhone" : "07066900500",
+        "shopAddress" : "how do you do today"
+    },
 }, {
   "_id": "6qiqPwBkeJdtdQc4G",
   "ancestors": [

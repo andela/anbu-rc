@@ -142,6 +142,12 @@ export default function () {
     description: faker.lorem.paragraph(),
     type: "simple",
     vendor: faker.company.companyName(),
+    vendorDetail: {
+      userId: "tteettsssii3344",
+      shopName: faker.company.companyName(),
+      shopPhone: _.random(0, 1000000).toString(),
+      shopAddress: faker.lorem.sentence()
+    },
     price: priceRange,
     isLowQuantity: false,
     isSoldOut: false,

@@ -5,6 +5,7 @@ import { Reaction } from "/client/api";
 import Logger from "/client/modules/logger";
 import { ReactionProduct } from "/lib/api";
 import Sortable from "sortablejs";
+import { Meteor } from "meteor/meteor";
 
 /**
  * productGrid helpers
@@ -12,6 +13,18 @@ import Sortable from "sortablejs";
 
 Template.productGrid.onCreated(function () {
   Session.set("productGrid/selectedProducts", []);
+  const instance = this;
+  instance.state = new ReactiveDict();
+  this.state.setDefault({
+    userShopId: null
+  });
+  if (Reaction.hasPermission("createProduct")) {
+    if (Reaction.hasPermission("admin")) {
+      instance.state.set("userShopId", "J8Bhq3uTtdgwZx3rz");
+    } else {
+      instance.state.set("userShopId", Meteor.userId());
+    }
+  }
 });
 
 Template.productGrid.onRendered(function () {
@@ -91,6 +104,12 @@ Template.productGrid.helpers({
     return Template.instance().state.equals("canLoadMoreProducts", true);
   },
   products() {
+    Template.currentData().products.map((eachProd) => {
+      if (Reaction.hasPermission("createProduct")) {
+        eachProd.viewerShopId = Template.instance().state.get("userShopId");
+        return eachProd;
+      }
+    });
     return Template.currentData().products;
   }
 });

@@ -32,7 +32,9 @@
       {{/if}}
     </a>
 
-    {{> gridControls controlProps}}
+    {{#if isProductCreator}}
+      {{> gridControls controlProps}}
+    {{/if}}
     {{> gridContent}}
   </li>
 </template>

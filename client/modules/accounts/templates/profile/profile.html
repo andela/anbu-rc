@@ -1,5 +1,14 @@
 <template name="accountProfile">
-
+  <style>
+    #form-role span{
+      font-weight: bold;
+      margin-right: 10px
+    }
+    .help-block {
+      color: #a94442;
+    }
+  </style>
+  
   <div class="flex flex-column flex-align-center flex-2x container-lg">
 
     <div class="flex-item">
@@ -35,7 +44,55 @@
         </div>
       </div>
     </div>
-
+  {{#if isNotGuestOrAdmin }}
+    <!-- Upgrading button -->
+    <div class="flex-item">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title" >{{shopFormHeader}}</h3>
+          <i class="fa fa-chevron-down" aria-hidden="true" data-toggle="collapse" data-target="#showVendorForm" style="float:right;margin-top: -15px;"></i>
+					<span style="color:green; float:right;margin-top: -15px;margin-right:30px;">{{updatedShop}}</span>
+        </div>
+        <!-- show vendor form -->
+        <div class="panel-content">
+          <div id="showVendorForm" class="collapse">
+              <form>
+                <div class="row form-group col-md-12">
+                  <label class="control-label">Shop Name</label>
+                  <input class="form-control shop-name" type="text" value="{{shopProfile.shopName}}" {{shopNameDisable}}>
+                  {{#if hasError messages.errors.shopName}}
+                    <span class="help-block">
+                      {{i18n messages.errors.shopName.i18nKeyReason messages.errors.shopName.reason}}
+                    </span>
+                  {{/if}}
+                </div>
+                <div class="row form-group col-md-12">
+                  <label class="control-label">Phone</label>
+                  <input class="form-control shop-phone" type="text" value="{{shopProfile.shopPhone}}">
+                  {{#if hasError messages.errors.shopPhone}}
+                    <span class="help-block">
+                      {{i18n messages.errors.shopPhone.i18nKeyReason messages.errors.shopPhone.reason}}
+                    </span>
+                  {{/if}}
+                </div>
+                <div class="row form-group col-md-12">
+                  <label class="control-label">Shop Address</label>
+                  <input class="form-control shop-address" type="text" value="{{shopProfile.shopAddress}}">
+                  {{#if hasError messages.errors.shopAddress}}
+                    <span class="help-block">
+                      {{i18n messages.errors.shopAddress.i18nKeyReason messages.errors.shopAddress.reason}}
+                    </span>
+                  {{/if}}
+                </div>
+              </form>
+            <button class="btn btn-primary register-shop-button" type="submit">{{shopFormButtonText}}</button>
+          </div>
+        </div>
+        <!-- end of vendor form -->
+      </div>
+    </div>
+  {{/if}}
+    <!-- End of Upgrading button -->
 
     <div class="flex-item">
       {{> addressBookPanel}}
