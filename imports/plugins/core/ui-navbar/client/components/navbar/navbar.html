@@ -10,10 +10,12 @@
     <div class="notification" data-step="4" data-intro="Notification">
       {{> note tpl="notificationDropdown"}}
     </div>
+    
+    <div class="tour">{{> React TourButtonComponent}}</div>
     <div class="accounts">{{> accounts tpl="staticPageNav"}}</div>
     <div class="search">{{> React IconButtonComponent}}</div>
     <div class="languages hidden-xs">{{> i18nChooser}}</div>
-    <div class="accounts">{{> accounts tpl="loginDropdown"}}</div>
+    <div id="accounts" class="accounts">{{> accounts tpl="loginDropdown"}}</div>
     <div class="cart">{{> cartIcon}}</div>
     <div class="cart-alert">{{> cartPanel}}</div>
   </div>
