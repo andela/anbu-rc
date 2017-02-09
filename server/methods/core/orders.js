@@ -6,9 +6,10 @@ import Future from "fibers/future";
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import { getSlug } from "/lib/api";
-import { Cart, Media, Orders, Products, Shops } from "/lib/collections";
+import { Cart, Media, Orders, Products, Shops, Notifications } from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import { Logger, Reaction } from "/server/api";
+import { HTTP } from "meteor/http";
 
 /**
  * Reaction Order Methods
@@ -177,24 +178,6 @@ Meteor.methods({
     });
   },
 
-/**
-   * orders/cancelOrder
-   *
-   * @summary Cancel an Order
-   * @param {Object} order - order object
-   * @return {Object} return update result
-   */
-  "orders/cancelOrder"(order) {
-    check(order, Object);
-    const orderId = order._id;
-    Orders.update(orderId, {
-      $set: { "workflow.status": "canceled" },
-      $addToSet: { "workflow.workflow": "coreOrderWorkflow/canceled" }
-    });
-
-    return Meteor.call("wallet/refund", order);
-  },
-
   /**
    * orders/vendorCancelOrder
    *
@@ -203,13 +186,9 @@ Meteor.methods({
    * @param {Object} newComment - new comment object
    * @return {Object} return update result
    */
-  "orders/vendorCancelOrder"(order, newComment) {
+  "orders/cancelOrder"(order, newComment) {
     check(order, Object);
     check(newComment, Object);
-
-    if (!Reaction.hasPermission("orders")) {
-      throw new Meteor.Error(403, "Access Denied");
-    }
 
     Orders.update(order._id, {
       $set: { "workflow.status": "canceled" },
@@ -358,6 +337,42 @@ Meteor.methods({
     return false;
   },
 
+    /**
+      * Get user notifications
+      * @param {String} currentUserId - ID of the current user
+      * @return {Boolean} - the notification object or false
+      */
+  "notifications/getNotifications": function (currentUserId) {
+    try {
+      check(currentUserId, String);
+      // console.log(currentUserId);
+     // TODO: add  'seen' criteria to the notification
+     // to check if the user has opened the notification.
+      const notification = Notifications.find({userId: currentUserId}).fetch();
+      return notification ? notification : [false];
+    } catch (e) {
+     // Fail silently if the userId is not matched.
+      return false;
+    }
+  },
+
+   /**
+  * Clear user notifications
+  * @param {String} currentUserId - ID of the current user
+  */
+
+  "notifications/clearNotifications": function (currentUserId) {
+    try {
+      check(currentUserId, String);
+      const selector = {
+        userId: currentUserId
+      };
+      Notifications.remove(selector);
+    } catch (e) {
+     // Fail silently if the userId is not matched.
+    }
+  },
+
   /**
    * orders/sendNotification
    *
@@ -375,9 +390,94 @@ Meteor.methods({
 
     this.unblock();
 
-    // Get Shop information
+    // Update the notification collection
+    const notification = {
+      userId: Meteor.userId(),
+      name: "Order Created",
+      type: "new",
+      message: "Order creation successful!",
+      orderId: order._id
+    };
+
+    // Order shipped message
+    if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
+      notification.name = "Order Shipped";
+      notification.type = "shipped";
+      notification.message = "Your order has been shipped!";
+    }
+
+    // order completed message
+    if (order.workflow.status === "coreOrderWorkflow/completed") {
+      notification.name = "Order Completed";
+      notification.type = "completed";
+      notification.message = "Your order has been Delivered!";
+    }
+
+    // canceled order
+    if (order.workflow.status === "canceled") {
+      notification.name = "Order Canceled";
+      notification.type = "canceled";
+      notification.message = "Your order has been cancel!";
+    }
+
+
+    check(notification, Schemas.Notifications);
+       // Insert new order into the notifications database.
+    Notifications.insert(notification);
+
+    // Send SMS to the buyers phone using the billing address number.
+    const customerPhoneNumber = order.billing[0].address.phone;
+
     const shop = Shops.findOne(order.shopId);
     const shopContact = shop.addressBook[0];
+
+    //  Loop through orders to get vendor information and send notification to them
+    const numberOfItems = order.items.length;
+    let products;
+    for (let i = 0; i < numberOfItems; i += 1) {
+      products += ` ${order.items[i].title},`;
+    }
+
+    const customerMessageContent = {
+      to: customerPhoneNumber,
+      message: `Your order for ${products} has been received and is now being processed. Thanks.`
+    };
+    if (order.workflow.status === "new") {
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
+        if (error) {
+          Logger.info("ERROR", error);
+        } else {
+          Logger.warn("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
+      customerMessageContent.message = "The order you placed on reaction commerce store has been shipped.";
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "coreOrderWorkflow/completed") {
+      customerMessageContent.message = "The order you placed on reaction commerce store has been delivered.";
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    } else if (order.workflow.status === "canceled") {
+      customerMessageContent.message = "The order you placed on reaction commerce store has been canceled.";
+      Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
+        if (error) {
+          Logger.warn("ERROR", error);
+        } else {
+          Logger.info("SMS SENT", result);
+        }
+      });
+    }
 
     // Get shop logo, if available
     let emailLogo;
@@ -893,5 +993,28 @@ Meteor.methods({
       throw new Meteor.Error(
         "Attempt to refund transaction failed", result.error);
     }
+  },
+
+  "send/sms/alert": function (smsContent) {
+    check(smsContent, Object);
+    // check(sendTo, String);
+    HTTP.call("GET", Meteor.settings.SMS.URL,
+      {
+        params:
+        {
+          cmd: "sendquickmsg",
+          owneremail: Meteor.settings.SMS.OWNEREMAIL,
+          subacct: Meteor.settings.SMS.SUBACCT,
+          subacctpwd: Meteor.settings.SMS.SUBACCTPWD,
+          message: smsContent.message,
+          sender: "ANBU-SQUAD",
+          sendto: smsContent.to,
+          msgtype: 0
+        }
+      }, (error, result) => {
+        error ? Logger.warn("ERROR IN SEDING THE SMS", error)
+        : Logger.info("New order sms alert sent to ", smsContent.to, result);
+      }
+    );
   }
 });
