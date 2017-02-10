@@ -80,6 +80,12 @@ function handlePayment(result) {
   });
 }
 
+function getOwnerDetails() {
+  const ownerDetails = Accounts.find(Meteor.userId()).fetch();
+  const ownersEmail = ownerDetails[0].emails[0].address;
+  return ownersEmail;
+}
+
 // Paystack payment
 const payWithPaystack = (email, amount) => {
   const paystackConfig = getPaystackSettings();
@@ -95,8 +101,7 @@ const payWithPaystack = (email, amount) => {
 Template.wallet.events({
   "submit #deposit": (event) => {
     event.preventDefault();
-    const accountDetails = Accounts.find(Meteor.userId()).fetch();
-    const userMail = accountDetails[0].emails[0].address;
+    const userMail = getOwnerDetails();
     const amount = Number(document.getElementById("depositAmount").value);
     const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
     if (!mailRegex.test(userMail)) {
@@ -114,6 +119,7 @@ Template.wallet.events({
     const amount = Number(document.getElementById("transferAmount").value);
     const recipient = document.getElementById("recipient").value;
     const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
+    const senderEmail = getOwnerDetails();
     if (isNaN(amount)) {
       Alerts.toast("You entered an invalid number", "error");
       return false;
@@ -123,20 +129,44 @@ Template.wallet.events({
     } else if (!mailRegex.test(recipient)) {
       Alerts.toast("Invalid email address", "error");
       return false;
+    } else if (senderEmail === recipient) {
+      Alerts.toast("You can not transfer money to yourself", "error");
+      return false;
     }
     const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit" };
-    Meteor.call("wallet/transaction", Meteor.userId(), transaction, (err, res) => {
-      if (res === 2) {
-        Alerts.toast(`No user with email ${recipient}`, "error");
-        return false;
-      } else if (res === 1) {
-        document.getElementById("recipient").value = "";
-        document.getElementById("transferAmount").value = "";
-        Alerts.toast("The transfer was successful", "success");
-        return true;
+    Meteor.call("wallet/recipientDetails", recipient, (err, res) => {
+      if (res) {
+        let message;
+        if (res.profile.addressBook === undefined) {
+          message = `Email: ${res.emails[0].address}
+            User has not updated their account with name and phone numbers`;
+        } else {
+          message = `Name: ${res.profile.addressBook[0].fullName}
+            Email: ${res.emails[0].address}
+            Phone: ${res.profile.addressBook[0].phone}`;
+        }
+        Alerts.alert({
+          title: "Recipient's Information",
+          text: message,
+          type: "info",
+          showCancelButton: true,
+          confirmButtonText: "Transfer"
+        }, () => {
+          Meteor.call("wallet/transaction", Meteor.userId(), transaction, (error, response) => {
+            if (response === 2) {
+              Alerts.toast(`No user with email ${recipient}`, "error");
+              return false;
+            } else if (response === 1) {
+              document.getElementById("recipient").value = "";
+              document.getElementById("transferAmount").value = "";
+              Alerts.toast("The transfer was successful", "success");
+              return true;
+            }
+            Alerts.toast("An error occured, please try again", "error");
+            return false;
+          });
+        });
       }
-      Alerts.toast("An error occured, please try again", "error");
-      return false;
     });
   }
 });

@@ -69,5 +69,16 @@ Meteor.methods({
     } catch (error) {
       return false;
     }
+  },
+
+  /**
+  * wallet/recipientDetails method to return the details of the recipient
+  * @param {string} recipientEmail the email of the recipient
+  * @return {object} the details of the recipient
+  */
+  "wallet/recipientDetails": (recipientEmail) => {
+    check(recipientEmail, String);
+    const recipient = Accounts.findOne({"emails.0.address": recipientEmail});
+    return recipient;
   }
 });
