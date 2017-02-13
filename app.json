@@ -30,11 +30,15 @@
     },
     "BUILDPACK_CLEAR_CACHE": {
       "required": true
-    }
+    },
+		"SMS": {
+			"required": true
+		}
   },
   "formation": {
   },
   "addons": [
+		"sendgrid",
     "mongolab",
     "papertrail"
   ],
