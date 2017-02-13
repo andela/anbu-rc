@@ -1280,8 +1280,8 @@ Meteor.methods({
     check(handle, String);
     const product = Products.findOne({handle: handle});
     let result;
-    let view = product.views || 0;
     if (product) {
+      let view = product.views || 0;
       view += 1;
       const productUpdate = Object.assign({}, product, {views: view});
       result = Products.upsert(product._id, {$set: productUpdate}, {validate: false});

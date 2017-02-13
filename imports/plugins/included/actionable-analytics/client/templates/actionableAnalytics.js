@@ -98,39 +98,35 @@ Template.actionableAnalytics.onCreated(function () {
     ordersAnalytics: [],
     productsAnalytics: []
   });
-  this.autorun(() => {
-    const orderSub = Meteor.subscribe("Orders");
-    const productSub = Meteor.subscribe("searchresults/actionableAnalytics");
-    if (orderSub.ready()) {
+  const self = this;
+  self.autorun(() => {
+    const orderSub = self.subscribe("Orders");
+    const productSub = self.subscribe("searchresults/actionableAnalytics");
+    if (self.subscriptionsReady()) {
       const allOrders = Orders.find({
         createdAt: {
-          $gte: this.state.get("beforeDate"),
-          $lt: this.state.get("afterDate")
+          $gte: self.state.get("beforeDate"),
+          $lt: self.state.get("afterDate")
         }
       }).fetch();
       if (allOrders) {
         const analyticsItems = extractAnalyticsItems(allOrders);
-        this.state.set("ordersPlaced", allOrders.length);
-        this.state.set("totalSales", analyticsItems.totalSales);
-        this.state.set("totalItemsPurchased", analyticsItems.totalItemsPurchased);
-        this.state.set("salesPerDay", analyticsItems.salesPerDay);
-        this.state.set("totalShippingCost", analyticsItems.totalShippingCost);
-        this.state.set("analytics", analyticsItems.analytics);
-        this.state.set("analyticsStatement", analyticsItems.analyticsStatement);
-        this.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
+        self.state.set("ordersPlaced", allOrders.length);
+        self.state.set("totalSales", analyticsItems.totalSales);
+        self.state.set("totalItemsPurchased", analyticsItems.totalItemsPurchased);
+        self.state.set("salesPerDay", analyticsItems.salesPerDay);
+        self.state.set("totalShippingCost", analyticsItems.totalShippingCost);
+        self.state.set("analytics", analyticsItems.analytics);
+        self.state.set("analyticsStatement", analyticsItems.analyticsStatement);
+        self.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
+        orderSub.stop();
       }
 
-    //   created_at: {
-    //     $gte: ISODate("2010-04-29T00:00:00.000Z"),
-    //     $lt: ISODate("2010-05-01T00:00:00.000Z")
-    // }
-
-      orderSub.stop();
       if (productSub.ready()) {
         const products = ProductSearch.find({
-          isVisible: true, createdAt: {
-            $gte: this.state.get("beforeDate"),
-            $lt: this.state.get("afterDate")
+          createdAt: {
+            $gte: self.state.get("beforeDate"),
+            $lt: self.state.get("afterDate")
           }
         }, {
           views: 1,
@@ -138,10 +134,10 @@ Template.actionableAnalytics.onCreated(function () {
           quantitySold: 1
         }).fetch();
         if (products) {
-          this.state.set("productsAnalytics", products);
+          self.state.set("productsAnalytics", products);
         }
+        productSub.stop();
       }
-      productSub.stop();
     }
   });
 });
