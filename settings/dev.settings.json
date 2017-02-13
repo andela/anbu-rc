@@ -7,11 +7,5 @@
     "REACTION_EMAIL": ""
   },
   "isDebug": "info",
-  "public": {},
-  "SMS": {
-    "OWNEREMAIL": "pleroonigeria@gmail.com",
-    "SUBACCT": "anbu",
-    "SUBACCTPWD": "anbu",
-    "URL": "http://www.smslive247.com/http/index.aspx"
-  }
+  "public": {}
 }
