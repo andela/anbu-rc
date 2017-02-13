@@ -54,7 +54,7 @@ function handlePayment(result) {
     } else if (response.data.data.status !== "success") {
       Alerts.toast("Payment was unsuccessful", "error");
     } else {
-      const exchangeRate = getExchangeRate();
+      const exchangeRate = +getExchangeRate();
       const paystackResponse = response.data.data;
       paystackMethod = {
         processor: "Paystack",
@@ -97,10 +97,13 @@ Template.wallet.events({
     event.preventDefault();
     const accountDetails = Accounts.find(Meteor.userId()).fetch();
     const userMail = accountDetails[0].emails[0].address;
-    const amount = parseInt(document.getElementById("depositAmount").value, 10);
+    const amount = Number(document.getElementById("depositAmount").value);
     const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
     if (!mailRegex.test(userMail)) {
       Alerts.toast("Invalid email address", "error");
+      return false;
+    } else if (isNaN(amount)) {
+      Alerts.toast("Invalid amount entered", "error");
       return false;
     }
     payWithPaystack(userMail, amount);
@@ -108,38 +111,43 @@ Template.wallet.events({
 
   "submit #transfer": (event) => {
     event.preventDefault();
-    const exchangeRate = getExchangeRate();
-    const amount = parseInt(document.getElementById("transferAmount").value, 10) / exchangeRate;
-    if (amount > Template.instance().state.get("details").balance) {
+    const amount = Number(document.getElementById("transferAmount").value);
+    const recipient = document.getElementById("recipient").value;
+    const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
+    if (isNaN(amount)) {
+      Alerts.toast("You entered an invalid number", "error");
+      return false;
+    } else if (amount > Template.instance().state.get("details").balance) {
       Alerts.toast("Insufficient Balance", "error");
       return false;
+    } else if (!mailRegex.test(recipient)) {
+      Alerts.toast("Invalid email address", "error");
+      return false;
     }
-    const recipient = document.getElementById("recipient").value;
     const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit" };
     Meteor.call("wallet/transaction", Meteor.userId(), transaction, (err, res) => {
       if (res === 2) {
         Alerts.toast(`No user with email ${recipient}`, "error");
+        return false;
       } else if (res === 1) {
         document.getElementById("recipient").value = "";
         document.getElementById("transferAmount").value = "";
         Alerts.toast("The transfer was successful", "success");
-      } else {
-        Alerts.toast("An error occured, please try again", "error");
+        return true;
       }
+      Alerts.toast("An error occured, please try again", "error");
+      return false;
     });
   }
 });
 
 Template.wallet.helpers({
   balance() {
-    return Template.instance().state.get("details").balance;
+    return Template.instance().state.get("details");
   },
 
   getTransactions() {
-    const transactions = Template.instance().state.get("details").transactions;
-    if (transactions.length > 0) {
-      return transactions;
-    }
-    return false;
+    const details = Template.instance().state.get("details");
+    return  details ? details.transactions : [];
   }
 });

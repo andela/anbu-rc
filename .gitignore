@@ -30,8 +30,6 @@ selenium-server-standalone-3.0.1.jar
 
 *.sublime-workspace
 
-
-
 jsdoc.json
 
 lib-cov
@@ -87,6 +85,10 @@ imports/plugins/custom/*
 
 
 .reaction/config.json
-
 .vscode
 settings.json
+.env
+geckodriver
+selenium-server-standalone-3.0.1.jar
+settings.json
+.vscode

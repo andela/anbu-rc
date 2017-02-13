@@ -9,43 +9,11 @@ const supportedCollections = ["products", "orders", "accounts"];
 function getProductFindTerm(searchTerm, searchTags, userId) {
   const shopId = Reaction.getShopId();
   const findTerm = {
-    $and: [
-      { shopId: shopId },
-      {
-        $or: [
-          {
-            description: {
-              $regex: searchTerm,
-              $options: "i"
-            }
-          },
-          {
-            title: {
-              $regex: searchTerm,
-              $options: "i"
-            }
-          },
-          {
-            vendor: {
-              $regex: searchTerm,
-              $options: "i"
-            }
-          },
-          {
-            handle: {
-              $regex: searchTerm,
-              $options: "i"
-            }
-          },
-          {
-            metafields: {
-              $regex: searchTerm,
-              $options: "i"
-            }
-          }
-        ]
-      }
-    ]
+    shopId: shopId,
+    title: {
+      $regex: searchTerm,
+      $options: "i"
+    }
   };
   if (searchTags.length) {
     findTerm.hashtags = {$all: searchTags};
@@ -71,7 +39,8 @@ getResults.products = function (searchTerm, facets, maxResults, userId) {
         price: 1,
         vendor: 1,
         createdAt: 1,
-        quantitySold: 1
+        quantitySold: 1,
+        views: 1
       },
       sort: {score: {$meta: "textScore"}},
       limit: maxResults
@@ -164,4 +133,13 @@ Meteor.publish("SearchResults", function (collection, searchTerm, facets, maxRes
     return this.ready();
   }
   return getResults[collection](searchTerm, facets, maxResults, this.userId);
+});
+
+Meteor.publish("searchresults/actionableAnalytics", () => {
+  const subResults =  ProductSearch.find({isVisible: true}, {
+    views: 1,
+    title: 1,
+    quantitySold: 1
+  });
+  return subResults;
 });

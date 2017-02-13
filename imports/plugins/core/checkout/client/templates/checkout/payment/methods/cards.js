@@ -45,10 +45,10 @@ Template.corePaymentMethods.helpers({
 
 Template.walletPayment.onCreated(function () {
   this.state = new ReactiveDict();
+  this.state.setDefault({
+    details: { balance: 0 }
+  });
   this.autorun(() => {
-    this.state.setDefault({
-      details: {balance: 0}
-    });
     this.subscribe("transactionDetails", Meteor.userId());
     const transactionInfo = Wallets.find().fetch();
     this.state.set("details", transactionInfo[0]);
@@ -57,7 +57,7 @@ Template.walletPayment.onCreated(function () {
 
 Template.walletPayment.helpers({
   balance: () => {
-    return Template.instance().state.get("details").balance;
+    return Template.instance().state.get("details");
   }
 });
 
@@ -100,7 +100,7 @@ Template.walletPayment.events({
         Meteor.call("cart/submitPayment", paymentMethod);
         Alerts.toast("Payment Successful", "success");
       } else {
-        Alerts.toast("An error occured, please try again", "error");
+        Alerts.toast("An error occured, please try again, I am the wallet", "error");
       }
     });
   }

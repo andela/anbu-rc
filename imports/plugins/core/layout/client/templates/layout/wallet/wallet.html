@@ -7,7 +7,7 @@
           <h3 class="panel-title">Your Balance</h3>
         </div>
         <div class="panel-content">
-          <span style="font-weight: bolder; font-size: 4.2em">{{formatPrice balance}}</span>
+          <span style="font-weight: bolder; font-size: 4.2em">{{formatPrice balance.balance}}</span>
         </div>
 
       </div>
@@ -18,12 +18,13 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Deposit</h3>
+          <p class="panel-body">Enter the amount you want to Deposit in Naira (transfer using paystack)</p>
         </div>
 
         <div class="panel-content">
           <form id="deposit">
             <div class="row form-group col-md-6 col-md-offset-3">
-              <input id="depositAmount" class="form-control" type="number" placeholder="Amount">
+              <input id="depositAmount" class="form-control" type="text" placeholder="Amount">
             </div>
             <button type="submit" class="row col-md-2 col-md-offset-5 btn btn-success">Deposit</button>
           </form>
@@ -35,15 +36,16 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Transfer</h3>
+          <p class="panel-body">Enter the amount you want to transfer from your wallet</p>
         </div>
 
         <div class="panel-content">
           <form id="transfer">
             <div class="col-xs-6">
-              <input id="transferAmount" class="form-control" type="number" name="amount" placeholder="Amount">
+              <input id="transferAmount" class="form-control" type="text" name="amount" placeholder="Amount">
             </div>
             <div class="col-xs-6">
-              <input id="recipient" class="form-control" type="text" name="email" placeholder="Beneficiary Email">
+              <input id="recipient" class="form-control" type="email" name="email" placeholder="Beneficiary Email">
             </div>
             <button type="submit" class="btn btn-success col-md-2 col-md-offset-5" style="margin-top:15px">Transfer</button>
           </form>
@@ -67,7 +69,7 @@
             </tr>
           </thead>
           <tbody>
-            {{#if getTransactions }}
+            {{#if getTransactions 'gt' 0}}
               {{#each transaction in getTransactions }}
               <tr>
                 <td>{{capitalize transaction.transactionType}}</td>
