@@ -178,6 +178,24 @@ Meteor.methods({
     });
   },
 
+/**
+   * orders/cancelOrder
+   *
+   * @summary Cancel an Order
+   * @param {Object} order - order object
+   * @return {Object} return update result
+   */
+  "orders/cancelOrder"(order) {
+    check(order, Object);
+    const orderId = order._id;
+    Orders.update(orderId, {
+      $set: { "workflow.status": "canceled" },
+      $addToSet: { "workflow.workflow": "coreOrderWorkflow/canceled" }
+    });
+
+    return Meteor.call("wallet/refund", order);
+  },
+
   /**
    * orders/vendorCancelOrder
    *
@@ -186,9 +204,13 @@ Meteor.methods({
    * @param {Object} newComment - new comment object
    * @return {Object} return update result
    */
-  "orders/cancelOrder"(order, newComment) {
+  "orders/vendorCancelOrder"(order, newComment) {
     check(order, Object);
     check(newComment, Object);
+
+    if (!Reaction.hasPermission("orders")) {
+      throw new Meteor.Error(403, "Access Denied");
+    }
 
     Orders.update(order._id, {
       $set: { "workflow.status": "canceled" },
