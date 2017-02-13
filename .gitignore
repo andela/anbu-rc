@@ -10,7 +10,7 @@
 *.seed
 *.sublime-project
 *.sublime-workspace
-.vscode
+
 jsdoc.json
 lib-cov
 logs
