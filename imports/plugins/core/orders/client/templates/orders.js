@@ -298,7 +298,12 @@ Template.orderStatusDetail.helpers({
   orderAge: function () {
     return moment(this.createdAt).fromNow();
   },
-
+  orderStatus: function () {
+    return this.workflow.status;
+  },
+  orderComments() {
+    return this.comments ? `Reason: ${this.comments[0].body}` : "";
+  },
   shipmentTracking: function () {
     if (this.shipping[0].tracking) {
       return this.shipping[0].tracking;
