@@ -87,6 +87,8 @@ Template.actionableAnalytics.onCreated(function () {
   this.state = new ReactiveDict();
   this.state.setDefault({
     ordersPlaced: 0,
+    beforeDate: new Date(),
+    afterDate: new Date(),
     totalSales: 0,
     totalItemsPurchased: 0,
     totalShippingCost: 0,
@@ -100,7 +102,12 @@ Template.actionableAnalytics.onCreated(function () {
     const orderSub = Meteor.subscribe("Orders");
     const productSub = Meteor.subscribe("searchresults/actionableAnalytics");
     if (orderSub.ready()) {
-      const allOrders = Orders.find().fetch();
+      const allOrders = Orders.find({
+        createdAt: {
+          $gte: this.state.get("beforeDate"),
+          $lt: this.state.get("afterDate")
+        }
+      }).fetch();
       if (allOrders) {
         const analyticsItems = extractAnalyticsItems(allOrders);
         this.state.set("ordersPlaced", allOrders.length);
@@ -112,9 +119,20 @@ Template.actionableAnalytics.onCreated(function () {
         this.state.set("analyticsStatement", analyticsItems.analyticsStatement);
         this.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
       }
+
+    //   created_at: {
+    //     $gte: ISODate("2010-04-29T00:00:00.000Z"),
+    //     $lt: ISODate("2010-05-01T00:00:00.000Z")
+    // }
+
       orderSub.stop();
       if (productSub.ready()) {
-        const products = ProductSearch.find({isVisible: true}, {
+        const products = ProductSearch.find({
+          isVisible: true, createdAt: {
+            $gte: this.state.get("beforeDate"),
+            $lt: this.state.get("afterDate")
+          }
+        }, {
           views: 1,
           title: 1,
           quantitySold: 1
@@ -126,6 +144,37 @@ Template.actionableAnalytics.onCreated(function () {
       productSub.stop();
     }
   });
+});
+
+Template.actionableAnalytics.onRendered(() => {
+  const instance = Template.instance();
+  const toDatePicker = new Pikaday({
+    field: $("#todatepicker")[0],
+    format: "DD/MM/YYYY",
+    onSelect: function () {
+      let nextDate = this.getDate();
+      nextDate = new Date(nextDate.setHours(23));
+      nextDate = new Date(nextDate.setMinutes(59));
+      instance.state.set("afterDate", nextDate);
+    }
+  });
+
+  const fromDatePicker = new Pikaday({
+    field: $("#fromdatepicker")[0],
+    format: "DD/MM/YYYY",
+    onSelect: function () {
+      toDatePicker.setMinDate(this.getDate());
+      let nextDate = this.getDate();
+      if (Date.parse(toDatePicker.getDate()) <= Date.parse(nextDate)) {
+        nextDate = new Date(nextDate.setHours(23));
+        nextDate = new Date(nextDate.setMinutes(59));
+        toDatePicker.setDate(nextDate);
+      }
+      instance.state.set("beforeDate", this.getDate());
+    }
+  });
+  fromDatePicker.setDate(new Date());
+  toDatePicker.setDate(new Date(fromDatePicker.getDate().setHours(23)));
 });
 
 Template.actionableAnalytics.helpers({
