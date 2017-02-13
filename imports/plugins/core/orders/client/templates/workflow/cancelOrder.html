@@ -7,15 +7,8 @@
     <div class="panel-body">
       <form name="cancelOrderForm">
         <div class="form-group {{hasError messages.errors.comment}}">
-          <label class="sr-only" for="comment">Reason</label>
-          <select class="input-comment form-control" id="input-comment" name="comment">
-            <option selected>-- Select A Cancellation Reason --</option>
-            <option>Item Out Of Stock</option>
-            <option>Item Damaged</option>
-            <option>Shipping Type Unavailable</option>
-            <option>Cannot Ship To Location</option>
-            <option>Customer Changed Mind</option>
-          </select>
+          <label>Reason</label>
+          <textarea name="comment" class="form-control input-comment"></textarea>
           {{#if hasError messages.errors.comment}}
             <span class="help-block">
               {{messages.errors.comment.reason}}
