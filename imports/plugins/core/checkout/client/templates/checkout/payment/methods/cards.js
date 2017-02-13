@@ -100,7 +100,7 @@ Template.walletPayment.events({
         Meteor.call("cart/submitPayment", paymentMethod);
         Alerts.toast("Payment Successful", "success");
       } else {
-        Alerts.toast("An error occured, please try again, I am the wallet", "error");
+        Alerts.toast("An error occured, please try again", "error");
       }
     });
   }

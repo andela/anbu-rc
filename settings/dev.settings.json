@@ -7,11 +7,5 @@
     "REACTION_EMAIL": ""
   },
   "isDebug": "info",
-  "public": {},
-  "SMS": {
-    "OWNEREMAIL": "",
-    "SUBACCT": "",
-    "SUBACCTPWD": "",
-    "URL": ""
-  }
+  "public": {}
 }

@@ -38,7 +38,6 @@
   "formation": {
   },
   "addons": [
-		"sendgrid",
     "mongolab",
     "papertrail"
   ],
