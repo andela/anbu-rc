@@ -72,7 +72,9 @@ function handlePayment(result) {
           amount: paystackResponse.amount / (100 * exchangeRate),
           referenceId: paystackResponse.reference,
           date: new Date(),
-          transactionType: "Credit"
+          transactionType: "Credit",
+          from: self,
+          to: self
         };
         finalizeDeposit(paystackMethod);
       }
@@ -133,7 +135,7 @@ Template.wallet.events({
       Alerts.toast("You can not transfer money to yourself", "error");
       return false;
     }
-    const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit" };
+    const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit", from: senderEmail };
     Meteor.call("wallet/recipientDetails", recipient, (err, res) => {
       if (res) {
         let message;
@@ -166,6 +168,9 @@ Template.wallet.events({
             return false;
           });
         });
+      } else {
+        Alerts.toast(`No user with email ${recipient}`, "error");
+        return false;
       }
     });
   }
