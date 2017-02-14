@@ -197,7 +197,7 @@ Template.actionableAnalytics.helpers({
   ordersPlaced() {
     const instance = Template.instance();
     const orders = instance.state.get("ordersPlaced");
-    return orders;
+    return orders - Template.instance().state.get("ordersCancelled");
   },
   totalSales() {
     const instance = Template.instance();
