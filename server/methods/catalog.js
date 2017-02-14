@@ -1279,7 +1279,7 @@ Meteor.methods({
   "products/updateViews": (handle) => {
     check(handle, String);
     const product = Products.findOne({handle: handle});
-    let result;
+    let result = {};
     if (product) {
       let view = product.views || 0;
       view += 1;
