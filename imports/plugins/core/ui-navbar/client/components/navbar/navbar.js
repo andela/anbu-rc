@@ -96,11 +96,14 @@ Template.CoreNavigationBar.helpers({
         instance.toggleMenuCallback = callback;
       }
     };
+  },
+  currentUser() {
+    return Reaction.hasPermission("admin") ||
+    (!Reaction.hasPermission("anonymous")) ? true : false;
   }
 });
 
 // notification template session
-
 Template.notificationItem.onCreated(function () {
   this.notifications = ReactiveVar();
   // Create an auto run to Check for notifications on page load

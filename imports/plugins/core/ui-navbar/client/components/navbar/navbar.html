@@ -6,10 +6,12 @@
     <div class="menu">
       {{> tagNav tagNavProps}}
     </div>
-    <div class="notificationList"></div>
-    <div class="notification" data-step="4" data-intro="Notification">
-      {{> note tpl="notificationDropdown"}}
-    </div>
+		{{#if currentUser}}
+      <div class="notificationList"></div>
+      <div class="notification" data-step="4" data-intro="Notification">
+        {{> note tpl="notificationDropdown"}}
+      </div>
+		{{/if}}
     
     <div class="tour">{{> React TourButtonComponent}}</div>
     <div class="accounts">{{> accounts tpl="staticPageNav"}}</div>

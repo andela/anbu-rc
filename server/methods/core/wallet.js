@@ -19,15 +19,15 @@ Meteor.methods({
     check(userId, String);
     check(transactions, Schemas.Transaction);
     let balanceOptions;
-    const {amount, transactionType} = transactions;
+    const {amount, transactionType, from, date} = transactions;
     if (transactionType === "Credit") {
-      const { from, date } = transactions;
       balanceOptions = {balance: amount};
       notification = {
         userId: userId,
         name: "Credit Transaction",
         type: transactionType,
-        message: `Credit Alert! \u20A6${amount} has been credited into your account by ${from} on ${date}, Balance: ${balanceOptions.balance}`,
+        message: `Credit Alert!
+				${amount} has been credited into your account by ${from} on ${date}, Balance: ${balanceOptions.balance}`,
         orderId: transactions.referenceId || "00000"
       };
     }
@@ -42,7 +42,8 @@ Meteor.methods({
           userId: userId,
           name: "Debit Transaction",
           type: transactionType,
-          message: `Debit Alert! \u20A6${amount} has been transfer from your account to ${recipient._id}`,
+          message: `Debit Alert! 
+					${amount} has been transfered from your account to ${recipient._id}`,
           orderId: transactions.referenceId || "00000"
         };
         // deposit for the recipient
@@ -57,16 +58,19 @@ Meteor.methods({
           userId: userId,
           name: "Debit Transaction",
           type: transactionType,
-          message: `Debit Alert! \u20A6${amount} was deducted from your account for the payment of the order you made;\
-          \n Order Id: ${transactions.orderId} \n Date: ${transactions.date}`,
+          message: `Debit Alert! 
+					${amount} was deducted from your account for the payment of the order you made;
+          Order Id: ${transactions.orderId}
+					Date: ${transactions.date}`,
           orderId: transactions.orderId || "00000"
         };
         alertPhone = Accounts.findOne(userId).profile.addressBook[0].phone;
         smsContent = {
           to: alertPhone,
           message:
-          `Debit Alert! \u20A6${amount} was deducted from your account for the payment of the order you made;\
-           Order Id: ${transactions.orderId} \n Date: ${transactions.date}`
+          `Debit Alert! ${amount} was deducted from your account for the payment of the order you made;
+           Order Id: ${transactions.orderId}
+					 Date: ${transactions.date}`
         };
       }
       balanceOptions = {balance: -amount};
@@ -103,8 +107,9 @@ Meteor.methods({
       userId: userId,
       name: "Money Refund",
       type: "Refund",
-      message: `Refund! \u20A6${amount} has be refunded into your account based on canceled order ${orderId}`,
-      orderId: orderId || "0000"
+      message: `Refund!
+			${amount} has been refunded into your account based on canceled order ${orderId}`,
+      orderId: orderId
     };
     try {
       check(notification, Schemas.Notifications);
