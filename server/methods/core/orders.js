@@ -417,7 +417,7 @@ Meteor.methods({
     if (order.workflow.status === "canceled") {
       notification.name = "Order Canceled";
       notification.type = "canceled";
-      notification.message = "Your order has been cancel!";
+      notification.message = "Your order has been cancelled!";
     }
 
 
@@ -445,9 +445,9 @@ Meteor.methods({
     if (order.workflow.status === "new") {
       Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
         if (error) {
-          Logger.info("ERROR", error);
+          Logger.warn("ERROR", error);
         } else {
-          Logger.warn("SMS SENT", result);
+          Logger.info("SMS SENT", result);
         }
       });
     } else if (order.workflow.status === "coreOrderItemWorkflow/shipped") {
@@ -469,7 +469,7 @@ Meteor.methods({
         }
       });
     } else if (order.workflow.status === "canceled") {
-      customerMessageContent.message = "The order you placed on reaction commerce store has been canceled.";
+      customerMessageContent.message = "The order you placed on reaction commerce store has been cancelled.";
       Meteor.call("send/sms/alert", customerMessageContent, (error, result) => {
         if (error) {
           Logger.warn("ERROR", error);
@@ -997,7 +997,6 @@ Meteor.methods({
 
   "send/sms/alert": function (smsContent) {
     check(smsContent, Object);
-    // check(sendTo, String);
     HTTP.call("GET", Meteor.settings.SMS.URL,
       {
         params:
