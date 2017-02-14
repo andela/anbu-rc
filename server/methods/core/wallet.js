@@ -51,6 +51,7 @@ Meteor.methods({
           amount,
           from: sender.emails[0].address,
           date: new Date(),
+          to: recipient.emails[0].address,
           transactionType: "Credit"
         });
       } else {
@@ -102,7 +103,7 @@ Meteor.methods({
     }
     const orderId = orderInfo._id;
     userId = orderInfo.userId;
-    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt};
+    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: "admin", to: "self"};
     const notification = {
       userId: userId,
       name: "Money Refund",
@@ -120,5 +121,19 @@ Meteor.methods({
     } catch (error) {
       return false;
     }
+  },
+
+  /**
+  * wallet/recipientDetails method to return the details of the recipient
+  * @param {string} recipientEmail the email of the recipient
+  * @return {object} the details of the recipient
+  */
+  "wallet/recipientDetails": (recipientEmail) => {
+    check(recipientEmail, String);
+    const recipient = Accounts.findOne({"emails.0.address": recipientEmail});
+    if (!recipient) {
+      return undefined;
+    }
+    return recipient;
   }
 });
