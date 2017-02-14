@@ -11,6 +11,7 @@ import { ReactiveDict } from "meteor/reactive-dict";
  */
 function extractAnalyticsItems(allOrders) {
   let totalSales = 0;
+  let ordersCancelled = 0;
   let totalItemsPurchased = 0;
   let totalShippingCost = 0;
   const analytics = {};
@@ -19,53 +20,46 @@ function extractAnalyticsItems(allOrders) {
   allOrders.forEach((order) => {
     const orderDate = order.createdAt;
     const dateString = orderDate.toISOString().split("T")[0];
-    ordersAnalytics.push({
-      date: dateString,
-      country: order.billing[0].address.region,
-      city: order.billing[0].address.city,
-      paymentProcessor: order.billing[0].paymentMethod.processor,
-      shipping: order.billing[0].invoice.shipping,
-      taxes: order.billing[0].invoice.taxes
-    });
-    totalSales += order.billing[0].invoice.subtotal;
-    totalItemsPurchased += order.items.length;
-    totalShippingCost += order.billing[0].invoice.shipping;
-    order.items.forEach((item) => {
-      if (analytics[item.title]) {
-        analytics[item.title].quantitySold += item.quantity;
-        analytics[item.title].totalSales += item.variants.price;
-      } else {
-        analytics[item.title] = {
-          quantitySold: item.quantity,
-          totalSales: item.variants.price
-        };
-      }
-      const uniqueStamp = `${dateString}::${item.title}`;
-      if (analyticsStatement[uniqueStamp] && analyticsStatement[uniqueStamp].title === item.title) {
-        analyticsStatement[uniqueStamp].totalSales += item.variants.price;
-        analyticsStatement[uniqueStamp].quantity += item.quantity;
-      } else {
-        analyticsStatement[uniqueStamp] = {
-          title: item.title,
-          quantity: item.quantity,
-          dateString,
-          totalSales: item.variants.price
-        };
-      }
-    });
+    if (order.workflow.status !== "canceled") {
+      ordersAnalytics.push({
+        date: dateString,
+        country: order.billing[0].address.region,
+        city: order.billing[0].address.city,
+        paymentProcessor: order.billing[0].paymentMethod.processor,
+        shipping: order.billing[0].invoice.shipping,
+        taxes: order.billing[0].invoice.taxes
+      });
+      totalSales += order.billing[0].invoice.subtotal;
+      totalItemsPurchased += order.items.length;
+      totalShippingCost += order.billing[0].invoice.shipping;
+      order.items.forEach((item) => {
+        if (analytics[item.title]) {
+          analytics[item.title].quantitySold += item.quantity;
+          analytics[item.title].totalSales += item.variants.price;
+        } else {
+          analytics[item.title] = {
+            quantitySold: item.quantity,
+            totalSales: item.variants.price
+          };
+        }
+        const uniqueStamp = `${dateString}::${item.title}`;
+        if (analyticsStatement[uniqueStamp] && analyticsStatement[uniqueStamp].title === item.title) {
+          analyticsStatement[uniqueStamp].totalSales += item.variants.price;
+          analyticsStatement[uniqueStamp].quantity += item.quantity;
+        } else {
+          analyticsStatement[uniqueStamp] = {
+            title: item.title,
+            quantity: item.quantity,
+            dateString,
+            totalSales: item.variants.price
+          };
+        }
+      });
+    } else {
+      ordersCancelled += 1;
+    }
   });
-  const latestOrder = _.maxBy(allOrders, (order) => {
-    return Date.parse(order.createdAt);
-  });
-  const oldestOrder = _.minBy(allOrders, (order) => {
-    return Date.parse(order.createdAt);
-  });
-  let salesPerDay = 0;
-  if (oldestOrder && latestOrder) {
-    const difference = daysDifference(Date.parse(oldestOrder.createdAt), Date.parse(latestOrder.createdAt));
-    salesPerDay = difference === 0 ? totalSales : totalSales / difference;
-  }
-  return {totalSales, totalItemsPurchased, totalShippingCost, salesPerDay, analytics, analyticsStatement, ordersAnalytics};
+  return {totalSales, totalItemsPurchased, totalShippingCost, analytics, analyticsStatement, ordersAnalytics, ordersCancelled};
 }
 
 /**
@@ -77,12 +71,27 @@ function extractAnalyticsItems(allOrders) {
  */
 function daysDifference(date1, date2) {
   // a Day represented in milliseconds
+
   const oneDay = 1000 * 60 * 60 * 24;
   // Calculate the difference in milliseconds
-  const difference = date2 - date1;
+  const difference = new Date(new Date(date2).setHours(0)) - new Date(new Date(date1).setHours(0));
   // Convert back to days and return
   return Math.round(difference / oneDay);
 }
+
+/**
+ * Helper method to set up the average sales total
+ * @param{Number} totalSales - total sales
+ * @param{Date} fromDate - start date
+ * @param{toDate} toDate - end date
+ * @return{Number} sales per day
+ */
+function setUpAverageSales(totalSales, fromDate, toDate) {
+  const difference = daysDifference(Date.parse(fromDate), Date.parse(toDate));
+  salesPerDay = difference === 0 ? totalSales : totalSales / difference;
+  return salesPerDay;
+}
+
 Template.actionableAnalytics.onCreated(function () {
   this.state = new ReactiveDict();
   this.state.setDefault({
@@ -93,6 +102,7 @@ Template.actionableAnalytics.onCreated(function () {
     totalItemsPurchased: 0,
     totalShippingCost: 0,
     salesPerDay: 0,
+    ordersCancelled: 0,
     analytics: {},
     analyticsStatement: {},
     ordersAnalytics: [],
@@ -114,11 +124,11 @@ Template.actionableAnalytics.onCreated(function () {
         self.state.set("ordersPlaced", allOrders.length);
         self.state.set("totalSales", analyticsItems.totalSales);
         self.state.set("totalItemsPurchased", analyticsItems.totalItemsPurchased);
-        self.state.set("salesPerDay", analyticsItems.salesPerDay);
         self.state.set("totalShippingCost", analyticsItems.totalShippingCost);
         self.state.set("analytics", analyticsItems.analytics);
         self.state.set("analyticsStatement", analyticsItems.analyticsStatement);
         self.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
+        self.state.set("ordersCancelled", analyticsItems.ordersCancelled);
         orderSub.stop();
       }
 
@@ -137,6 +147,10 @@ Template.actionableAnalytics.onCreated(function () {
           self.state.set("productsAnalytics", products);
         }
         productSub.stop();
+        self.state.set("salesPerDay",
+          setUpAverageSales(self.state.get("totalSales"),
+          self.state.get("beforeDate"),
+          self.state.get("afterDate")));
       }
     }
   });
@@ -144,6 +158,7 @@ Template.actionableAnalytics.onCreated(function () {
 
 Template.actionableAnalytics.onRendered(() => {
   const instance = Template.instance();
+  let fromDatePicker = {};
   const toDatePicker = new Pikaday({
     field: $("#todatepicker")[0],
     format: "DD/MM/YYYY",
@@ -155,7 +170,7 @@ Template.actionableAnalytics.onRendered(() => {
     }
   });
 
-  const fromDatePicker = new Pikaday({
+  fromDatePicker = new Pikaday({
     field: $("#fromdatepicker")[0],
     format: "DD/MM/YYYY",
     onSelect: function () {
@@ -165,12 +180,16 @@ Template.actionableAnalytics.onRendered(() => {
         nextDate = new Date(nextDate.setHours(23));
         nextDate = new Date(nextDate.setMinutes(59));
         toDatePicker.setDate(nextDate);
+      } else {
+        instance.state.set("beforeDate", this.getDate());
       }
-      instance.state.set("beforeDate", this.getDate());
     }
   });
+  fromDatePicker.setMaxDate(new Date());
+  toDatePicker.setMaxDate(new Date());
   fromDatePicker.setDate(new Date());
   toDatePicker.setDate(new Date(fromDatePicker.getDate().setHours(23)));
+  // instance.state.set("salesPerDay", setUpAverageSales(instance.state.get("totalSales"), fromDatePicker.getDate(), toDatePicker.getDate()));
 });
 
 Template.actionableAnalytics.helpers({
@@ -275,5 +294,8 @@ Template.actionableAnalytics.helpers({
       },
       "desc"
     );
+  },
+  ordersCancelled() {
+    return Template.instance().state.get("ordersCancelled");
   }
 });
