@@ -103,7 +103,7 @@ Meteor.methods({
     }
     const orderId = orderInfo._id;
     userId = orderInfo.userId;
-    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: 'admin', to: 'self'};
+    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: "admin", to: "self"};
     const notification = {
       userId: userId,
       name: "Money Refund",
