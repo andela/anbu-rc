@@ -10,28 +10,26 @@
 
       <div class="rui search-modal-options-container">
         {{#if productSearchResults}}
-        <div class="col-sm-4">
-          <div class="rui">
-            <div class="col-sm-6">
-              {{> productSearchSort sortOptions=sortOptions }}
-            </div>
-            <div class="col-sm-6">
-              {{> vendorFilter productSearchVendors=productSearchVendors}}
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-8">
           {{> productSearchTags tagSearchResults=tagSearchResults }}
-        </div>
         {{/if}}
       </div>
       
       {{> searchTypeToggle }}
 
     </div>
-
-    {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
     
+    <div class="row">
+      <div class="col-md-3" style="padding:10px 20px;">
+        {{#if productSearchResults}}
+          {{> productSearchSort options=productOptions selectOptions=productSelectOptions}}
+          {{> vendorFilter options=vendorOptions selectOptions=vendorSelectOptions }}
+        {{/if}}
+      </div>
+      <div class="col-md-9">
+        {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
+      </div>
+    </div>
+
   </div>
 
 </template>
