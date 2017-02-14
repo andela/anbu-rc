@@ -30,7 +30,10 @@
     },
     "BUILDPACK_CLEAR_CACHE": {
       "required": true
-    }
+    },
+		"METEOR_SETTINGS": {
+			"required": true
+		}
   },
   "formation": {
   },
