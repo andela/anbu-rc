@@ -33,6 +33,7 @@ Meteor.methods({
           amount,
           from: sender.emails[0].address,
           date: new Date(),
+          to: recipient.emails[0].address,
           transactionType: "Credit"
         });
       }
@@ -62,7 +63,7 @@ Meteor.methods({
     }
     const orderId = orderInfo._id;
     userId = orderInfo.userId;
-    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt};
+    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: 'admin', to: 'self'};
     try {
       Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
       return true;
@@ -79,6 +80,9 @@ Meteor.methods({
   "wallet/recipientDetails": (recipientEmail) => {
     check(recipientEmail, String);
     const recipient = Accounts.findOne({"emails.0.address": recipientEmail});
+    if (!recipient) {
+      return undefined;
+    }
     return recipient;
   }
 });
