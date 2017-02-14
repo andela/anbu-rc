@@ -177,7 +177,8 @@ Template.products.events({
 Template.socialTimeline.onCreated(function () {
   this.state = new ReactiveDict();
   this.state.setDefault({
-    timeline: {}
+    timeline: {},
+    fbWidth: 590
   });
 
   this.autorun(() => {
@@ -185,6 +186,13 @@ Template.socialTimeline.onCreated(function () {
     const socialConfig = Packages.findOne({
       name: "reaction-social"
     });
+
+    if (this.subscriptionsReady()) {
+      const width = document.getElementById("pad").offsetWidth;
+      if (typeof width === Number) {
+        this.state.set("fbWidth", width);
+      }
+    }
     this.state.set("timeline", socialConfig.settings.public.apps);
   });
 });
@@ -201,9 +209,8 @@ Template.socialTimeline.helpers({
     const facebookConfig = Template.instance().state.get("timeline").facebook;
     if (facebookConfig.enabled && facebookConfig.appId && facebookConfig.profilePage) {
       const index = facebookConfig.profilePage.lastIndexOf("/");
-      return `https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F${facebookConfig.profilePage.substr(index)}&tabs=timeline&width=1000&height=400&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=${facebookConfig.appId}`;
+      return `https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F${facebookConfig.profilePage.substr(index)}&tabs=timeline&width=${Template.instance().state.get("fbWidth")}&height=400&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false&appId=${facebookConfig.appId}`;
     }
     return false;
   }
-
 });
