@@ -74,7 +74,7 @@ function daysDifference(date1, date2) {
 
   const oneDay = 1000 * 60 * 60 * 24;
   // Calculate the difference in milliseconds
-  const difference = new Date(new Date(date2).setHours(0)) - new Date(new Date(date1).setHours(0));
+  const difference = new Date(new Date(date2).setHours(23)) - new Date(new Date(date1).setHours(0));
   // Convert back to days and return
   return Math.round(difference / oneDay);
 }
@@ -115,8 +115,8 @@ Template.actionableAnalytics.onCreated(function () {
     if (self.subscriptionsReady()) {
       const allOrders = Orders.find({
         createdAt: {
-          $gte: self.state.get("beforeDate"),
-          $lt: self.state.get("afterDate")
+          $gte: new Date(self.state.get("beforeDate").setHours(0)),
+          $lte: new Date(self.state.get("afterDate").setHours(23))
         }
       }).fetch();
       if (allOrders) {
@@ -135,8 +135,8 @@ Template.actionableAnalytics.onCreated(function () {
       if (productSub.ready()) {
         const products = ProductSearch.find({
           createdAt: {
-            $gte: self.state.get("beforeDate"),
-            $lt: self.state.get("afterDate")
+            $gte: new Date(self.state.get("beforeDate").setHours(0)),
+            $lte: new Date(self.state.get("afterDate").setHours(23))
           }
         }, {
           views: 1,
@@ -164,8 +164,8 @@ Template.actionableAnalytics.onRendered(() => {
     format: "DD/MM/YYYY",
     onSelect: function () {
       let nextDate = this.getDate();
-      nextDate = new Date(nextDate.setHours(23));
-      nextDate = new Date(nextDate.setMinutes(59));
+      // nextDate = new Date(nextDate.setHours(23));
+      // nextDate = new Date(nextDate.setMinutes(59));
       instance.state.set("afterDate", nextDate);
     }
   });
@@ -176,9 +176,9 @@ Template.actionableAnalytics.onRendered(() => {
     onSelect: function () {
       toDatePicker.setMinDate(this.getDate());
       let nextDate = this.getDate();
-      if (Date.parse(toDatePicker.getDate()) <= Date.parse(nextDate)) {
-        nextDate = new Date(nextDate.setHours(23));
-        nextDate = new Date(nextDate.setMinutes(59));
+      if (Date.parse(toDatePicker.getDate()) < Date.parse(nextDate)) {
+        // nextDate = new Date(nextDate.setHours(23));
+        // nextDate = new Date(nextDate.setMinutes(59));
         toDatePicker.setDate(nextDate);
       } else {
         instance.state.set("beforeDate", this.getDate());
@@ -188,7 +188,8 @@ Template.actionableAnalytics.onRendered(() => {
   fromDatePicker.setMaxDate(new Date());
   toDatePicker.setMaxDate(new Date());
   fromDatePicker.setDate(new Date());
-  toDatePicker.setDate(new Date(fromDatePicker.getDate().setHours(23)));
+  toDatePicker.setDate(fromDatePicker.getDate());
+  // toDatePicker.setDate(new Date(fromDatePicker.getDate().setHours(23)));
   // instance.state.set("salesPerDay", setUpAverageSales(instance.state.get("totalSales"), fromDatePicker.getDate(), toDatePicker.getDate()));
 });
 
