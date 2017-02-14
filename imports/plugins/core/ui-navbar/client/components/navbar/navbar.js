@@ -1,3 +1,5 @@
+import { Meteor } from "meteor/meteor";
+import { Template } from "meteor/templating";
 import { FlatButton } from "/imports/plugins/core/ui/client/components";
 import { Reaction, Router } from "/client/api";
 import { Tags, Accounts } from "/lib/collections";
@@ -5,6 +7,13 @@ import { playTour } from "/imports/plugins/included/tour/client/tour.js";
 
 Template.CoreNavigationBar.onCreated(function () {
   this.state = new ReactiveDict();
+  this.notifications = ReactiveVar();
+  this.autorun(() => {
+    const instance = this;
+    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
+      instance.notifications.set(!!res);
+    });
+  });
 });
 
 Template.CoreNavigationBar.onRendered(function () {
@@ -44,12 +53,6 @@ Template.CoreNavigationBar.helpers({
       component: FlatButton,
       icon: "fa fa-search",
       kind: "flat"
-      // onClick() {
-      //   Blaze.renderWithData(Template.searchModal, {
-      //   }, $("body").get(0));
-      //   $("body").css("overflow-y", "hidden");
-      //   $("#search-input").focus();
-      // }
     };
   },
   TourButtonComponent() {
@@ -93,5 +96,70 @@ Template.CoreNavigationBar.helpers({
         instance.toggleMenuCallback = callback;
       }
     };
+  },
+  currentUser() {
+    return Reaction.hasPermission("admin") ||
+    (!Reaction.hasPermission("anonymous")) ? true : false;
+  }
+});
+
+// notification template session
+Template.notificationItem.onCreated(function () {
+  this.notifications = ReactiveVar();
+  // Create an auto run to Check for notifications on page load
+  // and set the notification reactive variable.
+  this.autorun(() => {
+    const instance = this;
+    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
+      instance.notifications.set(res);
+    });
+  });
+});
+
+Template.notificationDropdown.onCreated(function () {
+  this.notifications = ReactiveVar();
+
+  // Create an auto run to Check for notifications on page load
+  // and set the notification reactive variable.
+  this.autorun(() => {
+    const instance = this;
+    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
+      instance.notifications.set(res.length);
+    });
+  });
+});
+
+Template.dropDownNotifications.events({
+    /**
+   * Clear Notifications
+   * @param  {Event} event - jQuery Event
+   * @return {void}
+   */
+  "click #clearNotifications": (event) => {
+    event.preventDefault();
+    Meteor.call("notifications/clearNotifications", Meteor.userId());
+    Meteor._reload.reload();
+  }
+});
+
+Template.notificationDropdown.helpers({
+  NotificationIcon() {
+  // Check if the user has pending notifications
+  // and set the appropriate Icon
+    return (Template.instance().notifications.get() > 0)
+    ? "fa fa-bell"
+    : "fa fa-bell-o";
+  },
+  NotificationCount() {
+    return Template.instance().notifications.get();
+  },
+  checkNotification() {
+    return (Template.instance().notifications.get() > 0);
+  }
+});
+Template.notificationItem.helpers({
+  showNotification() {
+    // Change the display state of the notification to show the latest notification when clicked
+    return Template.instance().notifications.get();
   }
 });

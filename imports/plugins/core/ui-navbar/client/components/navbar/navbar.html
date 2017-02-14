@@ -6,6 +6,12 @@
     <div class="menu">
       {{> tagNav tagNavProps}}
     </div>
+		{{#if currentUser}}
+      <div class="notificationList"></div>
+      <div class="notification" data-step="4" data-intro="Notification">
+        {{> note tpl="notificationDropdown"}}
+      </div>
+		{{/if}}
     
     <div class="tour">{{> React TourButtonComponent}}</div>
     <div class="accounts">{{> accounts tpl="staticPageNav"}}</div>
@@ -15,4 +21,47 @@
     <div class="cart">{{> cartIcon}}</div>
     <div class="cart-alert">{{> cartPanel}}</div>
   </div>
+</template>
+
+<template  name="notificationDropdown">
+ <div class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="1000">
+   <i class="{{NotificationIcon}}"><span class="badge badge-pill badge-info">{{NotificationCount}}</span></i>
+   <span class="caret"></span>
+ </div>
+ {{#if checkNotification}}
+   {{> dropDownNotifications}}
+ {{/if}}
+</template>
+
+<template name="dropDownNotifications">
+  <style>
+    .dropdown-menu {
+      color: #00ff00;
+      left: 50%;
+			width: 35%;
+    }
+  </style>
+ <div class="dropdown-menu" role="menu" >
+  <div class="user-notifications-dropdown">
+    <div class="user-notifications-dropdown-content">
+     {{> DropdownApps}}
+   </div>
+   <li class="divider"></li>
+   <div class="btn btn-primary btn-block" id="clearNotifications">Clear All</div>
+  </div>
+ </div>
+</template>
+
+<template name="DropdownApps">
+   <ul class="user-notifications-dropdown-apps">
+     {{> notificationItem}}
+   </ul>
+</template>
+
+<template name="notificationItem">
+   {{#each notification in showNotification}}
+     <li class="dropdown-apps-icon">
+       {{notification.message}}
+     </li>
+   {{/each}}
 </template>

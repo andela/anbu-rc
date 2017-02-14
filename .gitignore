@@ -42,3 +42,5 @@ imports/plugins/custom/*
 .env
 geckodriver
 selenium-server-standalone-3.0.1.jar
+settings.json
+.vscode
