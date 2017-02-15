@@ -1,6 +1,5 @@
 import { Template } from "meteor/templating";
 import { NumericInput } from "/imports/plugins/core/ui/client/components";
-import { Reaction } from "/client/api";
 
 Template.ordersListSummary.onCreated(function () {
   this.state = new ReactiveDict();
