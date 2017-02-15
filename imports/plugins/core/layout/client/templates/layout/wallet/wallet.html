@@ -57,35 +57,44 @@
       <div class="row">
         <h2>Transactions</h2>
 
-        <table class="table table-hover table-bordered">
-          <thead>
-            <tr>
-              <th>Transaction Type</th>
-              <th>Amount</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Order Id</th>
-              <th>Date and Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#if getTransactions 'gt' 0}}
-              {{#each transaction in getTransactions }}
-              <tr>
-                <td>{{capitalize transaction.transactionType}}</td>
-                <td>{{formatPrice transaction.amount}}</td>
-                <td>{{transaction.from}}</td>
-                <td>{{transaction.to}}</td>
-                <td>{{transaction.orderId}}</td>
-                <td>{{transaction.date}}</td>
-              </tr>
-              {{/each}}
-            {{else}}
-            <tr>You do not have any transaction yet!</tr>
-            {{/if}}
-          </tbody>
-        </table>
+        {{> transactionDetails}}
       </div>
     </div>
+  </div>
+</template>
+
+<template name="transactionDetails">
+  <div>
+    {{#if isReady}}
+    {{#if transactions 'gt' 0 }}
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>Transaction Type</th>
+          <th>Amount</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Order Id</th>
+          <th>Date and Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each transactions }}
+        <tr>
+          <td>{{capitalize transactionType}}</td>
+          <td>{{formatPrice amount}}</td>
+          <td>{{from}}</td>
+          <td>{{to}}</td>
+          <td>{{orderId}}</td>
+          <td>{{date}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+    <h3>You have not made any transaction yet</h3>
+    {{/if}}
+    {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-center" onClick=clickEvent}} {{else}}
+    Loading... {{/if}}
   </div>
 </template>

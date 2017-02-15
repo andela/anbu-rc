@@ -2,17 +2,26 @@
 import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 import { Reaction } from "/client/api";
-import { Accounts, Packages, Wallets, Shops } from "/lib/collections";
+import { Accounts, Packages, Wallets, Shops, Transactions } from "/lib/collections";
 
 Template.wallet.onCreated(function bodyOnCreated() {
   this.state = new ReactiveDict();
   this.state.setDefault({
-    details: { balance: 0, transactions: [] }
+    details: { balance: 0 }
   });
   this.autorun(() => {
     this.subscribe("transactionDetails", Meteor.userId());
     const transactionInfo = Wallets.find().fetch();
     this.state.set("details", transactionInfo[0]);
+  });
+});
+
+Template.transactionDetails.onCreated(function () {
+  this.pagination = new Meteor.Pagination(Transactions, {
+    sort: {
+      date: -1
+    },
+    perPage: 10
   });
 });
 
@@ -74,7 +83,8 @@ function handlePayment(result) {
           date: new Date(),
           transactionType: "Credit",
           from: "self",
-          to: "self"
+          to: "self",
+          userId: Meteor.userId()
         };
         finalizeDeposit(paystackMethod);
       }
@@ -132,10 +142,16 @@ Template.wallet.events({
       Alerts.toast("Invalid email address", "error");
       return false;
     } else if (senderEmail === recipient) {
-      Alerts.toast("You can not transfer money to yourself", "error");
+      Alerts.toast("You can not transfer from your wallet to the same wallet", "error");
       return false;
     }
-    const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit", from: senderEmail };
+    const transaction = { amount,
+      to: recipient,
+      date: new Date(),
+      transactionType: "Debit",
+      from: senderEmail,
+      userId: Meteor.userId()
+    };
     Meteor.call("wallet/recipientDetails", recipient, (err, res) => {
       if (res) {
         let message;
@@ -179,10 +195,23 @@ Template.wallet.events({
 Template.wallet.helpers({
   balance() {
     return Template.instance().state.get("details");
-  },
+  }
+});
 
-  getTransactions() {
-    const details = Template.instance().state.get("details");
-    return  details ? details.transactions : [];
+Template.transactionDetails.helpers({
+  isReady: function () {
+    return Template.instance().pagination.ready();
+  },
+  templatePagination: function () {
+    return Template.instance().pagination;
+  },
+  transactions: function () {
+    return Template.instance().pagination.getPage();
+  },
+  // optional helper used to return a callback that should be executed before changing the page
+  clickEvent: function () {
+    return function (e) {
+      e.preventDefault();
+    };
   }
 });
