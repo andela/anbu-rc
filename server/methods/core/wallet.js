@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { Wallets, Accounts, Notifications } from "/lib/collections";
+import { Wallets, Accounts, Notifications, Transactions } from "/lib/collections";
 import * as Schemas from "/lib/collections/schemas";
 import { check } from "meteor/check";
 
@@ -51,7 +51,9 @@ Meteor.methods({
           amount,
           from: sender.emails[0].address,
           date: new Date(),
-          transactionType: "Credit"
+          transactionType: "Credit",
+          to: "self",
+          userId: recipient._id
         });
       } else {
         notification = {
@@ -76,11 +78,14 @@ Meteor.methods({
       balanceOptions = {balance: -amount};
     }
 
+
     try {
       check(notification, Schemas.Notifications);
+      check(transactions, Schemas.Transaction);
       Notifications.insert(notification);
       Meteor.call("send/sms/alert", smsContent);
-      Wallets.update({userId}, {$push: {transactions: transactions}, $inc: balanceOptions}, {upsert: true});
+      Transactions.insert(transactions);
+      Wallets.update({ userId }, { $inc: balanceOptions }, { upsert: true });
       return 1;
     } catch (error) {
       return 0;
@@ -102,7 +107,15 @@ Meteor.methods({
     }
     const orderId = orderInfo._id;
     userId = orderInfo.userId;
-    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: "admin", to: "self"};
+    const transactions = {
+      amount,
+      userId,
+      orderId,
+      transactionType: "Refund",
+      date: orderInfo.updatedAt,
+      from: "admin",
+      to: "self"
+    };
     const notification = {
       userId: userId,
       name: "Money Refund",
@@ -113,9 +126,11 @@ Meteor.methods({
     };
     try {
       check(notification, Schemas.Notifications);
+      check(transactions, Schema.Transaction);
       Notifications.insert(notification);
       Meteor.call("send/sms/alert", smsContent);
-      Wallets.update({userId}, {$push: {transactions: transaction}, $inc: {balance: amount}}, {upsert: true});
+      Transactions.insert(transactions);
+      Wallets.update({ userId }, { $inc: { balance: amount} }, { upsert: true });
       return true;
     } catch (error) {
       return false;
