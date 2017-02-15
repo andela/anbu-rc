@@ -27,7 +27,7 @@ Template.coreOrderCancelOrder.events({
     const validateComment = (comment) => {
       check(comment, Match.OptionalOrNull(String));
       const reasons = [
-        " Item Out Of Stock",
+        "Item Out Of Stock",
         "Item Damaged",
         "Shipping Type Unavailable",
         "Cannot Ship To Location",
