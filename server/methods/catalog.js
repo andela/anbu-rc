@@ -1276,16 +1276,12 @@ Meteor.methods({
   "products/updateViews": (handle) => {
     check(handle, String);
     const product = Products.findOne({handle: handle});
-    let result = {};
+    let result;
+    let view = product.views || 0;
     if (product) {
-      const price = product.price || {range: "0.00 - 0.00", min: 0.00, max: 0.00};
-      product.views = product.views + 1;
-      product.price = price;
-      result = Products.upsert(product._id, {$set: product}, {
-        selector: {
-          type: product.type
-        }
-      });
+      view += 1;
+      const productUpdate = Object.assign({}, product, {views: view});
+      result = Products.upsert(product._id, {$set: productUpdate}, {validate: false});
     }
     return result;
   }
