@@ -51,9 +51,8 @@ Meteor.methods({
           amount,
           from: sender.emails[0].address,
           date: new Date(),
-          transactionType: "Credit",
-          to: "self",
-          userId: recipient._id
+          to: recipient.emails[0].address,
+          transactionType: "Credit"
         });
       } else {
         notification = {
@@ -107,6 +106,7 @@ Meteor.methods({
     }
     const orderId = orderInfo._id;
     userId = orderInfo.userId;
+<<<<<<< HEAD
     const transactions = {
       amount,
       userId,
@@ -116,6 +116,9 @@ Meteor.methods({
       from: "admin",
       to: "self"
     };
+=======
+    const transaction = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: "admin", to: "self"};
+>>>>>>> df1a0fcaed42853f8447df144931dfb95f988cf9
     const notification = {
       userId: userId,
       name: "Money Refund",

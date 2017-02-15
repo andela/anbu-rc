@@ -82,9 +82,8 @@ function handlePayment(result) {
           referenceId: paystackResponse.reference,
           date: new Date(),
           transactionType: "Credit",
-          from: "self",
-          to: "self",
-          userId: Meteor.userId()
+          from: self,
+          to: self
         };
         finalizeDeposit(paystackMethod);
       }
@@ -142,16 +141,10 @@ Template.wallet.events({
       Alerts.toast("Invalid email address", "error");
       return false;
     } else if (senderEmail === recipient) {
-      Alerts.toast("You can not transfer from your wallet to the same wallet", "error");
+      Alerts.toast("You can not transfer money to yourself", "error");
       return false;
     }
-    const transaction = { amount,
-      to: recipient,
-      date: new Date(),
-      transactionType: "Debit",
-      from: senderEmail,
-      userId: Meteor.userId()
-    };
+    const transaction = { amount, to: recipient, date: new Date(), transactionType: "Debit", from: senderEmail };
     Meteor.call("wallet/recipientDetails", recipient, (err, res) => {
       if (res) {
         let message;
@@ -185,7 +178,7 @@ Template.wallet.events({
           });
         });
       } else {
-        Alerts.toast("No user found with such email", "error");
+        Alerts.toast(`No user with email ${recipient}`, "error");
         return false;
       }
     });
