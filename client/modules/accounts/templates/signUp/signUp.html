@@ -1,4 +1,14 @@
 <template name="loginFormSignUpView">
+  <!-- add temporary styling for  radio buttons-->
+  <style>
+    #form-role span{
+      font-weight: bold;
+      margin-right: 10px
+    }
+    .help-block {
+      color: #a94442;
+    }
+  </style>
 
   <div class="loginForm-title">
     <h2 data-i18n="accountsUI.createAccount">Create an Account</h2>
@@ -15,6 +25,24 @@
   <form class="login-form" novalidate>
 
     {{> loginFormMessages messages=messages}}
+
+    <!-- Add user type radio button -->
+    <div id="form-role" class="form-group radio">
+      <span> I am a </span>
+      <label><input  class="user-role" value="noVendor" type="radio" name="role" checked>Customer</label>
+      <label><input class="user-role" value="isVendor" type="radio" name="role">Vendor</label>
+    </div>
+    <!-- end of radio button -->
+
+    <div class="form-group form-group-username {{hasError messages.errors.username}}">
+      <label for="username-{{uniqueId}}" class="control-label" data-i18n="accountsUI.username">Username</label>
+      <input id="username-{{uniqueId}}" class="form-control login-input--username" type="username" value="{{credentials.username}}">
+      {{#if hasError messages.errors.username}}
+        <span class="help-block">
+          {{i18n messages.errors.username.i18nKeyReason messages.errors.username.reason}}
+        </span>
+      {{/if}}
+    </div>
 
     <div class="form-group form-group-email {{hasError messages.errors.email}}">
       <label for="email-{{uniqueId}}" class="control-label" data-i18n="accountsUI.emailAddress">Email</label>
@@ -38,6 +66,41 @@
       {{/if}}
     </div>
 
+    <!-- show vendor form -->
+      {{#if showVendorForm}}
+        <fieldset>
+          <div class="row form-group col-md-12">
+            <label class="control-label">Shop Name</label>
+            <input class="form-control shop-name" type="text" pattern="\w{20}">
+            {{#if hasError messages.errors.shopName}}
+              <span class="help-block">
+                {{i18n messages.errors.shopName.i18nKeyReason messages.errors.shopName.reason}}
+              </span>
+            {{/if}}
+          </div>
+          <div class="row form-group col-md-12">
+            <label class="control-label">Phone</label>
+            <input class="form-control shop-phone" type="tel" pattern="([0-9]{3}\)|[0-9]{3}-)[0-9]{3}-[0-9]{4}$">
+            {{#if hasError messages.errors.shopPhone}}
+              <span class="help-block">
+                {{i18n messages.errors.shopPhone.i18nKeyReason messages.errors.shopPhone.reason}}
+              </span>
+            {{/if}}
+          </div>
+          <div class="row form-group col-md-12">
+            <label class="control-label">Shop Address</label>
+            <input class="form-control shop-address" type="text" pattern="\w{250}">
+            {{#if hasError messages.errors.shopAddress}}
+              <span class="help-block">
+                {{i18n messages.errors.shopAddress.i18nKeyReason messages.errors.shopAddress.reason}}
+              </span>
+            {{/if}}
+          </div>
+        </fieldset>
+      {{/if}}
+    <!-- end of vendor form -->
+    <br>
+
     <div class="form-group">
       <button class="btn btn-primary btn-block" type="Submit" data-i18n="accountsUI.signUpButton"  data-event-category="accounts" data-event-action="register">Register</button>
     </div>
@@ -45,7 +108,5 @@
     <div class="form-group">
       <a data-i18n="accountsUI.signIn"  data-event-category="accounts" data-event-action="signIn" href>Sign In</a>
     </div>
-
   </form>
-
 </template>

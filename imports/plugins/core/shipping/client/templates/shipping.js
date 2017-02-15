@@ -52,12 +52,13 @@ Template.shippingProviderTable.onCreated(function () {
 });
 
 Template.shippingProviderTable.helpers({
+  checkVendorId(vendorId) {
+    return Reaction.hasPermission(["admin"]) || vendorId === Meteor.userId();
+  },
   shipping() {
     const instance = Template.instance();
     if (instance.subscriptionsReady()) {
-      return Shipping.find({
-        shopId: Reaction.getShopId()
-      });
+      return Shipping.find({ methods: { vendorId: Meteor.userId() } });
     }
   }
 });
@@ -159,7 +160,9 @@ Template.addShippingMethod.events({
  */
 Template.shippingProviderTable.helpers({
   shipping() {
-    return Shipping.find();
+    const allShipping = Shipping.find().fetch();
+    return Reaction.hasPermission(["admin"]) ? allShipping
+      : allShipping.filter(shipping => shipping.vendorId === Meteor.userId());
   },
   selectedShippingMethod() {
     const session = Session.get("selectedShippingMethod");
@@ -255,6 +258,7 @@ AutoForm.hooks({
     onSubmit(insertDoc, updateDoc, currentDoc) {
       const providerId = currentDoc ?  currentDoc._id : Template.instance().parentTemplate(4).$(".delete-shipping-method").data("provider-id");
       let error;
+      insertDoc.vendorId = Meteor.userId();
       try {
         Meteor.call("shipping/methods/add", insertDoc, providerId);
         this.done();
@@ -283,7 +287,7 @@ AutoForm.hooks({
       // or where we are adding additional methods to an existing array of provider methods in the admin panel.
       const providerId = Template.instance().parentTemplate(4).$(".delete-shipping-method").data("provider-id");
       try {
-        _.extend(insertDoc, { _id: currentDoc._id });
+        _.extend(insertDoc, { _id: currentDoc._id, vendorId: Meteor.userId() });
         Meteor.call("shipping/methods/update", providerId, currentDoc._id, insertDoc);
         Session.set("updatedMethodObj", insertDoc);
         this.done();

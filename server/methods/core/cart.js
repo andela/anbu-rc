@@ -306,6 +306,8 @@ Meteor.methods({
     // `quantityProcessing`?
     let product;
     let variant;
+    let vendorId;
+
     Collections.Products.find({ _id: { $in: [
       productId,
       variantId
@@ -329,6 +331,11 @@ Meteor.methods({
       Logger.warn(`Product variant: ${ variantId } was not found in database`);
       throw new Meteor.Error(404, "ProductVariant not found",
         "ProductVariant with such id was not found!");
+    }
+    if (product.vendorDetail) {
+      vendorId = product.vendorDetail.userId;
+    } else {
+      vendorId = "";
     }
     // performs calculations admissibility of adding product to cart
     const quantity = quantityProcessing(product, variant, itemQty);
@@ -377,7 +384,8 @@ Meteor.methods({
           quantity: quantity,
           variants: variant,
           title: product.title,
-          type: product.type
+          type: product.type,
+          vendorId
         }
       }
     }, function (error, result) {

@@ -72,7 +72,10 @@ Meteor.methods({
           const newQuantitySold = product.quantitySold + item.quantity;
           const productUpdate = Object.assign({}, product, {quantitySold: newQuantitySold});
           // Might be a bug, but "update" refused to work, hence the use of the "upsert"" method.
-          Products.upsert(product._id, {$set: productUpdate}, {validate: false});
+// <<<<<<< HEAD
+//           Products.upsert(product._id, {$set: productUpdate}, {validate: false});
+// =======
+          Products.update({_id}, {$set: productUpdate}, {selector: {type: "simple"}});
         }
       }
       // check of existing reserved inventory for this cart
