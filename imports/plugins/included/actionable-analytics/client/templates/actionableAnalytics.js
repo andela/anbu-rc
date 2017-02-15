@@ -111,8 +111,7 @@ Template.actionableAnalytics.onCreated(function () {
   const self = this;
   self.autorun(() => {
     const orderSub = self.subscribe("Orders");
-    const productSub = self.subscribe("searchresults/actionableAnalytics");
-    if (self.subscriptionsReady()) {
+    if (orderSub.ready()) {
       const allOrders = Orders.find({
         createdAt: {
           $gte: new Date(self.state.get("beforeDate").setHours(0)),
@@ -129,26 +128,8 @@ Template.actionableAnalytics.onCreated(function () {
         self.state.set("analyticsStatement", analyticsItems.analyticsStatement);
         self.state.set("ordersAnalytics", analyticsItems.ordersAnalytics);
         self.state.set("ordersCancelled", analyticsItems.ordersCancelled);
-        orderSub.stop();
-      }
-
-      if (productSub.ready()) {
-        const products = ProductSearch.find({
-          createdAt: {
-            $gte: new Date(self.state.get("beforeDate").setHours(0)),
-            $lte: new Date(self.state.get("afterDate").setHours(23))
-          }
-        }, {
-          views: 1,
-          title: 1,
-          quantitySold: 1
-        }).fetch();
-        if (products) {
-          self.state.set("productsAnalytics", products);
-        }
-        productSub.stop();
         self.state.set("salesPerDay",
-          setUpAverageSales(self.state.get("totalSales"),
+        setUpAverageSales(self.state.get("totalSales"),
           self.state.get("beforeDate"),
           self.state.get("afterDate")));
       }
