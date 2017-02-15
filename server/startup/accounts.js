@@ -140,7 +140,6 @@ export default function () {
       // create wallet for new user
       Collections.Wallets.insert({
         userId: account.userId,
-        transactions: [],
         balance: 0.0
       });
 

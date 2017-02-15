@@ -101,3 +101,4 @@ practicalmeteor:mocha-console-runner
 nimble:restivus
 jss:bootstrap-multi-select
 mizzao:autocomplete
+kurounin:pagination-blaze
