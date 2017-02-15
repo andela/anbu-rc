@@ -144,9 +144,7 @@ Template.actionableAnalytics.onRendered(() => {
     field: $("#todatepicker")[0],
     format: "DD/MM/YYYY",
     onSelect: function () {
-      let nextDate = this.getDate();
-      // nextDate = new Date(nextDate.setHours(23));
-      // nextDate = new Date(nextDate.setMinutes(59));
+      const nextDate = this.getDate();
       instance.state.set("afterDate", nextDate);
     }
   });
@@ -156,10 +154,8 @@ Template.actionableAnalytics.onRendered(() => {
     format: "DD/MM/YYYY",
     onSelect: function () {
       toDatePicker.setMinDate(this.getDate());
-      let nextDate = this.getDate();
+      const nextDate = this.getDate();
       if (Date.parse(toDatePicker.getDate()) < Date.parse(nextDate)) {
-        // nextDate = new Date(nextDate.setHours(23));
-        // nextDate = new Date(nextDate.setMinutes(59));
         toDatePicker.setDate(nextDate);
       } else {
         instance.state.set("beforeDate", this.getDate());
