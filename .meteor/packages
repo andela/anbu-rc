@@ -102,3 +102,5 @@ nimble:restivus
 jss:bootstrap-multi-select
 mizzao:autocomplete
 kurounin:pagination-blaze
+mrt:moment
+richsilv:pikaday
