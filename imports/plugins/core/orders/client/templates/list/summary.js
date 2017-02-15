@@ -34,9 +34,6 @@ Template.ordersListSummary.helpers({
   },
 
   showCancelOrderForm() {
-    if (Reaction.hasPermission("createProduct")) {
-      return false;
-    }
     return !(this.order.workflow.status === "canceled"
     || this.order.workflow.status === "coreOrderWorkflow/completed");
   },
