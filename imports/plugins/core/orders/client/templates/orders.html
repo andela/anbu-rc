@@ -69,6 +69,11 @@
 
 
 <template name="orderStatusDetail">
+  <style>
+    #cancel-order {
+      display: none !important;
+    }
+  </style>
   <div class="col-xs-8">
     <div data-i18n="orderDetail.created">Created {{orderAge}} {{dateFormat createdAt format="MMM D, YYYY hh:mm:ss A"}}</div>
     <p>
