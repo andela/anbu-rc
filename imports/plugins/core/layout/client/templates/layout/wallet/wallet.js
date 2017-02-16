@@ -132,8 +132,8 @@ Template.wallet.events({
     const recipient = document.getElementById("recipient").value;
     const mailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,63}$/i;
     const senderEmail = getOwnerDetails();
-    if (isNaN(amount)) {
-      Alerts.toast("You entered an invalid number", "error");
+    if (isNaN(amount) || amount < 1) {
+      Alerts.toast("You entered an invalid amount", "error");
       return false;
     } else if (amount > Template.instance().state.get("details").balance) {
       Alerts.toast("Insufficient Balance", "error");

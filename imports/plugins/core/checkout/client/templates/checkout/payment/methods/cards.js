@@ -76,7 +76,8 @@ Template.walletPayment.events({
       amount: cartAmount,
       date: new Date(),
       orderId: transactionId,
-      transactionType: "Debit"
+      transactionType: "Debit",
+      userId: Meteor.userId()
     }, (err, res) => {
       if (res) {
         const paymentMethod = {
