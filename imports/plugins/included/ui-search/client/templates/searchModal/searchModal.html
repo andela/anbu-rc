@@ -19,13 +19,17 @@
     </div>
     
     <div class="row">
-      <div class="col-md-3" style="padding:10px 20px;">
+      <div class="col-md-12" style="padding-left:10px; padding-right: 10px; padding-bottom: 10px; background-color: #666666">
         {{#if productSearchResults}}
-          {{> productSearchSort options=productOptions selectOptions=productSelectOptions}}
+        <div class="col-md-5 col-md-push-1">
           {{> vendorFilter options=vendorOptions selectOptions=vendorSelectOptions }}
+        </div>
+        <div class="col-md-4 col-md-push-1">
+          {{> productSearchSort options=productOptions selectOptions=productSelectOptions}}
+        </div>
         {{/if}}
       </div>
-      <div class="col-md-9">
+      <div class="col-md-12" style="overflow-y: scroll">
         {{> searchResults productSearchResults=productSearchResults orderSearchResults=orderSearchResults accountSearchResults=accountSearchResults orderTable=orderTable accountTable=accountTable }}
       </div>
     </div>
