@@ -104,6 +104,7 @@ const payWithPaystack = (email, amount) => {
   const handler = PaystackPop.setup({
     key: paystackConfig.settings.publicKey,
     email: email,
+    ref: Random.id(16),
     amount: amount * 100,
     callback: handlePayment
   });
@@ -119,7 +120,7 @@ Template.wallet.events({
     if (!mailRegex.test(userMail)) {
       Alerts.toast("Invalid email address", "error");
       return false;
-    } else if (isNaN(amount)) {
+    } else if (isNaN(amount) || amount < 1) {
       Alerts.toast("Invalid amount entered", "error");
       return false;
     }
