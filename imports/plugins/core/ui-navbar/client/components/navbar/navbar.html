@@ -38,7 +38,7 @@
     .dropdown-menu {
       color: #00ff00;
       left: 50%;
-			width: 35%;
+      width: 35%;
     }
   </style>
  <div class="dropdown-menu" role="menu" >
@@ -53,9 +53,17 @@
 </template>
 
 <template name="DropdownApps">
+  <style>
+    .drop {
+      max-height: 200px;
+      overflow-y: scroll;
+    }
+  </style>
+  <div class="drop">
    <ul class="user-notifications-dropdown-apps">
      {{> notificationItem}}
    </ul>
+  </div>
 </template>
 
 <template name="notificationItem">
