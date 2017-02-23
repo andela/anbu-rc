@@ -76,7 +76,6 @@ class ProductDetailContainer extends Component {
       } else {
         productId = currentProduct._id;
         const isDigital = this.isDigital;
-        console.log(isDigital);
 
         if (productId) {
           Meteor.call("cart/addToCart", productId, currentVariant._id, quantity, isDigital, (error) => {
@@ -154,7 +153,7 @@ class ProductDetailContainer extends Component {
   }
 
   listenToIsDigital(isDigital) {
-    this.setState({ isDigital: isDigital })
+    this.setState({ isDigital: isDigital });
   }
 
   render() {
@@ -169,7 +168,6 @@ class ProductDetailContainer extends Component {
             onCartQuantityChange={this.handleCartQuantityChange}
             onViewContextChange={this.handleViewContextChange}
             socialComponent={<SocialContainer />}
-            topVariantComponent={<VariantListContainer />}
             isDigital={this.isDigital}
             topVariantComponent={<VariantListContainer product={this.props.product} isDigital={this.isDigital}/>}
             onDeleteProduct={this.handleDeleteProduct}

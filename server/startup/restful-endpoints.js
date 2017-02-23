@@ -19,7 +19,6 @@ export default () => {
           action() {
             if (Roles.userIsInRole(this.userId, ["owner", "admin"], Roles.GLOBAL_GROUP)) {
               const isCreated = collection.insert(this.bodyParams);
-              console.log(isCreated)
               if (isCreated) {
                 const record = collection.findOne(isCreated);
                 return {
@@ -64,7 +63,7 @@ export default () => {
               statusCode: 403,
               message: "You are not permitted to access this route",
               body: this.bodyParams
-            }
+            };
           }
         }
       }

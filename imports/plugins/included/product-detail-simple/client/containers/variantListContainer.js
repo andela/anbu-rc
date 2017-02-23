@@ -79,7 +79,8 @@ class VariantListContainer extends Component {
     this.state = {
       isDigital: true
     }
-  }
+  };
+  
   componentWillReceiveProps() {
     this.setState({});
   }
@@ -203,7 +204,7 @@ function composer(props, onData) {
   }
 
   let editable;
-  let products = props.products;
+  const products = props.products;
 
   if (Reaction.Router.getQueryParam("as") === "customer") {
     editable = false;
