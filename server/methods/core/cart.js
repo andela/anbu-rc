@@ -287,12 +287,14 @@ Meteor.methods({
    *  @param {String} productId - productId to add to Cart
    *  @param {String} variantId - product variant _id
    *  @param {Number} [itemQty] - qty to add to cart
+   *  @param {Boolean} isDigital - product is digital or not
    *  @return {Number|Object} Mongo insert response
    */
-  "cart/addToCart": function (productId, variantId, itemQty) {
+  "cart/addToCart": function (productId, variantId, itemQty, isDigital) {
     check(productId, String);
     check(variantId, String);
     check(itemQty, Match.Optional(Number));
+    check(isDigital, Boolean);
 
     const cart = Collections.Cart.findOne({ userId: this.userId });
     if (!cart) {
@@ -377,7 +379,9 @@ Meteor.methods({
           quantity: quantity,
           variants: variant,
           title: product.title,
-          type: product.type
+          type: product.type,
+          isDigital: product.isDigital,
+          downloadUrl: product.downloadUrl || ""
         }
       }
     }, function (error, result) {
@@ -578,6 +582,7 @@ Meteor.methods({
             _id: itemClone._id,
             productId: itemClone.productId,
             shopId: itemClone.shopId,
+            isDigital: itemClone.isDigital,
             variantId: itemClone.variants._id
           });
         }

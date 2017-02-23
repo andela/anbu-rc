@@ -16,6 +16,13 @@
           {{title}} <small>{{variants.title}}</small>
         </div>
 
+        {{#if showDownload}}
+        <iframe id="download-frame" style="display:none;"></iframe> 
+        <div class="order-detail-title">
+          <a href="{{downloadUrl}}" id="download-product" class="btn btn-success" download>Download Now</a>
+        </div>
+        {{/if}}
+
         <div class="order-detail-quantity">
         </div>
 
