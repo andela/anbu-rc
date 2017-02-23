@@ -103,7 +103,8 @@ function markInventoryShipped(doc) {
       quantity: orderItem.quantity,
       productId: orderItem.productId,
       variants: orderItem.variants,
-      title: orderItem.title
+      title: orderItem.title,
+      isDigital: orderItem.isDigital
     };
     cartItems.push(cartItem);
   }
@@ -120,7 +121,8 @@ function markInventorySold(doc) {
       quantity: orderItem.quantity,
       productId: orderItem.productId,
       variants: orderItem.variants,
-      title: orderItem.title
+      title: orderItem.title,
+      isDigital: orderItem.isDigital
     };
     cartItems.push(cartItem);
   }

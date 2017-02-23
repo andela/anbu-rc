@@ -1,5 +1,4 @@
 <template name="dashboardOrdersList">
-
 {{#each orders data=data}}
   <div class="panel panel-default order-list-detail">
     <div class="panel-heading">
@@ -93,7 +92,7 @@
     </div>
 
     <div class="panel-footer">
-      {{> ordersListSummary order=.}}
+      {{> ordersListSummary order=. }}
     </div>
     {{#if hasComment}}
       <div class="panel-footer">

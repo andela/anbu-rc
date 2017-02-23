@@ -1,6 +1,5 @@
 import { Template } from "meteor/templating";
 import { NumericInput } from "/imports/plugins/core/ui/client/components";
-import { Reaction } from "/client/api";
 
 Template.ordersListSummary.onCreated(function () {
   this.state = new ReactiveDict();
@@ -34,9 +33,6 @@ Template.ordersListSummary.helpers({
   },
 
   showCancelOrderForm() {
-    if (Reaction.hasPermission("createProduct")) {
-      return false;
-    }
     return !(this.order.workflow.status === "canceled"
     || this.order.workflow.status === "coreOrderWorkflow/completed");
   },

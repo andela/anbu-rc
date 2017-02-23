@@ -24,7 +24,7 @@
         <div class="panel-content">
           <form id="deposit">
             <div class="row form-group col-md-6 col-md-offset-3">
-              <input id="depositAmount" class="form-control" type="text" placeholder="Amount">
+              <input id="depositAmount" class="form-control" type="number" placeholder="Amount">
             </div>
             <button type="submit" class="row col-md-2 col-md-offset-5 btn btn-success">Deposit</button>
           </form>
@@ -42,7 +42,7 @@
         <div class="panel-content">
           <form id="transfer">
             <div class="col-xs-6">
-              <input id="transferAmount" class="form-control" type="text" name="amount" placeholder="Amount">
+              <input id="transferAmount" class="form-control" type="number" name="amount" placeholder="Amount">
             </div>
             <div class="col-xs-6">
               <input id="recipient" class="form-control" type="email" name="email" placeholder="Beneficiary Email">
@@ -57,35 +57,44 @@
       <div class="row">
         <h2>Transactions</h2>
 
-        <table class="table table-hover table-bordered">
-          <thead>
-            <tr>
-              <th>Transaction Type</th>
-              <th>Amount</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Order Id</th>
-              <th>Date and Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#if getTransactions 'gt' 0}}
-              {{#each transaction in getTransactions }}
-              <tr>
-                <td>{{capitalize transaction.transactionType}}</td>
-                <td>{{formatPrice transaction.amount}}</td>
-                <td>{{transaction.from}}</td>
-                <td>{{transaction.to}}</td>
-                <td>{{transaction.orderId}}</td>
-                <td>{{transaction.date}}</td>
-              </tr>
-              {{/each}}
-            {{else}}
-            <tr>You do not have any transaction yet!</tr>
-            {{/if}}
-          </tbody>
-        </table>
+        {{> transactionDetails}}
       </div>
     </div>
+  </div>
+</template>
+
+<template name="transactionDetails">
+  <div>
+    {{#if isReady}}
+    {{#if transactions 'gt' 0 }}
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr>
+          <th>Transaction Type</th>
+          <th>Amount</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Order Id</th>
+          <th>Date and Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each transactions }}
+        <tr>
+          <td>{{capitalize transactionType}}</td>
+          <td>{{formatPrice amount}}</td>
+          <td>{{from}}</td>
+          <td>{{to}}</td>
+          <td>{{orderId}}</td>
+          <td>{{date}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+    <h3>You have not made any transaction yet</h3>
+    {{/if}}
+    {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-center" onClick=clickEvent}} {{else}}
+    Loading... {{/if}}
   </div>
 </template>

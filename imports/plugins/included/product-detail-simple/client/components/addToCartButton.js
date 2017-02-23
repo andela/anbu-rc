@@ -18,6 +18,7 @@ class AddToCartButton extends Component {
           min="1"
           name="addToCartQty"
           onChange={this.hanleCartQuantityChange}
+          type={this.props.inputType}
           type="number"
           value={this.props.cartQuantity}
         />
@@ -35,6 +36,7 @@ class AddToCartButton extends Component {
 
 AddToCartButton.propTypes = {
   cartQuantity: PropTypes.number,
+  inputType: PropTypes.string,
   onCartQuantityChange: PropTypes.func,
   onClick: PropTypes.func
 };

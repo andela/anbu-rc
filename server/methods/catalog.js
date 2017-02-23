@@ -1266,9 +1266,6 @@ Meteor.methods({
 
     // if collection updated we return new `isVisible` state
     return res === 1 && !product.isVisible;
-
-    Logger.debug("invalid product visibility ", productId);
-    throw new Meteor.Error(400, "Bad Request");
   },
 
   /**
@@ -1279,9 +1276,9 @@ Meteor.methods({
   "products/updateViews": (handle) => {
     check(handle, String);
     const product = Products.findOne({handle: handle});
-    let result;
-    let view = product.views || 0;
+    let result = {};
     if (product) {
+      let view = product.views || 0;
       view += 1;
       const productUpdate = Object.assign({}, product, {views: view});
       result = Products.upsert(product._id, {$set: productUpdate}, {validate: false});

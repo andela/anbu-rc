@@ -5,6 +5,7 @@ import Packages from "./packages";
 import Registry from "./registry";
 import Init from "./init";
 import RestfulApi from "./restful-endpoints";
+import DigitalProducts from "./product-upload";
 
 export default function () {
   Accounts();
@@ -14,4 +15,5 @@ export default function () {
   Registry();
   Init();
   RestfulApi();
+  DigitalProducts();
 }

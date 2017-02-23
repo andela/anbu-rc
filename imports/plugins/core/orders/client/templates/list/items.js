@@ -49,6 +49,7 @@ Template.ordersListItems.helpers({
           foundItem.quantity++;
         } else {
           // Otherwise push the unique item into the combinedItems array
+          orderItem.showDownload = (orderItem.isDigital && order.workflow.status === "coreOrderWorkflow/completed");
           combinedItems.push(orderItem);
         }
       }
@@ -68,5 +69,13 @@ Template.ordersListItems.helpers({
       format: currencyFormat,
       isEditing: false
     };
+  }
+});
+
+Template.ordersListItems.events({
+  "click #download-product": (event) => {
+    // event.preventDefault();
+    const url = event.target.href;
+    $("#download-frame").src = url;
   }
 });
