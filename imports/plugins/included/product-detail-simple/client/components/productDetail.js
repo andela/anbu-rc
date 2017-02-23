@@ -177,7 +177,7 @@ class ProductDetail extends Component {
             <option value="audio">Audio</option>
             <option value="book">Book</option>
             <option value="video">Video</option>
-            <option value="software">Software</option>
+            <option value="images">Image</option>
           </FieldGroup>
           {this.showDownloadControls()}
         </div>
