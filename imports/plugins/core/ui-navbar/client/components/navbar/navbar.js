@@ -2,16 +2,19 @@ import { Meteor } from "meteor/meteor";
 import { Template } from "meteor/templating";
 import { FlatButton } from "/imports/plugins/core/ui/client/components";
 import { Reaction, Router } from "/client/api";
-import { Tags, Accounts } from "/lib/collections";
+import { Tags, Accounts, Notifications } from "/lib/collections";
 import { playTour } from "/imports/plugins/included/tour/client/tour.js";
 
 Template.CoreNavigationBar.onCreated(function () {
   this.state = new ReactiveDict();
   this.notifications = ReactiveVar();
   this.autorun(() => {
-    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
-      Session.set("itemList", res);
-    });
+    const sub = this.subscribe("getNotification", Meteor.userId());
+    if (sub.ready()) {
+      let getNot = Notifications.find({ userId: Meteor.userId() }).fetch();
+      Session.set("itemList", getNot);
+      Session.set("itemLength", getNot.length);
+    }
   });
 });
 
@@ -100,30 +103,6 @@ Template.CoreNavigationBar.helpers({
     return Reaction.hasPermission("admin") ||
     (!Reaction.hasPermission("anonymous")) ? true : false;
   }
-});
-
-// notification template session
-Template.notificationItem.onCreated(function () {
-  this.notifications = ReactiveVar();
-  // Create an auto run to Check for notifications on page load
-  // and set the notification reactive variable.
-  this.autorun(() => {
-    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
-      Session.set("itemList", res);
-    });
-  });
-});
-
-Template.notificationDropdown.onCreated(function () {
-  this.notifications = ReactiveVar();
-
-  // Create an auto run to Check for notifications on page load
-  // and set the notification reactive variable.
-  this.autorun(() => {
-    Meteor.call("notifications/getNotifications", Meteor.userId(), (err, res) => {
-      Session.set("itemLength", res.length);
-    });
-  });
 });
 
 Template.dropDownNotifications.events({
