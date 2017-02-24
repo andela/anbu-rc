@@ -1,0 +1,144 @@
+import { Meteor } from "meteor/meteor";
+import { Wallets, Accounts, Notifications, Transactions } from "/lib/collections";
+import * as Schemas from "/lib/collections/schemas";
+import { check } from "meteor/check";
+
+Meteor.methods({
+
+  /**
+  * wallet/deposit method to deposit money into user's account
+  * @param {string} userId the id of the user
+  * @param {object} transactions details of the transaction
+  * @return {boolean} true or false if the db operation was successful
+  */
+  "wallet/transaction": (userId, transactions) => {
+    transactions.amount = transactions.amount;
+    let notification = {};
+    let smsContent = {};
+    let alertPhone;
+    check(userId, String);
+    check(transactions, Schemas.Transaction);
+    let balanceOptions;
+    const {amount, transactionType, from, date} = transactions;
+    if (transactionType === "Credit") {
+      balanceOptions = {balance: amount};
+      notification = {
+        userId: userId,
+        name: "Credit Transaction",
+        type: transactionType,
+        message: `Credit Alert!
+				${amount} has been credited into your account by ${from} on ${date}, Balance: ${balanceOptions.balance}`,
+        orderId: transactions.referenceId || "00000"
+      };
+    }
+    if (transactionType === "Debit") {
+      if (transactions.to) {
+        const recipient = Accounts.findOne({"emails.0.address": transactions.to});
+        const sender = Accounts.findOne(userId);
+        if (!recipient) {
+          return 2;
+        }
+        notification = {
+          userId: userId,
+          name: "Debit Transaction",
+          type: transactionType,
+          message: `Debit Alert! 
+					${amount} has been transfered from your account to ${recipient._id}`,
+          orderId: transactions.referenceId || "00000"
+        };
+        // deposit for the recipient
+        Meteor.call("wallet/transaction", recipient._id, {
+          amount,
+          from: sender.emails[0].address,
+          date: new Date(),
+          to: recipient.emails[0].address,
+          transactionType: "Credit"
+        });
+      } else {
+        notification = {
+          userId: userId,
+          name: "Debit Transaction",
+          type: transactionType,
+          message: `Debit Alert! 
+					${amount} was deducted from your account for the payment of the order you made;
+          Order Id: ${transactions.orderId}
+					Date: ${transactions.date}`,
+          orderId: transactions.orderId || "00000"
+        };
+        alertPhone = Accounts.findOne(userId).profile.addressBook[0].phone;
+        smsContent = {
+          to: alertPhone,
+          message:
+          `Debit Alert! ${amount} was deducted from your account for the payment of the order you made;
+           Order Id: ${transactions.orderId}
+					 Date: ${transactions.date}`
+        };
+      }
+      balanceOptions = {balance: -amount};
+    }
+
+
+    try {
+      check(notification, Schemas.Notifications);
+      check(transactions, Schemas.Transaction);
+      Notifications.insert(notification);
+      Meteor.call("send/sms/alert", smsContent);
+      Transactions.insert(transactions);
+      Wallets.update({ userId }, { $inc: balanceOptions }, { upsert: true });
+      return 1;
+    } catch (error) {
+      return 0;
+    }
+  },
+
+  /**
+  * wallet/refund method to return fund when an order is canceled
+  * @param {string} orderInfo the id of the logged in user
+  * @param {string} userId the order reference id
+  * @param {int} amount the amount to refund
+  * @return {boolean} true if the refund was successful
+  */
+  "wallet/refund": (orderInfo) => {
+    check(orderInfo, Object);
+    let amount = orderInfo.billing[0].invoice.total;
+    if (orderInfo.workflow.status === "coreOrderWorkflow/completed") {
+      amount -= orderInfo.billing[0].invoice.shipping;
+    }
+    const orderId = orderInfo._id;
+    userId = orderInfo.userId;
+    const transactions = {amount, orderId, transactionType: "Refund", date: orderInfo.updatedAt, from: "admin", to: "self"};
+    const notification = {
+      userId: userId,
+      name: "Money Refund",
+      type: "Refund",
+      message: `Refund!
+			${amount} has been refunded into your account based on canceled order ${orderId}`,
+      orderId: orderId
+    };
+    try {
+      check(notification, Schemas.Notifications);
+      check(transactions, Schema.Transaction);
+      Notifications.insert(notification);
+      Meteor.call("send/sms/alert", smsContent);
+      Transactions.insert(transactions);
+      Wallets.update({ userId }, { $inc: { balance: amount} }, { upsert: true });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  /**
+  * wallet/recipientDetails method to return the details of the recipient
+  * @param {string} recipientEmail the email of the recipient
+  * @return {object} the details of the recipient
+  */
+  "wallet/recipientDetails": (recipientEmail) => {
+    check(recipientEmail, String);
+    const recipient = Accounts.findOne({"emails.0.address": recipientEmail});
+    if (!recipient) {
+      return undefined;
+    }
+    return recipient;
+  }
+});

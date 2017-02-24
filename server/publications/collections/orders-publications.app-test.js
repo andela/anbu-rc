@@ -69,7 +69,7 @@ describe("Order Publication", function () {
       expect(data.shopId).to.equal(order.shopId);
     });
 
-    it("should not return shop orders for non admin", function () {
+    it("should return shop orders for vendors", function () {
       sandbox.stub(Collections.Orders._hookAspects.insert.before[0], "aspect");
       sandbox.stub(Collections.Orders._hookAspects.update.before[0], "aspect");
       sandbox.stub(Reaction, "hasPermission", () => true);
@@ -80,11 +80,11 @@ describe("Order Publication", function () {
         check(arguments, [Match.Any]);
       });
       sandbox.stub(Reaction, "getShopId", () => shop._id);
-      sandbox.stub(Roles, "userIsInRole", () => false);
+      sandbox.stub(Roles, "userIsInRole", () => true);
       order = Factory.create("order", { status: "created" });
       const publication = Meteor.server.publish_handlers["Orders"];
       const cursor = publication.apply(thisContext);
-      expect(cursor.fetch().length).to.equal(0);
+      expect(cursor.fetch().length > 0).to.equal(true);
     });
   });
 });

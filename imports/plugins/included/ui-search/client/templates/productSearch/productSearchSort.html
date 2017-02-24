@@ -1,10 +1,6 @@
 <template name="productSearchSort">
-  <label>Sort By: </label>
-  <div class="rui select">
-    <select data-event-action="sortSearchResult">
-      {{#each option in sortOptions}}
-        <option value={{option}}>{{option}}</option>
-      {{/each}}
-    </select>
+  <div class="rui" style="margin-top: 20px">
+    <label>Sort By: </label>
+    {{> MultiSelect id="options-select" name="options-select" options=options selectOptions=selectOptions}}
   </div>
 </template>

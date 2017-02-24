@@ -1,5 +1,4 @@
 <template name="dashboardOrdersList">
-
 {{#each orders data=data}}
   <div class="panel panel-default order-list-detail">
     <div class="panel-heading">
@@ -19,11 +18,7 @@
           </strong>
         </div>
         <div class="col-xs-6 col-sm-10">
-          {{#if orderStatus}}
-              <span data-i18n="order.completed">Completed</span>
-          {{else}}
-              <span data-i18n="order.processing">Processing</span>
-          {{/if}}
+          {{ orderStatus }}
         </div>
       </div>
 
@@ -97,8 +92,13 @@
     </div>
 
     <div class="panel-footer">
-      {{> ordersListSummary order=.}}
+      {{> ordersListSummary order=. }}
     </div>
+    {{#if hasComment}}
+      <div class="panel-footer">
+        {{> ordersListComment comments=comments}}
+      </div>
+    {{/if}}
   </div>
 
 {{else}}
@@ -106,4 +106,15 @@
     <span data-i18n="cartCompleted.noOrdersFound">No orders found.</span>
   </div>
 {{/each}}
+</template>
+
+<template name="ordersListComment">
+  <div>
+    <strong>Comments</strong>
+    {{#each comments}}
+      <div>
+        <p><b>{{dateFormat createdAt format="MMM D h:mm"}}</b> - {{body}}</p>
+      </div>
+    {{/each}}
+  </div>
 </template>
