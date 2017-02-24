@@ -668,8 +668,39 @@ Meteor.methods({
       return Products.insert(product);
     }
 
+    if (Reaction.hasPermission("owner")) {
+      return Products.insert({
+        type: "simple",
+        vendor: "Reaction",
+        vendorDetail: {
+          userId: "andelasquad",
+          shopName: "Reaction",
+          shopPhone: "08166910264",
+          shopAddress: "Ikorodu Road, Lagos"
+        }// needed for multi-schema
+      }, {
+        validate: false
+      }, (error, result) => {
+        // additionally, we want to create a variant to a new product
+        if (result) {
+          Products.insert({
+            ancestors: [result],
+            price: 0.00,
+            title: "",
+            type: "variant" // needed for multi-schema
+          });
+        }
+      });
+    }
     return Products.insert({
-      type: "simple" // needed for multi-schema
+      type: "simple", // needed for multi-schema
+      vendor: Meteor.user().profile.vendor[1].shopName,
+      vendorDetail: {
+        userId: Meteor.userId(),
+        shopName: Meteor.user().profile.vendor[1].shopName,
+        shopPhone: Meteor.user().profile.vendor[1].shopPhone,
+        shopAddress: Meteor.user().profile.vendor[1].shopAddress
+      }
     }, {
       validate: false
     }, (error, result) => {
@@ -1266,9 +1297,6 @@ Meteor.methods({
 
     // if collection updated we return new `isVisible` state
     return res === 1 && !product.isVisible;
-
-    Logger.debug("invalid product visibility ", productId);
-    throw new Meteor.Error(400, "Bad Request");
   },
 
   /**
@@ -1279,9 +1307,9 @@ Meteor.methods({
   "products/updateViews": (handle) => {
     check(handle, String);
     const product = Products.findOne({handle: handle});
-    let result;
-    let view = product.views || 0;
+    let result = {};
     if (product) {
+      let view = product.views || 0;
       view += 1;
       const productUpdate = Object.assign({}, product, {views: view});
       result = Products.upsert(product._id, {$set: productUpdate}, {validate: false});

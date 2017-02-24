@@ -82,6 +82,23 @@ export default function () {
     const shopId = shop._id;
     const defaultVisitorRole =  ["anonymous", "guest", "product", "tag", "index", "cart/checkout", "cart/completed"];
     const defaultRoles =  ["guest", "account/profile", "product", "tag", "index", "cart/checkout", "cart/completed"];
+    const vendorRoles = [
+      "reaction-orders",
+      "reaction-dashboard",
+      "dashboard",
+      "createProduct",
+      "orders",
+      "dashboard/orders",
+      "guest",
+      "account/profile",
+      "product",
+      "tag",
+      "index",
+      "cart/checkout",
+      "cart/completed",
+      "reaction-shipping",
+      "shipping"
+    ];
     const roles = {};
     const additionals = {
       profile: Object.assign({}, options && options.profile)
@@ -140,7 +157,6 @@ export default function () {
       // create wallet for new user
       Collections.Wallets.insert({
         userId: account.userId,
-        transactions: [],
         balance: 0.0
       });
 
@@ -151,9 +167,17 @@ export default function () {
         Meteor.call("accounts/sendWelcomeEmail", shopId, user._id);
       }
 
+      // add vendor's roles
+      if (options.profile) {
+        user.profile = { vendor: [ true, options.profile] };
+        roles[shopId] = vendorRoles;
+      } else {
+        user.profile = { vendor: [false] };
+      }
+
       // assign default user roles
       user.roles = roles;
-
+      // options.profile ? (user.vendor = options.profile) : (user.vendor = false);
       // run onCreateUser hooks
       // (the user object must be returned by all callbacks)
       const userDoc = Hooks.Events.run("onCreateUser", user, options);

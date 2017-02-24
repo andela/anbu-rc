@@ -55,7 +55,7 @@ Template.loginFormSignInView.events({
 
     if ($.isEmptyObject(errors) === false) {
       templateInstance.formMessages.set({
-        errors: errors
+        errors
       });
 
       // prevent password reset

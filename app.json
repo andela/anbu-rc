@@ -31,7 +31,7 @@
     "BUILDPACK_CLEAR_CACHE": {
       "required": true
     },
-		"SMS": {
+		"METEOR_SETTINGS": {
 			"required": true
 		}
   },
