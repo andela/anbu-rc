@@ -15,23 +15,56 @@ export default () => {
         authRequired: true
       },
       endpoints: {
-        put: {
+        post: {
           action() {
-            const isUpdated = collection.update(this.urlParams.id, {
-              $set: this.bodyParams
-            });
-            if (isUpdated) {
-              const record = collection.findOne(this.urlParams.id);
+            if (Roles.userIsInRole(this.userId, ["owner", "admin"], Roles.GLOBAL_GROUP)) {
+              const isCreated = collection.insert(this.bodyParams);
+              console.log(isCreated)
+              if (isCreated) {
+                const record = collection.findOne(isCreated);
+                return {
+                  statusCode: 201,
+                  status: "success",
+                  data: record
+                };
+              }
               return {
-                status: "success",
-                data: record
+                statusCode: 500,
+                message: "An error occured while trying to insert the document",
+                body: this.bodyParams
               };
             }
             return {
-              statusCode: 404,
-              message: "Item not found",
+              statusCode: 403,
+              message: "You are not permitted to access this route",
               body: this.bodyParams
-            };
+            }
+          }
+        },
+        put: {
+          action() {
+            if (Roles.userIsInRole(this.userId, ["owner", "admin"], Roles.GLOBAL_GROUP)) {
+              const isUpdated = collection.update(this.urlParams.id, {
+              $set: this.bodyParams
+              });
+              if (isUpdated) {
+                const record = collection.findOne(this.urlParams.id);
+                return {
+                  status: "success",
+                  data: record
+                };
+              }
+              return {
+                statusCode: 404,
+                message: "Item not found",
+                body: this.bodyParams
+              };
+            }
+            return {
+              statusCode: 403,
+              message: "You are not permitted to access this route",
+              body: this.bodyParams
+            }
           }
         }
       }
